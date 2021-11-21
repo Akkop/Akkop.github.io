@@ -19,7 +19,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"guohaojie.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"guohaojie.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="我们提着过去，走入人群">
@@ -136,7 +136,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档<span class="badge">1</span></a>
+    <a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档<span class="badge">2</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -218,16 +218,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-11-18 14:23:51" itemprop="dateCreated datePublished" datetime="2021-11-18T14:23:51+08:00">2021-11-18</time>
+              <time title="创建时间：2021-11-22 02:35:08 / 修改时间：02:33:16" itemprop="dateCreated datePublished" datetime="2021-11-22T02:35:08+08:00">2021-11-22</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-21 22:22:32" itemprop="dateModified" datetime="2021-11-21T22:22:32+08:00">2021-11-21</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -244,7 +238,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.4k</span>
+              <span>1.5k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -263,64 +257,110 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h5 id="功能模块划"><a href="#功能模块划" class="headerlink" title="功能模块划"></a>功能模块划</h5><p>Server层</p>
-<p>​        ——连接器（管理接连，权限验证）</p>
-<p>​        ——查询缓存</p>
-<p>​        ——分析器（词法分析，语法分析）</p>
-<p>​        ——优化器（执行计划生成，索引选择）</p>
-<p>​        ——执行器（操作引擎，返回结果）</p>
-<p>​        ——存储过程，触发器，视图等等。</p>
-<p>存储引擎层</p>
-<p>​        ——数据的存储和提取。</p>
-<p>MySQL 默认存储引擎是 InnoDB ，创建表的时候，如不指定引擎类型，默认InnoDB</p>
-<h5 id="SQL-执行过程"><a href="#SQL-执行过程" class="headerlink" title="SQL 执行过程"></a>SQL 执行过程</h5><p>连接器负责对客户端建立链接，获取权限，维持和管理连接</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">mysql -h ip -P port -u user -p</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+          <p>主要有mysq来的模块划分，以及mysql的分析器，优化器，执行器的概述</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/0.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
 
-<p>账户·密码正确，连接器查询权限获得权限，自此，断开连接之前都是该权限。</p>
-<p>连接完成后，没有动作，即 sleep 处于空闲状态。可以使用 show processlist 查看</p>
-<p>默认断开时间 8 小时 由 wait_timeout 控制，当断开后继续执行，抛出错误信息 lost connection 需要重新连接。</p>
-<p>长连接：客户持续有请求，则一直使用同一个连接</p>
-<p>短连接：每次执行完很少几次查询就会断开，下次查询重新建立</p>
-<p>减少建立连接，尽量使用长连接。</p>
-<p>若都是长连接，MySQL 占用内存涨的很快，因为 MySQL 执行过程中临时使用的内存管理在连接对象里面，要在断开连接时才会释放。长期积累 可能会 OOM MySQL 异常重启。</p>
-<p>—— 定期断开长连接。</p>
-<p>——使用mysql_reset_connection来重新初始化连接资源</p>
-<h5 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h5><p>MySQL建立连接后，执行sql</p>
-<p>执行前，判断之前是否执行过</p>
-<p>执行过，通过sql(key)直接返回数据（value）</p>
-<p>没有执行过，查询出结果，并放到缓存中</p>
-<p>多命中缓存，效率高</p>
-<p>大多数情况不建议使用查询缓存，因为可能弊大于利</p>
-<p>1。缓存需要语句完全相等，包括参数。</p>
-<p>2。表更新后就会失效 因此，只有在表更新频率不高，查询语句完全一致的情况下，可以手动开启缓存，其他一律关闭。 </p>
-<p>注意：mysql8之后，取消了缓存功能。</p>
-<p>可以使用 query_cache_type 设置成 DEMAND 来进行按需缓存 通过 SQL_CACHE 显示执行。</p>
-<figure class="highlight axapta"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> SQL_CACHE * <span class="keyword">from</span> T <span class="keyword">where</span> ID=<span class="number">10</span>；</span><br></pre></td></tr></table></figure>
+    
+    
+     >
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
 
-<p>MySQL 8.0 直接不使用缓存了</p>
-<p>可是使用 show variables 来查看服务器配置信息。</p>
-<h5 id="分析器"><a href="#分析器" class="headerlink" title="分析器"></a>分析器</h5><p>未命中缓存，进入分析器，进行查询。</p>
-<p>分析器首先做词法分析，它要知道这个语句中的单词是什么意思</p>
-<p>分析器再进行语法分析，词法分析结果，语法分析器根据语法规则判断 SQL 语句是否满足 SQL 语法</p>
-<p>表名和列名在分析语法时就已经确定过了</p>
-<p>You have an error in your SQL syntax  关注 use near 的解析</p>
-<p>分析器干两件事：</p>
-<ol>
-<li>解析语句，生成解析树 </li>
-<li>检查语句中的关键词，表，字段是否存在</li>
-</ol>
-<h5 id="优化器"><a href="#优化器" class="headerlink" title="优化器"></a>优化器</h5><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">mysql</span>&gt; select * from t<span class="number">1</span> join t<span class="number">2</span> using(ID)  where t<span class="number">1</span>.c=<span class="number">10</span> and t<span class="number">2</span>.d=<span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://guohaojie.com/0.html">
 
-<p>既可以先从表 t1 里面取出 c=10 的记录的 ID 值，再根据 ID 值关联到表 t2，再判断 t2 里面 d 的值是否等于 20。</p>
-<p>也可以先从表 t2 里面取出 d=20 的记录的 ID 值，再根据 ID 值关联到 t1，再判断 t1 里面 c 的值是否等于 10。</p>
-<p>执行效率不同</p>
-<p>尽可能扫描少的数据库行纪录</p>
-<p>优化器是在表里面有多个索引的时候，决定使用哪个索引；</p>
-<h5 id="执行器"><a href="#执行器" class="headerlink" title="执行器"></a>执行器</h5><p>判断是否对 表 T 有执行查询的权限</p>
-<p>权限验证不仅再执行器这里，再分析器知道要做什么之后，也会做一次权限校验叫precheck</p>
-<p>precheck 无法对运行时涉及到的表进行权限验证所以再执行器这里还需要验证。</p>
-<p>判断拥有权限后，根据表定义的引擎，使用执行器使用对应引擎提供的接口。</p>
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/abcd.png">
+      <meta itemprop="name" content="akkS">
+      <meta itemprop="description" content="我们提着过去，走入人群">
+    </span>
 
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一盘团子的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/0.html" class="post-title-link" itemprop="url">基础架构:一条SQL查询语句是如何执行的</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-11-18 14:23:51" itemprop="dateCreated datePublished" datetime="2021-11-18T14:23:51+08:00">2021-11-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-11-22 02:33:16" itemprop="dateModified" datetime="2021-11-22T02:33:16+08:00">2021-11-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>主要有mysq来的模块划分，以及mysql的分析器，优化器，执行器的概述</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/0.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -403,7 +443,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-count">2</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -460,17 +500,18 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">1k</span>
+    <span title="站点总字数">3k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">1 分钟</span>
+    <span title="站点阅读时长">3 分钟</span>
 </div>
 <!--
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
 -->
+
 
         
 
@@ -529,7 +570,7 @@
 
   
 
-<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/assets/z16.model.json"},"display":{"position":"right","width":250,"height":450,"hOffset":5,"vOffset":-20},"mobile":{"show":true},"react":{"opacity":0.8},"log":false});</script></body>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/assets/z16.model.json"},"display":{"position":"left","width":150,"height":350,"hOffset":5,"vOffset":-20},"mobile":{"show":true},"react":{"opacity":0.8},"log":false});</script></body>
 <!-- 页面点击小红心 -->
 <script type="text/javascript" src="/js/clicklove.js"></script>
 <script id="ribbon" size="150" alpha='0.3' zIndex="-2" src="js/canvas-ribbon.js"></script>
