@@ -22,20 +22,22 @@
     var CONFIG = {"hostname":"guohaojie.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="主要有mysq来的模块划分，以及mysql的分析器，优化器，执行器的概述">
+  <meta name="description" content="递归的本质和基本实现形式">
 <meta property="og:type" content="article">
-<meta property="og:title" content="基础架构:一条SQL查询语句是如何执行的">
-<meta property="og:url" content="http://guohaojie.com/0.html">
+<meta property="og:title" content="递归（Recurtion）">
+<meta property="og:url" content="http://guohaojie.com/8bf709ae.html">
 <meta property="og:site_name" content="一盘团子的博客">
-<meta property="og:description" content="主要有mysq来的模块划分，以及mysql的分析器，优化器，执行器的概述">
+<meta property="og:description" content="递归的本质和基本实现形式">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-11-21T18:35:08.328Z">
-<meta property="article:modified_time" content="2021-11-21T18:33:16.476Z">
+<meta property="og:image" content="http://guohaojie.com/%E9%80%92%E5%BD%92%EF%BC%88Recurtion%EF%BC%89%5Cimage-20211122230840070.png">
+<meta property="article:published_time" content="2021-11-22T16:47:42.000Z">
+<meta property="article:modified_time" content="2021-11-22T16:55:48.345Z">
 <meta property="article:author" content="akkS">
-<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="-算法 -递归">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://guohaojie.com/%E9%80%92%E5%BD%92%EF%BC%88Recurtion%EF%BC%89%5Cimage-20211122230840070.png">
 
-<link rel="canonical" href="http://guohaojie.com/0.html">
+<link rel="canonical" href="http://guohaojie.com/8bf709ae.html">
 
 
 <script id="page-configurations">
@@ -48,7 +50,7 @@
   };
 </script>
 
-  <title>基础架构:一条SQL查询语句是如何执行的 | 一盘团子的博客</title>
+  <title>递归（Recurtion） | 一盘团子的博客</title>
   
 
 
@@ -129,12 +131,12 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签<span class="badge">1</span></a>
+    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签<span class="badge">2</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="th fa-fw"></i>分类<span class="badge">1</span></a>
+    <a href="/categories/" rel="section"><i class="th fa-fw"></i>分类<span class="badge">2</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
@@ -199,7 +201,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://guohaojie.com/0.html">
+    <link itemprop="mainEntityOfPage" href="http://guohaojie.com/8bf709ae.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/abcd.png">
@@ -212,7 +214,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          基础架构:一条SQL查询语句是如何执行的
+          递归（Recurtion）
         </h1>
 
         <div class="post-meta">
@@ -223,7 +225,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-11-22 02:35:08 / 修改时间：02:33:16" itemprop="dateCreated datePublished" datetime="2021-11-22T02:35:08+08:00">2021-11-22</time>
+              <time title="创建时间：2021-11-23 00:47:42 / 修改时间：00:55:48" itemprop="dateCreated datePublished" datetime="2021-11-23T00:47:42+08:00">2021-11-23</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -231,7 +233,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
                 </span>
             </span>
 
@@ -260,66 +262,38 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>主要有mysq来的模块划分，以及mysql的分析器，优化器，执行器的概述</p>
+        <hr>
+<p>递归的本质和基本实现形式</p>
 <span id="more"></span>
 
-<h5 id="功能模块划"><a href="#功能模块划" class="headerlink" title="功能模块划"></a>功能模块划</h5><p>Server层</p>
-<p>​        ——连接器（管理接连，权限验证）</p>
-<p>​        ——查询缓存</p>
-<p>​        ——分析器（词法分析，语法分析）</p>
-<p>​        ——优化器（执行计划生成，索引选择）</p>
-<p>​        ——执行器（操作引擎，返回结果）</p>
-<p>​        ——存储过程，触发器，视图等等。</p>
-<p>存储引擎层</p>
-<p>​        ——数据的存储和提取。</p>
-<p>MySQL 默认存储引擎是 InnoDB ，创建表的时候，如不指定引擎类型，默认InnoDB</p>
-<h5 id="SQL-执行过程"><a href="#SQL-执行过程" class="headerlink" title="SQL 执行过程"></a>SQL 执行过程</h5><p>连接器负责对客户端建立链接，获取权限，维持和管理连接</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">mysql -h ip -P port -u user -p</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h1 id="递归1（Recurtion）"><a href="#递归1（Recurtion）" class="headerlink" title="递归1（Recurtion）"></a>递归1（Recurtion）</h1><h2 id="递归的本质和基本实现形式"><a href="#递归的本质和基本实现形式" class="headerlink" title="递归的本质和基本实现形式"></a>递归的本质和基本实现形式</h2><h3 id="什么是递归"><a href="#什么是递归" class="headerlink" title="什么是递归"></a><strong>什么是递归</strong></h3><ul>
+<li>函数自身调用自身</li>
+<li>通过函数体来进行循环</li>
+<li>以自相似的方法重复进行的过程</li>
+</ul>
+<h3 id="计算-n-n的阶乘"><a href="#计算-n-n的阶乘" class="headerlink" title="计算 n! n的阶乘"></a><strong>计算 n! n的阶乘</strong></h3><blockquote>
+<p>n! = 1 * 2 * 3 * 4 * n</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Factorial</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> N = <span class="number">5</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> n = <span class="number">0</span>; n &lt;= N; n++)&#123;</span><br><span class="line">            <span class="keyword">int</span> fact = factorial(n);</span><br><span class="line">            System.out.println(n + <span class="string">&quot; 的阶乘值是： &quot;</span> + fact);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">factorial</span><span class="params">(<span class="keyword">int</span> n)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(n &lt; <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> factorial(n-<span class="number">1</span>) * n;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">0 的阶乘值是： 1</span><br><span class="line">1 的阶乘值是： 1</span><br><span class="line">2 的阶乘值是： 2</span><br><span class="line">3 的阶乘值是： 6</span><br><span class="line">4 的阶乘值是： 24</span><br><span class="line">5 的阶乘值是： 120</span><br></pre></td></tr></table></figure>
+<h3 id="图解-阶乘"><a href="#图解-阶乘" class="headerlink" title="图解 阶乘"></a>图解 阶乘</h3><p><img src="/%E9%80%92%E5%BD%92%EF%BC%88Recurtion%EF%BC%89%5Cimage-20211122230840070.png" alt="image-20211122230840070"></p>
+<p>递归分为了两个部分</p>
+<ul>
+<li>解析路径部分 即： factorial(6) 到 6 * (5 * (4 * (3 * (2 * factorial(1)))) 目的展开路径。</li>
+<li>计算结果部分 即：6 * (5 * (4 * (3 * (2 * 1))) 到 6 * 120  结果叠加回去 最后得到 720</li>
+</ul>
+<h3 id="什么时候用递归-什么时候用递推"><a href="#什么时候用递归-什么时候用递推" class="headerlink" title="什么时候用递归 什么时候用递推"></a>什么时候用递归 什么时候用递推</h3><p>递推：如阶乘明显算5的阶乘 可以用递推 他的推导路径一目了然 1 * 2 * 3 * 4 … * n 等等 用 for 即可<br>递归：当推导路径不明确的时候可以使用递归，如计算一棵树的时候，取得某些节点符合条件节点，但是树并不一定就是平衡二叉树，不能确定他长什么样子的时候就可以使用递归。先探索树的路径，然后返回结果。</p>
+<h3 id="递归的三个关键"><a href="#递归的三个关键" class="headerlink" title="递归的三个关键"></a>递归的三个关键</h3><p>1.定义需要递归的问题（重叠子问题）<br>2.确定递归边界<br>3.保护和还原现场</p>
+<h3 id="保护和还原现场"><a href="#保护和还原现场" class="headerlink" title="保护和还原现场"></a>保护和还原现场</h3><blockquote>
+<p>当使用了全局变量的时候，才退出当前方法的时候要还原，因为这是所有重叠方法都需要使用的。<br>相对而言，局部变量和参数。就不需要还原了，因为每一次递归方法的时候他都会创建一个新的，重写方法之间没有关联。</p>
+</blockquote>
+<h3 id="递归模板"><a href="#递归模板" class="headerlink" title="递归模板"></a>递归模板</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">方法名</span><br><span class="line">	终止条件</span><br><span class="line">	本层处理</span><br><span class="line">	递归子问题</span><br><span class="line">	还原现场</span><br></pre></td></tr></table></figure>
 
-<p>账户·密码正确，连接器查询权限获得权限，自此，断开连接之前都是该权限。</p>
-<p>连接完成后，没有动作，即 sleep 处于空闲状态。可以使用 show processlist 查看</p>
-<p>默认断开时间 8 小时 由 wait_timeout 控制，当断开后继续执行，抛出错误信息 lost connection 需要重新连接。</p>
-<p>长连接：客户持续有请求，则一直使用同一个连接</p>
-<p>短连接：每次执行完很少几次查询就会断开，下次查询重新建立</p>
-<p>减少建立连接，尽量使用长连接。</p>
-<p>若都是长连接，MySQL 占用内存涨的很快，因为 MySQL 执行过程中临时使用的内存管理在连接对象里面，要在断开连接时才会释放。长期积累 可能会 OOM MySQL 异常重启。</p>
-<p>—— 定期断开长连接。</p>
-<p>——使用mysql_reset_connection来重新初始化连接资源</p>
-<h5 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h5><p>MySQL建立连接后，执行sql</p>
-<p>执行前，判断之前是否执行过</p>
-<p>执行过，通过sql(key)直接返回数据（value）</p>
-<p>没有执行过，查询出结果，并放到缓存中</p>
-<p>多命中缓存，效率高</p>
-<p>大多数情况不建议使用查询缓存，因为可能弊大于利</p>
-<p>1。缓存需要语句完全相等，包括参数。</p>
-<p>2。表更新后就会失效 因此，只有在表更新频率不高，查询语句完全一致的情况下，可以手动开启缓存，其他一律关闭。 </p>
-<p>注意：mysql8之后，取消了缓存功能。</p>
-<p>可以使用 query_cache_type 设置成 DEMAND 来进行按需缓存 通过 SQL_CACHE 显示执行。</p>
-<figure class="highlight axapta"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> SQL_CACHE * <span class="keyword">from</span> T <span class="keyword">where</span> ID=<span class="number">10</span>；</span><br></pre></td></tr></table></figure>
-
-<p>MySQL 8.0 直接不使用缓存了</p>
-<p>可是使用 show variables 来查看服务器配置信息。</p>
-<h5 id="分析器"><a href="#分析器" class="headerlink" title="分析器"></a>分析器</h5><p>未命中缓存，进入分析器，进行查询。</p>
-<p>分析器首先做词法分析，它要知道这个语句中的单词是什么意思</p>
-<p>分析器再进行语法分析，词法分析结果，语法分析器根据语法规则判断 SQL 语句是否满足 SQL 语法</p>
-<p>表名和列名在分析语法时就已经确定过了</p>
-<p>You have an error in your SQL syntax  关注 use near 的解析</p>
-<p>分析器干两件事：</p>
-<ol>
-<li>解析语句，生成解析树 </li>
-<li>检查语句中的关键词，表，字段是否存在</li>
-</ol>
-<h5 id="优化器"><a href="#优化器" class="headerlink" title="优化器"></a>优化器</h5><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">mysql</span>&gt; select * from t<span class="number">1</span> join t<span class="number">2</span> using(ID)  where t<span class="number">1</span>.c=<span class="number">10</span> and t<span class="number">2</span>.d=<span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-
-<p>既可以先从表 t1 里面取出 c=10 的记录的 ID 值，再根据 ID 值关联到表 t2，再判断 t2 里面 d 的值是否等于 20。</p>
-<p>也可以先从表 t2 里面取出 d=20 的记录的 ID 值，再根据 ID 值关联到 t1，再判断 t1 里面 c 的值是否等于 10。</p>
-<p>执行效率不同</p>
-<p>尽可能扫描少的数据库行纪录</p>
-<p>优化器是在表里面有多个索引的时候，决定使用哪个索引；</p>
-<h5 id="执行器"><a href="#执行器" class="headerlink" title="执行器"></a>执行器</h5><p>判断是否对 表 T 有执行查询的权限</p>
-<p>权限验证不仅再执行器这里，再分析器知道要做什么之后，也会做一次权限校验叫precheck</p>
-<p>precheck 无法对运行时涉及到的表进行权限验证所以再执行器这里还需要验证。</p>
-<p>判断拥有权限后，根据表定义的引擎，使用执行器使用对应引擎提供的接口。</p>
+<h2 id="递归实例"><a href="#递归实例" class="headerlink" title="递归实例"></a>递归实例</h2><p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/subsets/">78.子集</a></p>
+<ul>
+<li>子集是指数型的枚举/递归(元素的 选择与不选择 2^n 元素个数n)<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 作为最后的返回值</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;List&lt;Integer&gt;&gt; ans = <span class="keyword">new</span> ArrayList();;</span><br><span class="line">    <span class="keyword">private</span> List&lt;Integer&gt; set = <span class="keyword">new</span> ArrayList();</span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; subsets(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">        findSubsets(nums,<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">findSubsets</span><span class="params">(<span class="keyword">int</span>[] nums,<span class="keyword">int</span> index)</span></span>&#123;</span><br><span class="line">        <span class="comment">// 设置边界</span></span><br><span class="line">        <span class="keyword">if</span>(index == nums.length)&#123;</span><br><span class="line">            ans.add(<span class="keyword">new</span> ArrayList&lt;Integer&gt;(set));</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 本层处理</span></span><br><span class="line">        <span class="comment">// 本层两种处理 选择/不选择</span></span><br><span class="line">        <span class="comment">// 不选择</span></span><br><span class="line">        findSubsets(nums,index+<span class="number">1</span>);</span><br><span class="line">        <span class="comment">// 选择</span></span><br><span class="line">        set.add(nums[index]);</span><br><span class="line">        findSubsets(nums,index+<span class="number">1</span>);</span><br><span class="line">        <span class="comment">// 还原现场</span></span><br><span class="line">        set.remove(set.size() - <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
 
     </div>
 
@@ -340,7 +314,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/mysql/" rel="tag"># mysql</a>
+              <a href="/tags/%E7%AE%97%E6%B3%95-%E9%80%92%E5%BD%92/" rel="tag"># -算法 -递归</a>
           </div>
 
         
@@ -348,11 +322,11 @@
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/0.html" rel="next" title="">
-       <i class="fa fa-chevron-right"></i>
+    <a href="/183e61db.html" rel="prev" title="基础架构:一条SQL查询语句是如何执行的">
+      <i class="fa fa-chevron-left"></i> 基础架构:一条SQL查询语句是如何执行的
     </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -411,7 +385,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97%E5%88%92"><span class="nav-text">功能模块划</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#SQL-%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B"><span class="nav-text">SQL 执行过程</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E7%BC%93%E5%AD%98"><span class="nav-text">查询缓存</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E5%99%A8"><span class="nav-text">分析器</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E5%99%A8"><span class="nav-text">优化器</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E5%99%A8"><span class="nav-text">执行器</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%80%92%E5%BD%921%EF%BC%88Recurtion%EF%BC%89"><span class="nav-text">递归1（Recurtion）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%92%E5%BD%92%E7%9A%84%E6%9C%AC%E8%B4%A8%E5%92%8C%E5%9F%BA%E6%9C%AC%E5%AE%9E%E7%8E%B0%E5%BD%A2%E5%BC%8F"><span class="nav-text">递归的本质和基本实现形式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E9%80%92%E5%BD%92"><span class="nav-text">什么是递归</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97-n-n%E7%9A%84%E9%98%B6%E4%B9%98"><span class="nav-text">计算 n! n的阶乘</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E8%A7%A3-%E9%98%B6%E4%B9%98"><span class="nav-text">图解 阶乘</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E7%94%A8%E9%80%92%E5%BD%92-%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E7%94%A8%E9%80%92%E6%8E%A8"><span class="nav-text">什么时候用递归 什么时候用递推</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%92%E5%BD%92%E7%9A%84%E4%B8%89%E4%B8%AA%E5%85%B3%E9%94%AE"><span class="nav-text">递归的三个关键</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%9D%E6%8A%A4%E5%92%8C%E8%BF%98%E5%8E%9F%E7%8E%B0%E5%9C%BA"><span class="nav-text">保护和还原现场</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%92%E5%BD%92%E6%A8%A1%E6%9D%BF"><span class="nav-text">递归模板</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%92%E5%BD%92%E5%AE%9E%E4%BE%8B"><span class="nav-text">递归实例</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -434,13 +408,13 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
