@@ -22,20 +22,20 @@
     var CONFIG = {"hostname":"guohaojie.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="基础结构功能模块划Server层  连接器（管理接连，权限验证） 查询缓存 分析器（词法分析，语法分析） 优化器（执行计划生成，索引选择） 执行器（操作引擎，返回结果） 存储过程，触发器，视图等等。  存储引擎层  数据的存储和提取。  mysql 的默认引擎 MySQL 默认存储引擎是 InnoDB ，创建表的时候，如不指定引擎类型，默认InnoDB  mysql的小知识点连接器 连接器负责对客">
+  <meta name="description" content="Servlet规范和Servlet容器HTTP 服务器 怎么调用对应 Java 类的哪个方法？❌  方式：通过一堆if-else进行判断问题：HTTP 服务器的代码跟业务逻辑耦合在一起了，如果新加一个业务方法还要改 HTTP 服务器的代码。  ✔️  方式：通过接口进行解耦，各种业务类都必须实现这个接口(Servlet 接口)">
 <meta property="og:type" content="article">
-<meta property="og:title" content="基础架构:一条SQL查询语句是如何执行的">
-<meta property="og:url" content="http://guohaojie.com/183e61db.html">
+<meta property="og:title" content="Servlet规范和Servlet容器">
+<meta property="og:url" content="http://guohaojie.com/1c68dade.html">
 <meta property="og:site_name" content="一盘团子的博客">
-<meta property="og:description" content="基础结构功能模块划Server层  连接器（管理接连，权限验证） 查询缓存 分析器（词法分析，语法分析） 优化器（执行计划生成，索引选择） 执行器（操作引擎，返回结果） 存储过程，触发器，视图等等。  存储引擎层  数据的存储和提取。  mysql 的默认引擎 MySQL 默认存储引擎是 InnoDB ，创建表的时候，如不指定引擎类型，默认InnoDB  mysql的小知识点连接器 连接器负责对客">
+<meta property="og:description" content="Servlet规范和Servlet容器HTTP 服务器 怎么调用对应 Java 类的哪个方法？❌  方式：通过一堆if-else进行判断问题：HTTP 服务器的代码跟业务逻辑耦合在一起了，如果新加一个业务方法还要改 HTTP 服务器的代码。  ✔️  方式：通过接口进行解耦，各种业务类都必须实现这个接口(Servlet 接口)">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-11-21T18:35:08.328Z">
-<meta property="article:modified_time" content="2021-11-25T09:05:24.701Z">
+<meta property="article:published_time" content="2021-11-25T07:15:09.000Z">
+<meta property="article:modified_time" content="2021-11-25T08:14:30.837Z">
 <meta property="article:author" content="akkS">
-<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="-Tomcat">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://guohaojie.com/183e61db.html">
+<link rel="canonical" href="http://guohaojie.com/1c68dade.html">
 
 
 <script id="page-configurations">
@@ -48,7 +48,7 @@
   };
 </script>
 
-  <title>基础架构:一条SQL查询语句是如何执行的 | 一盘团子的博客</title>
+  <title>Servlet规范和Servlet容器 | 一盘团子的博客</title>
   
 
 
@@ -199,7 +199,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://guohaojie.com/183e61db.html">
+    <link itemprop="mainEntityOfPage" href="http://guohaojie.com/1c68dade.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/abcd.png">
@@ -212,7 +212,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          基础架构:一条SQL查询语句是如何执行的
+          Servlet规范和Servlet容器
         </h1>
 
         <div class="post-meta">
@@ -221,23 +221,17 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-11-22 02:35:08" itemprop="dateCreated datePublished" datetime="2021-11-22T02:35:08+08:00">2021-11-22</time>
+              <time title="创建时间：2021-11-25 15:15:09 / 修改时间：16:14:30" itemprop="dateCreated datePublished" datetime="2021-11-25T15:15:09+08:00">2021-11-25</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-25 17:05:24" itemprop="dateModified" datetime="2021-11-25T17:05:24+08:00">2021-11-25</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                  <a href="/categories/Tomcat/" itemprop="url" rel="index"><span itemprop="name">Tomcat</span></a>
                 </span>
             </span>
 
@@ -247,14 +241,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.4k</span>
+              <span>1.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -266,85 +260,91 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="基础结构"><a href="#基础结构" class="headerlink" title="基础结构"></a>基础结构</h1><h2 id="功能模块划"><a href="#功能模块划" class="headerlink" title="功能模块划"></a>功能模块划</h2><p><strong>Server层</strong></p>
-<ul>
-<li>连接器（管理接连，权限验证）</li>
-<li>查询缓存</li>
-<li>分析器（词法分析，语法分析）</li>
-<li>优化器（执行计划生成，索引选择）</li>
-<li>执行器（操作引擎，返回结果）</li>
-<li>存储过程，触发器，视图等等。</li>
-</ul>
-<p><strong>存储引擎层</strong></p>
-<ul>
-<li>数据的存储和提取。</li>
-</ul>
-<h2 id="mysql-的默认引擎"><a href="#mysql-的默认引擎" class="headerlink" title="mysql 的默认引擎"></a>mysql 的默认引擎</h2><blockquote>
-<p>MySQL 默认存储引擎是 InnoDB ，创建表的时候，如不指定引擎类型，默认InnoDB</p>
+        <h1 id="Servlet规范和Servlet容器"><a href="#Servlet规范和Servlet容器" class="headerlink" title="Servlet规范和Servlet容器"></a>Servlet规范和Servlet容器</h1><h2 id="HTTP-服务器-怎么调用对应-Java-类的哪个方法？"><a href="#HTTP-服务器-怎么调用对应-Java-类的哪个方法？" class="headerlink" title="HTTP 服务器 怎么调用对应 Java 类的哪个方法？"></a>HTTP 服务器 怎么调用对应 Java 类的哪个方法？</h2><p>❌</p>
+<blockquote>
+<p>方式：通过一堆if-else进行判断<br>问题：HTTP 服务器的代码跟业务逻辑耦合在一起了，如果新加一个业务方法还要改 HTTP 服务器的代码。</p>
 </blockquote>
-<h2 id="mysql的小知识点"><a href="#mysql的小知识点" class="headerlink" title="mysql的小知识点"></a>mysql的小知识点</h2><h3 id="连接器"><a href="#连接器" class="headerlink" title="连接器"></a>连接器</h3><ol>
-<li>连接器负责对客户端建立链接，获取权限，维持和管理连接<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql <span class="operator">-</span>h ip <span class="operator">-</span>P port <span class="operator">-</span>u <span class="keyword">user</span> <span class="operator">-</span>p</span><br></pre></td></tr></table></figure></li>
-<li>账户密&amp;码正确，连接器查询权限获得权限，自此，断开连接之前都是该权限。</li>
-</ol>
-<p><strong>完成连接后的小知识点</strong></p>
+<p>✔️</p>
+<blockquote>
+<p>方式：通过接口进行解耦，各种业务类都必须实现这个接口(Servlet 接口)</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？"><a href="#HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？" class="headerlink" title="HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？"></a>HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？</h2><p>❌</p>
+<blockquote>
+<p>方式：使用 HTTP 服务器进行<br>问题：HTTP 服务器 和 业务类耦合</p>
+</blockquote>
+<p>✔️</p>
+<blockquote>
+<p>方式：添加 Servlet 容器，Servlet 容器用来加载和管理业务类</p>
+</blockquote>
+<h2 id="Servlet-接口"><a href="#Servlet-接口" class="headerlink" title="Servlet 接口"></a>Servlet 接口</h2><blockquote>
+<p>Servlet 接口是 Servlet 容器跟具体业务类之间的接口。<br>Servlet 接口和 Servlet 容器这一整套规范叫作 Servlet 规范</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Servlet</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(ServletConfig config)</span> <span class="keyword">throws</span> ServletException</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function">ServletConfig <span class="title">getServletConfig</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">service</span><span class="params">(ServletRequest req, ServletResponse res）<span class="keyword">throws</span> ServletException, IOException;</span></span></span><br><span class="line"><span class="params"><span class="function">    </span></span></span><br><span class="line"><span class="params"><span class="function">    String getServletInfo()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="重点方法：service"><a href="#重点方法：service" class="headerlink" title="重点方法：service"></a>重点方法：<em><strong>service</strong></em></h3><p>service的两个参数</p>
 <ul>
-<li>连接完成后，没有动作，即 sleep 处于空闲状态。可以使用 show processlist 查看</li>
-<li>默认断开时间 8 小时 由 wait_timeout 控制，当断开后继续执行，抛出错误信息 lost connection 需要重新连接。</li>
-<li>长连接：客户持续有请求，则一直使用同一个连接</li>
-<li>短连接：每次执行完很少几次查询就会断开，下次查询重新建立</li>
-<li>减少建立连接，尽量使用长连接。</li>
+<li><p>ServletRequest 用来封装请求信息</p>
+</li>
+<li><p>ServletResponse 用来封装响应信息</p>
+</li>
 </ul>
-<p><strong>若都是长连接，MySQL 占用内存涨的很快，因为 MySQL 执行过程中临时使用的内存管理在连接对象里面，要在断开连接时才会释放。长期积累 可能会 OOM MySQL 异常重启。</strong></p>
+<blockquote>
+<p>本质上这两个类是对通信协议的封装</p>
+</blockquote>
+<h3 id="其余方法"><a href="#其余方法" class="headerlink" title="其余方法"></a>其余方法</h3><p>生命周期相关方法：<strong>init</strong> 和 <strong>destroy</strong></p>
 <ul>
-<li>定期断开长连接。</li>
-<li>使用mysql_reset_connection来重新初始化连接资源</li>
+<li>Servlet 容器在加载 Servlet 类的时候会调用 <strong>init</strong> 方法</li>
+<li>Servlet 容器在卸载 Servlet 类的时候会调用 <strong>destroy</strong> 方法</li>
 </ul>
-<h3 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h3><ol>
-<li>MySQL建立连接后，执行sql</li>
-<li>执行前，判断之前是否执行过</li>
-<li>执行过，通过sql(key)直接返回数据（value）</li>
-<li>没有执行过，查询出结果，并放到缓存中</li>
-<li>多命中缓存，效率高</li>
-</ol>
-<p><strong>大多数情况不建议使用查询缓存，因为可能弊大于利</strong></p>
-<ol>
-<li>缓存需要语句完全相等，包括参数。</li>
-<li>表更新后就会失效 因此，只有在表更新频率不高，查询语句完全一致的情况下，可以手动开启缓存，其他一律关闭。 </li>
-</ol>
-<p><strong>注意：mysql8之后，取消了缓存功能。</strong></p>
-<p>可以使用 <em><strong>query_cache_type</strong></em> 设置成 <em><strong>DEMAND</strong></em> 来进行按需缓存 通过 SQL_CACHE 显示执行。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> SQL_CACHE <span class="operator">*</span> <span class="keyword">from</span> T <span class="keyword">where</span> ID<span class="operator">=</span><span class="number">10</span>；</span><br></pre></td></tr></table></figure>
-<p><strong>可是使用 show variables 来查看服务器配置信息。</strong></p>
-<h3 id="分析器"><a href="#分析器" class="headerlink" title="分析器"></a>分析器</h3><ol>
-<li>未命中缓存，进入分析器，进行查询。</li>
-<li>分析器首先做词法分析，它要知道这个语句中的单词是什么意思</li>
-<li>分析器再进行语法分析，词法分析结果，语法分析器根据语法规则判断 SQL 语句是否满足 SQL 语法</li>
-<li>表名和列名在分析语法时就已经确定过了</li>
-</ol>
-<p><strong>tips:</strong> You have an error in your SQL syntax  关注 use near 的解析</p>
-<p><strong>分析器干两件事：</strong></p>
-<ol>
-<li>解析语句，生成解析树 </li>
-<li>检查语句中的关键词，表，字段是否存在</li>
-</ol>
-<h3 id="优化器"><a href="#优化器" class="headerlink" title="优化器"></a>优化器</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t1 <span class="keyword">join</span> t2 <span class="keyword">using</span>(ID)  <span class="keyword">where</span> t1.c<span class="operator">=</span><span class="number">10</span> <span class="keyword">and</span> t2.d<span class="operator">=</span><span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-<p>既可以先从表 t1 里面取出 c=10 的记录的 ID 值，再根据 ID 值关联到表 t2，再判断 t2 里面 d 的值是否等于 20。</p>
-<p>也可以先从表 t2 里面取出 d=20 的记录的 ID 值，再根据 ID 值关联到 t1，再判断 t1 里面 c 的值是否等于 10。<br><strong>区别:</strong></p>
-<ol>
-<li>执行效率不同</li>
-<li>尽可能扫描少的数据库行纪录</li>
-</ol>
-<p><em><strong>优化器是在表里面有多个索引的时候，决定使用哪个索引；</strong></em></p>
-<h3 id="执行器"><a href="#执行器" class="headerlink" title="执行器"></a>执行器</h3><ul>
-<li><p>判断是否对 表 T 有执行查询的权限</p>
-</li>
-<li><p>权限验证不仅再执行器这里，再分析器知道要做什么之后，也会做一次权限校验叫precheck</p>
-</li>
-<li><p>precheck 无法对运行时涉及到的表进行权限验证所以再执行器这里还需要验证。</p>
-</li>
-<li><p>判断拥有权限后，根据表定义的引擎，使用执行器使用对应引擎提供的接口。</p>
-</li>
+<p>Servlet 配置相关方法：<strong>getServletConfig</strong></p>
+<ul>
+<li>ServletConfig 的作用就是封装 Servlet 的初始化参数</li>
+<li>可以在web.xml给 Servlet 配置参数，并在程序里通过 getServletConfig 方法拿到这些参数。</li>
 </ul>
+<p>Servlet 的 <strong>GenericServlet</strong> 抽象类 和 <strong>HttpServlet</strong> 类</p>
+<ul>
+<li>GenericServlet 实现了 Servlet 的通用方法 而 HttpServlet 是在 GenericServlet 基础上进行了封装加入了 HTTP 特性</li>
+</ul>
+<p>HttpServlet 只需要重写 doGet 和 doPost。</p>
+<h2 id="Servlet-容器"><a href="#Servlet-容器" class="headerlink" title="Servlet 容器"></a>Servlet 容器</h2><p>整体工作流程</p>
+<ol>
+<li>客户端发起 HTTP 请求</li>
+<li>HTTP 服务器使用 ServletRequest 讲请求封装</li>
+<li>调用 Servlet 容器的 service 方法</li>
+<li>Servlet 容器，根据请求的 URL 和 Servlet 的映射关系，找到相应的 Servlet</li>
+<li>如果 Servlet 还没有被加载，就用反射机制创建这个 Servlet，并调用 Servlet 的 init 方法来完成初始化</li>
+<li>调用 Servlet 的 service 方法来处理请求，把 ServletResponse 对象返回给 HTTP 服务器</li>
+<li>讲响应返回给客户端</li>
+</ol>
+<p><strong>Web 应用层级</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">| - MyWebApp </span><br><span class="line">| - WEB-INF/web.xml -- 配置文件，用来配置Servlet等 </span><br><span class="line">| - WEB-INF/lib/ -- 存放Web应用所需各种JAR包 </span><br><span class="line">| - WEB-INF/classes/ -- 存放你的应用类，比如Servlet类 </span><br><span class="line">| - META-INF/ -- 目录存放工程的一些信息</span><br></pre></td></tr></table></figure>
+
+<p>Servlet 容器顺序</p>
+<ol>
+<li>实例化 Servlet</li>
+<li>调用 Servlet</li>
+</ol>
+<p><strong>Servlet 是怎么注册到 Servlet 容器中</strong></p>
+<ol>
+<li>以 Web 应用程序的方式来部署 Servlet </li>
+<li>Servlet 规范里定义了 ServletContext 这个接口来对应一个 Web 应用</li>
+<li>Servlet 容器在启动时会加载 Web 应用，并为每个 Web 应用创建唯一的 ServletContext 对象</li>
+<li>由于 ServletContext 持有所有 Servlet 实例，你还可以通过它来实现 Servlet 请求的转发。扩展机制</li>
+</ol>
+<p><strong>扩展机制</strong></p>
+<p>Servlet 规范提供了两种扩展机制：</p>
+<ul>
+<li>Filter  过滤器</li>
+<li>Listener 监听器</li>
+</ul>
+<p><strong>Filter 过滤器的流程</strong></p>
+<ol>
+<li>Web 应用部署完成</li>
+<li>Servlet 容器需要实例化 Filter 并把 Filter 链接成一个 FilterChain。</li>
+<li>请求进来，获取第一个 Filter 并调用 doFilter 方法，doFilter 方法负责调用这个 FilterChain 中的下一个 Filter。</li>
+</ol>
 
     </div>
 
@@ -365,7 +365,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/mysql/" rel="tag"># mysql</a>
+              <a href="/tags/Tomcat/" rel="tag"># -Tomcat</a>
           </div>
 
         
@@ -373,10 +373,13 @@
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/8bf709ac.html" rel="next" title="递归（Recurtion）">
-      递归（Recurtion） <i class="fa fa-chevron-right"></i>
+    <a href="/530cfffd.html" rel="prev" title="Tomcat基础">
+      <i class="fa fa-chevron-left"></i> Tomcat基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/d2d77b8f.html" rel="next" title="Tomcat连接器的设计">
+      Tomcat连接器的设计 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -436,7 +439,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E7%BB%93%E6%9E%84"><span class="nav-text">基础结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97%E5%88%92"><span class="nav-text">功能模块划</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql-%E7%9A%84%E9%BB%98%E8%AE%A4%E5%BC%95%E6%93%8E"><span class="nav-text">mysql 的默认引擎</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql%E7%9A%84%E5%B0%8F%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="nav-text">mysql的小知识点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5%E5%99%A8"><span class="nav-text">连接器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E7%BC%93%E5%AD%98"><span class="nav-text">查询缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E5%99%A8"><span class="nav-text">分析器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E5%99%A8"><span class="nav-text">优化器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E5%99%A8"><span class="nav-text">执行器</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Servlet%E8%A7%84%E8%8C%83%E5%92%8CServlet%E5%AE%B9%E5%99%A8"><span class="nav-text">Servlet规范和Servlet容器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-%E6%9C%8D%E5%8A%A1%E5%99%A8-%E6%80%8E%E4%B9%88%E8%B0%83%E7%94%A8%E5%AF%B9%E5%BA%94-Java-%E7%B1%BB%E7%9A%84%E5%93%AA%E4%B8%AA%E6%96%B9%E6%B3%95%EF%BC%9F"><span class="nav-text">HTTP 服务器 怎么调用对应 Java 类的哪个方法？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%A6%82%E4%BD%95%E7%9F%A5%E9%81%93%E7%94%B1%E5%93%AA%E4%B8%AA-Servlet-%E6%9D%A5%E5%A4%84%E7%90%86%E5%91%A2%EF%BC%9FServlet-%E5%8F%88%E6%98%AF%E7%94%B1%E8%B0%81%E6%9D%A5%E5%AE%9E%E4%BE%8B%E5%8C%96%E5%91%A2%EF%BC%9F"><span class="nav-text">HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Servlet-%E6%8E%A5%E5%8F%A3"><span class="nav-text">Servlet 接口</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E6%96%B9%E6%B3%95%EF%BC%9Aservice"><span class="nav-text">重点方法：service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BD%99%E6%96%B9%E6%B3%95"><span class="nav-text">其余方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Servlet-%E5%AE%B9%E5%99%A8"><span class="nav-text">Servlet 容器</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
