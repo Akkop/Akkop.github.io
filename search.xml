@@ -1,132 +1,426 @@
 <?xml version="1.0" encoding="utf-8"?>
-<search> 
-  
-  
-    
-    <entry>
-      <title>Tomcat连接器的设计</title>
-      <link href="/d2d77b8f.html"/>
-      <url>/d2d77b8f.html</url>
-      
-        <content type="html"><![CDATA[<h1 id="Tomcat连接器的设计"><a href="#Tomcat连接器的设计" class="headerlink" title="Tomcat连接器的设计"></a>Tomcat连接器的设计</h1><h2 id="Tomcat-总体架构"><a href="#Tomcat-总体架构" class="headerlink" title="Tomcat 总体架构"></a>Tomcat 总体架构</h2><p>Tomcat 要实现 <em><strong>2 个核心功能</strong></em>：</p><blockquote><p>处理 Socket 连接，负责网络字节流与 Request 和 Response 对象的转化。<br>加载和管理 Servlet，以及具体处理 Request 请求。</p></blockquote><p>对应2个核心功能 Tomcat 设计的组件</p><blockquote><p>连接器（connector）<br>容器（container）</p></blockquote><span id="more"></span><h2 id="Tomcat-支持的多种-I-O-模型和应用层协议"><a href="#Tomcat-支持的多种-I-O-模型和应用层协议" class="headerlink" title="Tomcat 支持的多种 I/O 模型和应用层协议"></a>Tomcat 支持的多种 I/O 模型和应用层协议</h2><p><strong>Tomcat 支持的 I/O 模型有：</strong></p><ul><li>NIO：非阻塞 I/O，采用 Java NIO 类库实现。</li><li>NIO.2：异步 I/O，采用 JDK 7 最新的 </li><li>NIO.2 类库实现。APR：采用 Apache 可移植运行库实现，是 C/C++ 编写的本地库。</li></ul><p><strong>Tomcat 支持的应用层协议有：</strong></p><ul><li>HTTP/1.1：这是大部分 Web 应用采用的访问协议。</li><li>AJP：用于和 Web 服务器集成（如 Apache）。</li><li>HTTP/2：HTTP 2.0 大幅度的提升了 Web 性能。</li></ul><p><em><strong>由于 Tomcat 需要 支持多种 I/O 模型和应用层协议，就需要多种的连接器了。</strong></em></p><blockquote><p>Tomcat 实例 包裹 连接器（connector）容器（container） 等于 Service 组件。<br>Tomcat 实例 有多个连接器和一个容器</p></blockquote><p><em><strong>连接器与容器之间通过标准的 ServletRequest 和 ServletResponse 通信</strong></em></p><p><strong>连接器</strong></p><blockquote><p>连接器对 Servlet 容器屏蔽了协议及 I/O 模型等的区别<br>在容器中获取到的都是一个标准的 ServletRequest 对象</p></blockquote><p><strong>连接器工作流程</strong>：</p><ul><li>监听网络端口</li><li>接受网络连接请求</li><li>读取网络请求字节流</li><li>根据具体应用层协议（HTTP/AJP）解析字节流，生成统一的 Tomcat Request 对象</li><li>将 Tomcat Request 对象转成标准的 ServletRequest</li><li>调用 Servlet 容器，得到 ServletResponse</li><li>将 ServletResponse 转成 Tomcat Response 对象</li><li>将 Tomcat Response 转成网络字节流</li><li>将响应字节流写回给浏览器</li></ul><h2 id="连接器的子模块"><a href="#连接器的子模块" class="headerlink" title="连接器的子模块"></a>连接器的子模块</h2><p>连接器需要完成 3 个高内聚的功能：</p><ul><li>网络通信。</li><li>应用层协议解析。</li><li>Tomcat Request/Response 与 ServletRequest/ServletResponse 的转化。</li></ul><p>对应这三块 分别对应三个组件 组件之间通过抽象接口交互</p><ul><li>Endpoint  网络通信</li><li>Processor  应用层协议解析</li><li>Adapter</li></ul><p>模块工作分工如下：</p><ul><li>Endpoint 负责提供字节流给 Processor， <strong>Socket</strong></li><li>Processor 负责提供 Tomcat Request 对象给 Adapter， <strong>Tomcat Request</strong></li><li>Adapter 负责提供 ServletRequest 对象给容器。  <strong>ServletRequest</strong></li></ul><p><strong>I/O</strong> <strong>模型和应用层协议可以自由组合</strong></p><blockquote><p>于是网络通信（Endpoint）和应用层协议解析（Processor）放在一起有了 ProtocolHandler 接口各种协议和通信模型的组合</p></blockquote><h3 id="层级结构"><a href="#层级结构" class="headerlink" title="层级结构"></a>层级结构</h3><ul><li>连接器 顶层</li><li>ProtocolHandler 1层 ， Adapter 1层</li><li>Endpoint 2层，Processor 2层</li></ul><h3 id="ProtocolHandler-组件"><a href="#ProtocolHandler-组件" class="headerlink" title="ProtocolHandler 组件"></a>ProtocolHandler 组件</h3><p><strong>Endpoint</strong>网络通信</p><ul><li>Endpoint 是通信端点，即通信监听的接口</li><li>具体的 Socket 接收和发送处理器，是对传输层的抽象，因此 Endpoint 是用来实现 TCP/IP 协议的。</li><li>AbstractEndpoint 是 Endpoint 的抽象，他有两个重要的子组件：<strong>Acceptor</strong> 和 <strong>SocketProcessor</strong>。<ul><li>Acceptor 用于监听 Socket 连接请求</li><li>SocketProcessor 用于处理接收到的 Socket 请求，它实现 Runnable 接口，在 run 方法里调用协议处理组件 Processor 进行处理.<ul><li>SocketProcessor 为了提高处理能力，SocketProcessor 被提交到线程池来执行。而这个线程池叫作执行器（Executor)</li></ul></li></ul></li></ul><p><strong>Processor</strong>应用层协议解析</p><ul><li>Processor 接收来自 Endpoint 的 Socket</li><li>读取字节流解析成 Tomcat Request 和 Response 对象，并通过 Adapter 将其提交到容器处理</li><li>Processor 是对应用层协议的抽象。</li></ul><h3 id="Adapter-组件"><a href="#Adapter-组件" class="headerlink" title="Adapter 组件"></a>Adapter 组件</h3><p><strong>ProtocolHandler 接口负责解析请求并生成 Tomcat Request 类</strong></p><ul><li>Tomcat Request 不是标准 ServletRequest 需要转换 这个工作是  <strong>CoyoteAdapter</strong> 完成的</li><li>连接器调用 <strong>CoyoteAdapter</strong> 的 sevice 方法，传入的是 Tomcat Request 对象，CoyoteAdapter 负责将 Tomcat Request 转成 ServletRequest，再调用容器的 service 方法。</li></ul><p><strong>连接器工作流程</strong></p><ul><li>Endpoint 接收到 Socket 连接后，生成一个 SocketProcessor 任务提交到线程池去处理</li><li>SocketProcessor 的 run 方法会调用 Processor 组件去解析应用层协议</li><li>Processor 通过解析生成 Request 对象后，会调用 Adapter 的 Service 方法。</li></ul>]]></content>
-      
-      
+<search>
+  <entry>
+    <title>Servlet规范和Servlet容器</title>
+    <url>/1c68dade.html</url>
+    <content><![CDATA[<h1 id="Servlet规范和Servlet容器"><a href="#Servlet规范和Servlet容器" class="headerlink" title="Servlet规范和Servlet容器"></a>Servlet规范和Servlet容器</h1><h2 id="HTTP-服务器-怎么调用对应-Java-类的哪个方法？"><a href="#HTTP-服务器-怎么调用对应-Java-类的哪个方法？" class="headerlink" title="HTTP 服务器 怎么调用对应 Java 类的哪个方法？"></a>HTTP 服务器 怎么调用对应 Java 类的哪个方法？</h2><p>❌</p>
+<blockquote>
+<p>方式：通过一堆if-else进行判断<br>问题：HTTP 服务器的代码跟业务逻辑耦合在一起了，如果新加一个业务方法还要改 HTTP 服务器的代码。</p>
+</blockquote>
+<p>✔️</p>
+<blockquote>
+<p>方式：通过接口进行解耦，各种业务类都必须实现这个接口(Servlet 接口)</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？"><a href="#HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？" class="headerlink" title="HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？"></a>HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？</h2><p>❌</p>
+<blockquote>
+<p>方式：使用 HTTP 服务器进行<br>问题：HTTP 服务器 和 业务类耦合</p>
+</blockquote>
+<p>✔️</p>
+<blockquote>
+<p>方式：添加 Servlet 容器，Servlet 容器用来加载和管理业务类</p>
+</blockquote>
+<h2 id="Servlet-接口"><a href="#Servlet-接口" class="headerlink" title="Servlet 接口"></a>Servlet 接口</h2><blockquote>
+<p>Servlet 接口是 Servlet 容器跟具体业务类之间的接口。<br>Servlet 接口和 Servlet 容器这一整套规范叫作 Servlet 规范</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Servlet</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(ServletConfig config)</span> <span class="keyword">throws</span> ServletException</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function">ServletConfig <span class="title">getServletConfig</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">service</span><span class="params">(ServletRequest req, ServletResponse res）<span class="keyword">throws</span> ServletException, IOException;</span></span></span><br><span class="line"><span class="params"><span class="function">    </span></span></span><br><span class="line"><span class="params"><span class="function">    String getServletInfo()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="重点方法：service"><a href="#重点方法：service" class="headerlink" title="重点方法：service"></a>重点方法：<em><strong>service</strong></em></h3><p>service的两个参数</p>
+<ul>
+<li><p>ServletRequest 用来封装请求信息</p>
+</li>
+<li><p>ServletResponse 用来封装响应信息</p>
+</li>
+</ul>
+<blockquote>
+<p>本质上这两个类是对通信协议的封装</p>
+</blockquote>
+<h3 id="其余方法"><a href="#其余方法" class="headerlink" title="其余方法"></a>其余方法</h3><p>生命周期相关方法：<strong>init</strong> 和 <strong>destroy</strong></p>
+<ul>
+<li>Servlet 容器在加载 Servlet 类的时候会调用 <strong>init</strong> 方法</li>
+<li>Servlet 容器在卸载 Servlet 类的时候会调用 <strong>destroy</strong> 方法</li>
+</ul>
+<p>Servlet 配置相关方法：<strong>getServletConfig</strong></p>
+<ul>
+<li>ServletConfig 的作用就是封装 Servlet 的初始化参数</li>
+<li>可以在web.xml给 Servlet 配置参数，并在程序里通过 getServletConfig 方法拿到这些参数。</li>
+</ul>
+<p>Servlet 的 <strong>GenericServlet</strong> 抽象类 和 <strong>HttpServlet</strong> 类</p>
+<ul>
+<li>GenericServlet 实现了 Servlet 的通用方法 而 HttpServlet 是在 GenericServlet 基础上进行了封装加入了 HTTP 特性</li>
+</ul>
+<p>HttpServlet 只需要重写 doGet 和 doPost。</p>
+<h2 id="Servlet-容器"><a href="#Servlet-容器" class="headerlink" title="Servlet 容器"></a>Servlet 容器</h2><p>整体工作流程</p>
+<ol>
+<li>客户端发起 HTTP 请求</li>
+<li>HTTP 服务器使用 ServletRequest 讲请求封装</li>
+<li>调用 Servlet 容器的 service 方法</li>
+<li>Servlet 容器，根据请求的 URL 和 Servlet 的映射关系，找到相应的 Servlet</li>
+<li>如果 Servlet 还没有被加载，就用反射机制创建这个 Servlet，并调用 Servlet 的 init 方法来完成初始化</li>
+<li>调用 Servlet 的 service 方法来处理请求，把 ServletResponse 对象返回给 HTTP 服务器</li>
+<li>讲响应返回给客户端</li>
+</ol>
+<p><strong>Web 应用层级</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">| - MyWebApp </span><br><span class="line">| - WEB-INF/web.xml -- 配置文件，用来配置Servlet等 </span><br><span class="line">| - WEB-INF/lib/ -- 存放Web应用所需各种JAR包 </span><br><span class="line">| - WEB-INF/classes/ -- 存放你的应用类，比如Servlet类 </span><br><span class="line">| - META-INF/ -- 目录存放工程的一些信息</span><br></pre></td></tr></table></figure>
+
+<p>Servlet 容器顺序</p>
+<ol>
+<li>实例化 Servlet</li>
+<li>调用 Servlet</li>
+</ol>
+<p><strong>Servlet 是怎么注册到 Servlet 容器中</strong></p>
+<ol>
+<li>以 Web 应用程序的方式来部署 Servlet </li>
+<li>Servlet 规范里定义了 ServletContext 这个接口来对应一个 Web 应用</li>
+<li>Servlet 容器在启动时会加载 Web 应用，并为每个 Web 应用创建唯一的 ServletContext 对象</li>
+<li>由于 ServletContext 持有所有 Servlet 实例，你还可以通过它来实现 Servlet 请求的转发。扩展机制</li>
+</ol>
+<p><strong>扩展机制</strong></p>
+<p>Servlet 规范提供了两种扩展机制：</p>
+<ul>
+<li>Filter  过滤器</li>
+<li>Listener 监听器</li>
+</ul>
+<p><strong>Filter 过滤器的流程</strong></p>
+<ol>
+<li>Web 应用部署完成</li>
+<li>Servlet 容器需要实例化 Filter 并把 Filter 链接成一个 FilterChain。</li>
+<li>请求进来，获取第一个 Filter 并调用 doFilter 方法，doFilter 方法负责调用这个 FilterChain 中的下一个 Filter。</li>
+</ol>
+]]></content>
       <categories>
-          
-          <category> Tomcat </category>
-          
+        <category>Tomcat</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> Tomcat </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Servlet规范和Servlet容器</title>
-      <link href="/1c68dade.html"/>
-      <url>/1c68dade.html</url>
-      
-        <content type="html"><![CDATA[<h1 id="Servlet规范和Servlet容器"><a href="#Servlet规范和Servlet容器" class="headerlink" title="Servlet规范和Servlet容器"></a>Servlet规范和Servlet容器</h1><h2 id="HTTP-服务器-怎么调用对应-Java-类的哪个方法？"><a href="#HTTP-服务器-怎么调用对应-Java-类的哪个方法？" class="headerlink" title="HTTP 服务器 怎么调用对应 Java 类的哪个方法？"></a>HTTP 服务器 怎么调用对应 Java 类的哪个方法？</h2><p>❌</p><blockquote><p>方式：通过一堆if-else进行判断<br>问题：HTTP 服务器的代码跟业务逻辑耦合在一起了，如果新加一个业务方法还要改 HTTP 服务器的代码。</p></blockquote><p>✔️</p><blockquote><p>方式：通过接口进行解耦，各种业务类都必须实现这个接口(Servlet 接口)</p></blockquote><span id="more"></span><h2 id="HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？"><a href="#HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？" class="headerlink" title="HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？"></a>HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？</h2><p>❌</p><blockquote><p>方式：使用 HTTP 服务器进行<br>问题：HTTP 服务器 和 业务类耦合</p></blockquote><p>✔️</p><blockquote><p>方式：添加 Servlet 容器，Servlet 容器用来加载和管理业务类</p></blockquote><h2 id="Servlet-接口"><a href="#Servlet-接口" class="headerlink" title="Servlet 接口"></a>Servlet 接口</h2><blockquote><p>Servlet 接口是 Servlet 容器跟具体业务类之间的接口。<br>Servlet 接口和 Servlet 容器这一整套规范叫作 Servlet 规范</p></blockquote><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Servlet</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(ServletConfig config)</span> <span class="keyword">throws</span> ServletException</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function">ServletConfig <span class="title">getServletConfig</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">service</span><span class="params">(ServletRequest req, ServletResponse res）<span class="keyword">throws</span> ServletException, IOException;</span></span></span><br><span class="line"><span class="params"><span class="function">    </span></span></span><br><span class="line"><span class="params"><span class="function">    String getServletInfo()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="重点方法：service"><a href="#重点方法：service" class="headerlink" title="重点方法：service"></a>重点方法：<em><strong>service</strong></em></h3><p>service的两个参数</p><ul><li><p>ServletRequest 用来封装请求信息</p></li><li><p>ServletResponse 用来封装响应信息</p></li></ul><blockquote><p>本质上这两个类是对通信协议的封装</p></blockquote><h3 id="其余方法"><a href="#其余方法" class="headerlink" title="其余方法"></a>其余方法</h3><p>生命周期相关方法：<strong>init</strong> 和 <strong>destroy</strong></p><ul><li>Servlet 容器在加载 Servlet 类的时候会调用 <strong>init</strong> 方法</li><li>Servlet 容器在卸载 Servlet 类的时候会调用 <strong>destroy</strong> 方法</li></ul><p>Servlet 配置相关方法：<strong>getServletConfig</strong></p><ul><li>ServletConfig 的作用就是封装 Servlet 的初始化参数</li><li>可以在web.xml给 Servlet 配置参数，并在程序里通过 getServletConfig 方法拿到这些参数。</li></ul><p>Servlet 的 <strong>GenericServlet</strong> 抽象类 和 <strong>HttpServlet</strong> 类</p><ul><li>GenericServlet 实现了 Servlet 的通用方法 而 HttpServlet 是在 GenericServlet 基础上进行了封装加入了 HTTP 特性</li></ul><p>HttpServlet 只需要重写 doGet 和 doPost。</p><h2 id="Servlet-容器"><a href="#Servlet-容器" class="headerlink" title="Servlet 容器"></a>Servlet 容器</h2><p>整体工作流程</p><ol><li>客户端发起 HTTP 请求</li><li>HTTP 服务器使用 ServletRequest 讲请求封装</li><li>调用 Servlet 容器的 service 方法</li><li>Servlet 容器，根据请求的 URL 和 Servlet 的映射关系，找到相应的 Servlet</li><li>如果 Servlet 还没有被加载，就用反射机制创建这个 Servlet，并调用 Servlet 的 init 方法来完成初始化</li><li>调用 Servlet 的 service 方法来处理请求，把 ServletResponse 对象返回给 HTTP 服务器</li><li>讲响应返回给客户端</li></ol><p><strong>Web 应用层级</strong></p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">| - MyWebApp </span><br><span class="line">| - WEB-INF/web.xml -- 配置文件，用来配置Servlet等 </span><br><span class="line">| - WEB-INF/lib/ -- 存放Web应用所需各种JAR包 </span><br><span class="line">| - WEB-INF/classes/ -- 存放你的应用类，比如Servlet类 </span><br><span class="line">| - META-INF/ -- 目录存放工程的一些信息</span><br></pre></td></tr></table></figure><p>Servlet 容器顺序</p><ol><li>实例化 Servlet</li><li>调用 Servlet</li></ol><p><strong>Servlet 是怎么注册到 Servlet 容器中</strong></p><ol><li>以 Web 应用程序的方式来部署 Servlet </li><li>Servlet 规范里定义了 ServletContext 这个接口来对应一个 Web 应用</li><li>Servlet 容器在启动时会加载 Web 应用，并为每个 Web 应用创建唯一的 ServletContext 对象</li><li>由于 ServletContext 持有所有 Servlet 实例，你还可以通过它来实现 Servlet 请求的转发。扩展机制</li></ol><p><strong>扩展机制</strong></p><p>Servlet 规范提供了两种扩展机制：</p><ul><li>Filter  过滤器</li><li>Listener 监听器</li></ul><p><strong>Filter 过滤器的流程</strong></p><ol><li>Web 应用部署完成</li><li>Servlet 容器需要实例化 Filter 并把 Filter 链接成一个 FilterChain。</li><li>请求进来，获取第一个 Filter 并调用 doFilter 方法，doFilter 方法负责调用这个 FilterChain 中的下一个 Filter。</li></ol>]]></content>
-      
-      
+      <tags>
+        <tag>Tomcat</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Tomcat基础</title>
+    <url>/530cfffd.html</url>
+    <content><![CDATA[<h1 id="Tomcat基础"><a href="#Tomcat基础" class="headerlink" title="Tomcat基础"></a>Tomcat基础</h1><h2 id="Web-容器是什么"><a href="#Web-容器是什么" class="headerlink" title="Web 容器是什么"></a>Web 容器是什么</h2><ul>
+<li>Servlet 是可以视作没有 main 方法的 java 程序，没有 mian 方法需要部署到 Servlet 容器中，由容器来实例化并调用Servlet</li>
+<li>为了方便使用，他们需要具有 HTTP 服务器功能</li>
+<li>Tomcat 或者 Jetty 就是 HTTP 服务器 + Servlet 容器</li>
+<li>Web 容器 = HTTP 服务器 + Servlet 容器 </li>
+</ul>
+<span id="more"></span>
+
+<blockquote>
+<p>如今的 SpringBoot 是内嵌的 Web 容器(Tomcat)，因为当前大环境为微服务(将大而全的单体应用拆分成一个个功能单一的微服务)，这也就需要更多的 Web 容器来启动，自然需要轻量级的 Web 容器，以减少资源的消耗，降低部署的成本，而选择内嵌，降低应用部署的复杂度。</p>
+</blockquote>
+<h2 id="怎么学习-Web-容器"><a href="#怎么学习-Web-容器" class="headerlink" title="怎么学习 Web 容器"></a>怎么学习 Web 容器</h2><p><strong>HTTP 的本质</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">HTTP 协议是浏览器与服务器之间的数据传送协议</span><br><span class="line">HTTP 协议的本质就是一种浏览器与服务器之间约定好的通信格式</span><br></pre></td></tr></table></figure>
+
+<p>获取远端 HTTP 服务器的数据时</p>
+<ol>
+<li>与 HTTP 服务器建立 Socket 连接。 ip + 端口</li>
+<li>生成请求数据并通过Socket发送出去</li>
+</ol>
+<p><strong>HTTP 协议做的事情</strong></p>
+<ul>
+<li>获取还是提交内容</li>
+<li>想要的内容是什么</li>
+<li>这些内容以一种什么样的格式放到请求</li>
+</ul>
+<p><strong>HTTP 工作原理</strong></p>
+<ol>
+<li>用户发起请求_输入网址回车</li>
+<li>浏览器发起 TCP 请求连接_经过 TCP 三次握手建立连接</li>
+<li>服务器接收并建立连接</li>
+<li>浏览器生成 HTTP 格式的数据包</li>
+<li>浏览器发送HTTP 格式的请求数据包</li>
+<li>服务器解析 HTTP 格式的数据包_得知客户端的意图</li>
+<li>服务器执行请求</li>
+<li>服务器生成 HTTP 格式的数据包</li>
+<li>发送响应数据包</li>
+<li>浏览器解析 HTTP 格式的数据包</li>
+<li>浏览器呈现 HTML 响应给用户</li>
+</ol>
+<p><strong>做了哪些事情</strong></p>
+<ul>
+<li>Tomcat 将 HTTP 请求数据字节解析成 Request 对象</li>
+<li>Request 对象 封装了 HTTP 所有的请求信息,此后交给 Web 应用处理</li>
+<li>处理后得到 Response 对象</li>
+<li>Tomcat 将 Response 对象转成 HTTP 格式得响应数据并返回给浏览器</li>
+</ul>
+<h2 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h2><p><strong>什么是Cookie</strong></p>
+<ul>
+<li>Cookie 是 HTTP 报文得一个请求头</li>
+<li>Cookie 本质上就是一份存储在用户本地的文件，里面包含了每次请求中都需要传递的信息</li>
+<li>服务器可以通过读取 Cookie 请求头就知道用户是谁(用户的标识信息)</li>
+</ul>
+<h2 id="Session"><a href="#Session" class="headerlink" title="Session"></a>Session</h2><blockquote>
+<p>好处只发送 Sessoion ID 相对安全，节省网络流量，重点是不需要在 Cookie 中保存大量用户信息。<br><strong>Session和Cookie的关系</strong></p>
+</blockquote>
+<ul>
+<li>Cookie 是明文保存，是存在隐患得，Session 是保存在服务器上得，里面保存着用户得状态。</li>
+<li>当用户请求到来时，服务端可以通过 Cookie 把用户的请求和用户的 Session 对应起来</li>
+<li>浏览器在 Cookie 中填充了一个 Session ID 之类的字段用来标识请求。</li>
+</ul>
+<p><strong>Session的创建</strong></p>
+<ol>
+<li>浏览器发起请求 服务器 创建 Session，生成唯一 Session ID 给浏览器带回去。</li>
+<li>浏览器发起请求 ，服务器依据带来得 SessionID 找对对应 Session，找到session后 就可以获取或者添加内容</li>
+</ol>
+<p><strong>Tomcat 对 Session 得处理</strong></p>
+<ul>
+<li>Session 有过期时间，因此 Tomcat 会开启后台线程定期轮询，如果 Session 过期就会将 Session 失效掉。</li>
+<li>使用长连接的 HTTP 协议，会在响应头加入 Connection:keep-alive</li>
+</ul>
+]]></content>
       <categories>
-          
-          <category> Tomcat </category>
-          
+        <category>Tomcat</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> Tomcat </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Tomcat基础</title>
-      <link href="/530cfffd.html"/>
-      <url>/530cfffd.html</url>
-      
-        <content type="html"><![CDATA[<h1 id="Tomcat基础"><a href="#Tomcat基础" class="headerlink" title="Tomcat基础"></a>Tomcat基础</h1><h2 id="Web-容器是什么"><a href="#Web-容器是什么" class="headerlink" title="Web 容器是什么"></a>Web 容器是什么</h2><ul><li>Servlet 是可以视作没有 main 方法的 java 程序，没有 mian 方法需要部署到 Servlet 容器中，由容器来实例化并调用Servlet</li><li>为了方便使用，他们需要具有 HTTP 服务器功能</li><li>Tomcat 或者 Jetty 就是 HTTP 服务器 + Servlet 容器</li><li>Web 容器 = HTTP 服务器 + Servlet 容器 </li></ul><span id="more"></span><blockquote><p>如今的 SpringBoot 是内嵌的 Web 容器(Tomcat)，因为当前大环境为微服务(将大而全的单体应用拆分成一个个功能单一的微服务)，这也就需要更多的 Web 容器来启动，自然需要轻量级的 Web 容器，以减少资源的消耗，降低部署的成本，而选择内嵌，降低应用部署的复杂度。</p></blockquote><h2 id="怎么学习-Web-容器"><a href="#怎么学习-Web-容器" class="headerlink" title="怎么学习 Web 容器"></a>怎么学习 Web 容器</h2><p><strong>HTTP 的本质</strong></p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HTTP 协议是浏览器与服务器之间的数据传送协议</span><br><span class="line">HTTP 协议的本质就是一种浏览器与服务器之间约定好的通信格式</span><br></pre></td></tr></table></figure><p>获取远端 HTTP 服务器的数据时</p><ol><li>与 HTTP 服务器建立 Socket 连接。 ip + 端口</li><li>生成请求数据并通过Socket发送出去</li></ol><p><strong>HTTP 协议做的事情</strong></p><ul><li>获取还是提交内容</li><li>想要的内容是什么</li><li>这些内容以一种什么样的格式放到请求</li></ul><p><strong>HTTP 工作原理</strong></p><ol><li>用户发起请求_输入网址回车</li><li>浏览器发起 TCP 请求连接_经过 TCP 三次握手建立连接</li><li>服务器接收并建立连接</li><li>浏览器生成 HTTP 格式的数据包</li><li>浏览器发送HTTP 格式的请求数据包</li><li>服务器解析 HTTP 格式的数据包_得知客户端的意图</li><li>服务器执行请求</li><li>服务器生成 HTTP 格式的数据包</li><li>发送响应数据包</li><li>浏览器解析 HTTP 格式的数据包</li><li>浏览器呈现 HTML 响应给用户</li></ol><p><strong>做了哪些事情</strong></p><ul><li>Tomcat 将 HTTP 请求数据字节解析成 Request 对象</li><li>Request 对象 封装了 HTTP 所有的请求信息,此后交给 Web 应用处理</li><li>处理后得到 Response 对象</li><li>Tomcat 将 Response 对象转成 HTTP 格式得响应数据并返回给浏览器</li></ul><h2 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h2><p><strong>什么是Cookie</strong></p><ul><li>Cookie 是 HTTP 报文得一个请求头</li><li>Cookie 本质上就是一份存储在用户本地的文件，里面包含了每次请求中都需要传递的信息</li><li>服务器可以通过读取 Cookie 请求头就知道用户是谁(用户的标识信息)</li></ul><h2 id="Session"><a href="#Session" class="headerlink" title="Session"></a>Session</h2><blockquote><p>好处只发送 Sessoion ID 相对安全，节省网络流量，重点是不需要在 Cookie 中保存大量用户信息。<br><strong>Session和Cookie的关系</strong></p></blockquote><ul><li>Cookie 是明文保存，是存在隐患得，Session 是保存在服务器上得，里面保存着用户得状态。</li><li>当用户请求到来时，服务端可以通过 Cookie 把用户的请求和用户的 Session 对应起来</li><li>浏览器在 Cookie 中填充了一个 Session ID 之类的字段用来标识请求。</li></ul><p><strong>Session的创建</strong></p><ol><li>浏览器发起请求 服务器 创建 Session，生成唯一 Session ID 给浏览器带回去。</li><li>浏览器发起请求 ，服务器依据带来得 SessionID 找对对应 Session，找到session后 就可以获取或者添加内容</li></ol><p><strong>Tomcat 对 Session 得处理</strong></p><ul><li>Session 有过期时间，因此 Tomcat 会开启后台线程定期轮询，如果 Session 过期就会将 Session 失效掉。</li><li>使用长连接的 HTTP 协议，会在响应头加入 Connection:keep-alive</li></ul>]]></content>
-      
-      
+      <tags>
+        <tag>Tomcat</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Tomcat连接器的设计</title>
+    <url>/d2d77b8f.html</url>
+    <content><![CDATA[<h1 id="Tomcat连接器的设计"><a href="#Tomcat连接器的设计" class="headerlink" title="Tomcat连接器的设计"></a>Tomcat连接器的设计</h1><h2 id="Tomcat-总体架构"><a href="#Tomcat-总体架构" class="headerlink" title="Tomcat 总体架构"></a>Tomcat 总体架构</h2><p>Tomcat 要实现 <em><strong>2 个核心功能</strong></em>：</p>
+<blockquote>
+<p>处理 Socket 连接，负责网络字节流与 Request 和 Response 对象的转化。<br>加载和管理 Servlet，以及具体处理 Request 请求。</p>
+</blockquote>
+<p>对应2个核心功能 Tomcat 设计的组件</p>
+<blockquote>
+<p>连接器（connector）<br>容器（container）</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="Tomcat-支持的多种-I-O-模型和应用层协议"><a href="#Tomcat-支持的多种-I-O-模型和应用层协议" class="headerlink" title="Tomcat 支持的多种 I/O 模型和应用层协议"></a>Tomcat 支持的多种 I/O 模型和应用层协议</h2><p><strong>Tomcat 支持的 I/O 模型有：</strong></p>
+<ul>
+<li>NIO：非阻塞 I/O，采用 Java NIO 类库实现。</li>
+<li>NIO.2：异步 I/O，采用 JDK 7 最新的 </li>
+<li>NIO.2 类库实现。APR：采用 Apache 可移植运行库实现，是 C/C++ 编写的本地库。</li>
+</ul>
+<p><strong>Tomcat 支持的应用层协议有：</strong></p>
+<ul>
+<li>HTTP/1.1：这是大部分 Web 应用采用的访问协议。</li>
+<li>AJP：用于和 Web 服务器集成（如 Apache）。</li>
+<li>HTTP/2：HTTP 2.0 大幅度的提升了 Web 性能。</li>
+</ul>
+<p><em><strong>由于 Tomcat 需要 支持多种 I/O 模型和应用层协议，就需要多种的连接器了。</strong></em></p>
+<blockquote>
+<p>Tomcat 实例 包裹 连接器（connector）容器（container） 等于 Service 组件。<br>Tomcat 实例 有多个连接器和一个容器</p>
+</blockquote>
+<p><em><strong>连接器与容器之间通过标准的 ServletRequest 和 ServletResponse 通信</strong></em></p>
+<p><strong>连接器</strong></p>
+<blockquote>
+<p>连接器对 Servlet 容器屏蔽了协议及 I/O 模型等的区别<br>在容器中获取到的都是一个标准的 ServletRequest 对象</p>
+</blockquote>
+<p><strong>连接器工作流程</strong>：</p>
+<ul>
+<li>监听网络端口</li>
+<li>接受网络连接请求</li>
+<li>读取网络请求字节流</li>
+<li>根据具体应用层协议（HTTP/AJP）解析字节流，生成统一的 Tomcat Request 对象</li>
+<li>将 Tomcat Request 对象转成标准的 ServletRequest</li>
+<li>调用 Servlet 容器，得到 ServletResponse</li>
+<li>将 ServletResponse 转成 Tomcat Response 对象</li>
+<li>将 Tomcat Response 转成网络字节流</li>
+<li>将响应字节流写回给浏览器</li>
+</ul>
+<h2 id="连接器的子模块"><a href="#连接器的子模块" class="headerlink" title="连接器的子模块"></a>连接器的子模块</h2><p>连接器需要完成 3 个高内聚的功能：</p>
+<ul>
+<li>网络通信。</li>
+<li>应用层协议解析。</li>
+<li>Tomcat Request/Response 与 ServletRequest/ServletResponse 的转化。</li>
+</ul>
+<p>对应这三块 分别对应三个组件 组件之间通过抽象接口交互</p>
+<ul>
+<li>Endpoint  网络通信</li>
+<li>Processor  应用层协议解析</li>
+<li>Adapter</li>
+</ul>
+<p>模块工作分工如下：</p>
+<ul>
+<li>Endpoint 负责提供字节流给 Processor， <strong>Socket</strong></li>
+<li>Processor 负责提供 Tomcat Request 对象给 Adapter， <strong>Tomcat Request</strong></li>
+<li>Adapter 负责提供 ServletRequest 对象给容器。  <strong>ServletRequest</strong></li>
+</ul>
+<p><strong>I/O</strong> <strong>模型和应用层协议可以自由组合</strong></p>
+<blockquote>
+<p>于是网络通信（Endpoint）和应用层协议解析（Processor）放在一起有了 ProtocolHandler 接口各种协议和通信模型的组合</p>
+</blockquote>
+<h3 id="层级结构"><a href="#层级结构" class="headerlink" title="层级结构"></a>层级结构</h3><ul>
+<li>连接器 顶层</li>
+<li>ProtocolHandler 1层 ， Adapter 1层</li>
+<li>Endpoint 2层，Processor 2层</li>
+</ul>
+<h3 id="ProtocolHandler-组件"><a href="#ProtocolHandler-组件" class="headerlink" title="ProtocolHandler 组件"></a>ProtocolHandler 组件</h3><p><strong>Endpoint</strong>网络通信</p>
+<ul>
+<li>Endpoint 是通信端点，即通信监听的接口</li>
+<li>具体的 Socket 接收和发送处理器，是对传输层的抽象，因此 Endpoint 是用来实现 TCP/IP 协议的。</li>
+<li>AbstractEndpoint 是 Endpoint 的抽象，他有两个重要的子组件：<strong>Acceptor</strong> 和 <strong>SocketProcessor</strong>。<ul>
+<li>Acceptor 用于监听 Socket 连接请求</li>
+<li>SocketProcessor 用于处理接收到的 Socket 请求，它实现 Runnable 接口，在 run 方法里调用协议处理组件 Processor 进行处理.<ul>
+<li>SocketProcessor 为了提高处理能力，SocketProcessor 被提交到线程池来执行。而这个线程池叫作执行器（Executor)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Processor</strong>应用层协议解析</p>
+<ul>
+<li>Processor 接收来自 Endpoint 的 Socket</li>
+<li>读取字节流解析成 Tomcat Request 和 Response 对象，并通过 Adapter 将其提交到容器处理</li>
+<li>Processor 是对应用层协议的抽象。</li>
+</ul>
+<h3 id="Adapter-组件"><a href="#Adapter-组件" class="headerlink" title="Adapter 组件"></a>Adapter 组件</h3><p><strong>ProtocolHandler 接口负责解析请求并生成 Tomcat Request 类</strong></p>
+<ul>
+<li>Tomcat Request 不是标准 ServletRequest 需要转换 这个工作是  <strong>CoyoteAdapter</strong> 完成的</li>
+<li>连接器调用 <strong>CoyoteAdapter</strong> 的 sevice 方法，传入的是 Tomcat Request 对象，CoyoteAdapter 负责将 Tomcat Request 转成 ServletRequest，再调用容器的 service 方法。</li>
+</ul>
+<p><strong>连接器工作流程</strong></p>
+<ul>
+<li>Endpoint 接收到 Socket 连接后，生成一个 SocketProcessor 任务提交到线程池去处理</li>
+<li>SocketProcessor 的 run 方法会调用 Processor 组件去解析应用层协议</li>
+<li>Processor 通过解析生成 Request 对象后，会调用 Adapter 的 Service 方法。</li>
+</ul>
+]]></content>
       <categories>
-          
-          <category> Tomcat </category>
-          
+        <category>Tomcat</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> Tomcat </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>递归（Recurtion）</title>
-      <link href="/8bf709ac.html"/>
-      <url>/8bf709ac.html</url>
-      
-        <content type="html"><![CDATA[<hr><p>递归的本质和基本实现形式</p><span id="more"></span><h1 id="递归（Recurtion）"><a href="#递归（Recurtion）" class="headerlink" title="递归（Recurtion）"></a>递归（Recurtion）</h1><h2 id="递归的本质和基本实现形式"><a href="#递归的本质和基本实现形式" class="headerlink" title="递归的本质和基本实现形式"></a>递归的本质和基本实现形式</h2><h3 id="什么是递归"><a href="#什么是递归" class="headerlink" title="什么是递归"></a><strong>什么是递归</strong></h3><ul><li>函数自身调用自身</li><li>通过函数体来进行循环</li><li>以自相似的方法重复进行的过程</li></ul><h3 id="计算-n-n的阶乘"><a href="#计算-n-n的阶乘" class="headerlink" title="计算 n! n的阶乘"></a><strong>计算 n! n的阶乘</strong></h3><blockquote><p>n! = 1 * 2 * 3 * 4 * n</p></blockquote><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Factorial</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> N = <span class="number">5</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> n = <span class="number">0</span>; n &lt;= N; n++)&#123;</span><br><span class="line">            <span class="keyword">int</span> fact = factorial(n);</span><br><span class="line">            System.out.println(n + <span class="string">&quot; 的阶乘值是： &quot;</span> + fact);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">factorial</span><span class="params">(<span class="keyword">int</span> n)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(n &lt; <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> factorial(n-<span class="number">1</span>) * n;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>输出:</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">0 的阶乘值是： 1</span><br><span class="line">1 的阶乘值是： 1</span><br><span class="line">2 的阶乘值是： 2</span><br><span class="line">3 的阶乘值是： 6</span><br><span class="line">4 的阶乘值是： 24</span><br><span class="line">5 的阶乘值是： 120</span><br></pre></td></tr></table></figure><h3 id="图解-阶乘"><a href="#图解-阶乘" class="headerlink" title="图解 阶乘"></a>图解 阶乘</h3><p><img src="/8bf709ac/image-20211122230840070.png" alt="image-20211122230840070"></p><p>递归分为了两个部分</p><ul><li>解析路径部分 即： factorial(6) 到 6 * (5 * (4 * (3 * (2 * factorial(1)))) 目的展开路径。</li><li>计算结果部分 即：6 * (5 * (4 * (3 * (2 * 1))) 到 6 * 120  结果叠加回去 最后得到 720</li></ul><h3 id="什么时候用递归-什么时候用递推"><a href="#什么时候用递归-什么时候用递推" class="headerlink" title="什么时候用递归 什么时候用递推"></a>什么时候用递归 什么时候用递推</h3><p>递推：如阶乘明显算5的阶乘 可以用递推 他的推导路径一目了然 1 * 2 * 3 * 4 … * n 等等 用 for 即可<br>递归：当推导路径不明确的时候可以使用递归，如计算一棵树的时候，取得某些节点符合条件节点，但是树并不一定就是平衡二叉树，不能确定他长什么样子的时候就可以使用递归。先探索树的路径，然后返回结果。</p><h3 id="递归的三个关键"><a href="#递归的三个关键" class="headerlink" title="递归的三个关键"></a>递归的三个关键</h3><p>1.定义需要递归的问题（重叠子问题）<br>2.确定递归边界<br>3.保护和还原现场</p><h3 id="保护和还原现场"><a href="#保护和还原现场" class="headerlink" title="保护和还原现场"></a>保护和还原现场</h3><blockquote><p>当使用了全局变量的时候，才退出当前方法的时候要还原，因为这是所有重叠方法都需要使用的。<br>相对而言，局部变量和参数。就不需要还原了，因为每一次递归方法的时候他都会创建一个新的，重写方法之间没有关联。</p></blockquote><h3 id="递归模板"><a href="#递归模板" class="headerlink" title="递归模板"></a>递归模板</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">方法名</span><br><span class="line">终止条件</span><br><span class="line">本层处理</span><br><span class="line">递归子问题</span><br><span class="line">还原现场</span><br></pre></td></tr></table></figure><h2 id="递归实例"><a href="#递归实例" class="headerlink" title="递归实例"></a>递归实例</h2><p><a href="https://leetcode-cn.com/problems/subsets/">78.子集</a></p><ul><li>子集是指数型的枚举/递归(元素的 选择与不选择 2^n 元素个数n)<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 作为最后的返回值</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;List&lt;Integer&gt;&gt; ans = <span class="keyword">new</span> ArrayList();;</span><br><span class="line">    <span class="keyword">private</span> List&lt;Integer&gt; set = <span class="keyword">new</span> ArrayList();</span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; subsets(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">        findSubsets(nums,<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">findSubsets</span><span class="params">(<span class="keyword">int</span>[] nums,<span class="keyword">int</span> index)</span></span>&#123;</span><br><span class="line">        <span class="comment">// 设置边界</span></span><br><span class="line">        <span class="keyword">if</span>(index == nums.length)&#123;</span><br><span class="line">            ans.add(<span class="keyword">new</span> ArrayList&lt;Integer&gt;(set));</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 本层处理</span></span><br><span class="line">        <span class="comment">// 本层两种处理 选择/不选择</span></span><br><span class="line">        <span class="comment">// 不选择</span></span><br><span class="line">        findSubsets(nums,index+<span class="number">1</span>);</span><br><span class="line">        <span class="comment">// 选择</span></span><br><span class="line">        set.add(nums[index]);</span><br><span class="line">        findSubsets(nums,index+<span class="number">1</span>);</span><br><span class="line">        <span class="comment">// 还原现场</span></span><br><span class="line">        set.remove(set.size() - <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li></ul>]]></content>
-      
-      
+      <tags>
+        <tag>Tomcat</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>基础架构:一条SQL查询语句是如何执行的</title>
+    <url>/183e61db.html</url>
+    <content><![CDATA[<h1 id="基础结构"><a href="#基础结构" class="headerlink" title="基础结构"></a>基础结构</h1><h2 id="功能模块划"><a href="#功能模块划" class="headerlink" title="功能模块划"></a>功能模块划</h2><p><strong>Server层</strong></p>
+<ul>
+<li>连接器（管理接连，权限验证）</li>
+<li>查询缓存</li>
+<li>分析器（词法分析，语法分析）</li>
+<li>优化器（执行计划生成，索引选择）</li>
+<li>执行器（操作引擎，返回结果）</li>
+<li>存储过程，触发器，视图等等。</li>
+</ul>
+<p><strong>存储引擎层</strong></p>
+<ul>
+<li>数据的存储和提取。</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="mysql-的默认引擎"><a href="#mysql-的默认引擎" class="headerlink" title="mysql 的默认引擎"></a>mysql 的默认引擎</h2><blockquote>
+<p>MySQL 默认存储引擎是 InnoDB ，创建表的时候，如不指定引擎类型，默认InnoDB</p>
+</blockquote>
+<h2 id="mysql的小知识点"><a href="#mysql的小知识点" class="headerlink" title="mysql的小知识点"></a>mysql的小知识点</h2><h3 id="连接器"><a href="#连接器" class="headerlink" title="连接器"></a>连接器</h3><ol>
+<li>连接器负责对客户端建立链接，获取权限，维持和管理连接<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">mysql <span class="operator">-</span>h ip <span class="operator">-</span>P port <span class="operator">-</span>u <span class="keyword">user</span> <span class="operator">-</span>p</span><br></pre></td></tr></table></figure></li>
+<li>账户密&amp;码正确，连接器查询权限获得权限，自此，断开连接之前都是该权限。</li>
+</ol>
+<p><strong>完成连接后的小知识点</strong></p>
+<ul>
+<li>连接完成后，没有动作，即 sleep 处于空闲状态。可以使用 show processlist 查看</li>
+<li>默认断开时间 8 小时 由 wait_timeout 控制，当断开后继续执行，抛出错误信息 lost connection 需要重新连接。</li>
+<li>长连接：客户持续有请求，则一直使用同一个连接</li>
+<li>短连接：每次执行完很少几次查询就会断开，下次查询重新建立</li>
+<li>减少建立连接，尽量使用长连接。</li>
+</ul>
+<p><strong>若都是长连接，MySQL 占用内存涨的很快，因为 MySQL 执行过程中临时使用的内存管理在连接对象里面，要在断开连接时才会释放。长期积累 可能会 OOM MySQL 异常重启。</strong></p>
+<ul>
+<li>定期断开长连接。</li>
+<li>使用mysql_reset_connection来重新初始化连接资源</li>
+</ul>
+<h3 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h3><ol>
+<li>MySQL建立连接后，执行sql</li>
+<li>执行前，判断之前是否执行过</li>
+<li>执行过，通过sql(key)直接返回数据（value）</li>
+<li>没有执行过，查询出结果，并放到缓存中</li>
+<li>多命中缓存，效率高</li>
+</ol>
+<p><strong>大多数情况不建议使用查询缓存，因为可能弊大于利</strong></p>
+<ol>
+<li>缓存需要语句完全相等，包括参数。</li>
+<li>表更新后就会失效 因此，只有在表更新频率不高，查询语句完全一致的情况下，可以手动开启缓存，其他一律关闭。 </li>
+</ol>
+<p><strong>注意：mysql8之后，取消了缓存功能。</strong></p>
+<p>可以使用 <em><strong>query_cache_type</strong></em> 设置成 <em><strong>DEMAND</strong></em> 来进行按需缓存 通过 SQL_CACHE 显示执行。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> SQL_CACHE <span class="operator">*</span> <span class="keyword">from</span> T <span class="keyword">where</span> ID<span class="operator">=</span><span class="number">10</span>；</span><br></pre></td></tr></table></figure>
+<p><strong>可是使用 show variables 来查看服务器配置信息。</strong></p>
+<h3 id="分析器"><a href="#分析器" class="headerlink" title="分析器"></a>分析器</h3><ol>
+<li>未命中缓存，进入分析器，进行查询。</li>
+<li>分析器首先做词法分析，它要知道这个语句中的单词是什么意思</li>
+<li>分析器再进行语法分析，词法分析结果，语法分析器根据语法规则判断 SQL 语句是否满足 SQL 语法</li>
+<li>表名和列名在分析语法时就已经确定过了</li>
+</ol>
+<p><strong>tips:</strong> You have an error in your SQL syntax  关注 use near 的解析</p>
+<p><strong>分析器干两件事：</strong></p>
+<ol>
+<li>解析语句，生成解析树 </li>
+<li>检查语句中的关键词，表，字段是否存在</li>
+</ol>
+<h3 id="优化器"><a href="#优化器" class="headerlink" title="优化器"></a>优化器</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t1 <span class="keyword">join</span> t2 <span class="keyword">using</span>(ID)  <span class="keyword">where</span> t1.c<span class="operator">=</span><span class="number">10</span> <span class="keyword">and</span> t2.d<span class="operator">=</span><span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+<p>既可以先从表 t1 里面取出 c=10 的记录的 ID 值，再根据 ID 值关联到表 t2，再判断 t2 里面 d 的值是否等于 20。</p>
+<p>也可以先从表 t2 里面取出 d=20 的记录的 ID 值，再根据 ID 值关联到 t1，再判断 t1 里面 c 的值是否等于 10。<br><strong>区别:</strong></p>
+<ol>
+<li>执行效率不同</li>
+<li>尽可能扫描少的数据库行纪录</li>
+</ol>
+<p><em><strong>优化器是在表里面有多个索引的时候，决定使用哪个索引；</strong></em></p>
+<h3 id="执行器"><a href="#执行器" class="headerlink" title="执行器"></a>执行器</h3><ul>
+<li><p>判断是否对 表 T 有执行查询的权限</p>
+</li>
+<li><p>权限验证不仅再执行器这里，再分析器知道要做什么之后，也会做一次权限校验叫precheck</p>
+</li>
+<li><p>precheck 无法对运行时涉及到的表进行权限验证所以再执行器这里还需要验证。</p>
+</li>
+<li><p>判断拥有权限后，根据表定义的引擎，使用执行器使用对应引擎提供的接口。</p>
+</li>
+</ul>
+]]></content>
       <categories>
-          
-          <category> 算法 </category>
-          
+        <category>数据库</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> 算法 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>基础架构:一条SQL查询语句是如何执行的</title>
-      <link href="/183e61db.html"/>
-      <url>/183e61db.html</url>
-      
-        <content type="html"><![CDATA[<h1 id="基础结构"><a href="#基础结构" class="headerlink" title="基础结构"></a>基础结构</h1><h2 id="功能模块划"><a href="#功能模块划" class="headerlink" title="功能模块划"></a>功能模块划</h2><p><strong>Server层</strong></p><ul><li>连接器（管理接连，权限验证）</li><li>查询缓存</li><li>分析器（词法分析，语法分析）</li><li>优化器（执行计划生成，索引选择）</li><li>执行器（操作引擎，返回结果）</li><li>存储过程，触发器，视图等等。</li></ul><p><strong>存储引擎层</strong></p><ul><li>数据的存储和提取。</li></ul><h2 id="mysql-的默认引擎"><a href="#mysql-的默认引擎" class="headerlink" title="mysql 的默认引擎"></a>mysql 的默认引擎</h2><blockquote><p>MySQL 默认存储引擎是 InnoDB ，创建表的时候，如不指定引擎类型，默认InnoDB</p></blockquote><h2 id="mysql的小知识点"><a href="#mysql的小知识点" class="headerlink" title="mysql的小知识点"></a>mysql的小知识点</h2><h3 id="连接器"><a href="#连接器" class="headerlink" title="连接器"></a>连接器</h3><ol><li>连接器负责对客户端建立链接，获取权限，维持和管理连接<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql <span class="operator">-</span>h ip <span class="operator">-</span>P port <span class="operator">-</span>u <span class="keyword">user</span> <span class="operator">-</span>p</span><br></pre></td></tr></table></figure></li><li>账户密&amp;码正确，连接器查询权限获得权限，自此，断开连接之前都是该权限。</li></ol><p><strong>完成连接后的小知识点</strong></p><ul><li>连接完成后，没有动作，即 sleep 处于空闲状态。可以使用 show processlist 查看</li><li>默认断开时间 8 小时 由 wait_timeout 控制，当断开后继续执行，抛出错误信息 lost connection 需要重新连接。</li><li>长连接：客户持续有请求，则一直使用同一个连接</li><li>短连接：每次执行完很少几次查询就会断开，下次查询重新建立</li><li>减少建立连接，尽量使用长连接。</li></ul><p><strong>若都是长连接，MySQL 占用内存涨的很快，因为 MySQL 执行过程中临时使用的内存管理在连接对象里面，要在断开连接时才会释放。长期积累 可能会 OOM MySQL 异常重启。</strong></p><ul><li>定期断开长连接。</li><li>使用mysql_reset_connection来重新初始化连接资源</li></ul><h3 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h3><ol><li>MySQL建立连接后，执行sql</li><li>执行前，判断之前是否执行过</li><li>执行过，通过sql(key)直接返回数据（value）</li><li>没有执行过，查询出结果，并放到缓存中</li><li>多命中缓存，效率高</li></ol><p><strong>大多数情况不建议使用查询缓存，因为可能弊大于利</strong></p><ol><li>缓存需要语句完全相等，包括参数。</li><li>表更新后就会失效 因此，只有在表更新频率不高，查询语句完全一致的情况下，可以手动开启缓存，其他一律关闭。 </li></ol><p><strong>注意：mysql8之后，取消了缓存功能。</strong></p><p>可以使用 <em><strong>query_cache_type</strong></em> 设置成 <em><strong>DEMAND</strong></em> 来进行按需缓存 通过 SQL_CACHE 显示执行。</p><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> SQL_CACHE <span class="operator">*</span> <span class="keyword">from</span> T <span class="keyword">where</span> ID<span class="operator">=</span><span class="number">10</span>；</span><br></pre></td></tr></table></figure><p><strong>可是使用 show variables 来查看服务器配置信息。</strong></p><h3 id="分析器"><a href="#分析器" class="headerlink" title="分析器"></a>分析器</h3><ol><li>未命中缓存，进入分析器，进行查询。</li><li>分析器首先做词法分析，它要知道这个语句中的单词是什么意思</li><li>分析器再进行语法分析，词法分析结果，语法分析器根据语法规则判断 SQL 语句是否满足 SQL 语法</li><li>表名和列名在分析语法时就已经确定过了</li></ol><p><strong>tips:</strong> You have an error in your SQL syntax  关注 use near 的解析</p><p><strong>分析器干两件事：</strong></p><ol><li>解析语句，生成解析树 </li><li>检查语句中的关键词，表，字段是否存在</li></ol><h3 id="优化器"><a href="#优化器" class="headerlink" title="优化器"></a>优化器</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t1 <span class="keyword">join</span> t2 <span class="keyword">using</span>(ID)  <span class="keyword">where</span> t1.c<span class="operator">=</span><span class="number">10</span> <span class="keyword">and</span> t2.d<span class="operator">=</span><span class="number">20</span>;</span><br></pre></td></tr></table></figure><p>既可以先从表 t1 里面取出 c=10 的记录的 ID 值，再根据 ID 值关联到表 t2，再判断 t2 里面 d 的值是否等于 20。</p><p>也可以先从表 t2 里面取出 d=20 的记录的 ID 值，再根据 ID 值关联到 t1，再判断 t1 里面 c 的值是否等于 10。<br><strong>区别:</strong></p><ol><li>执行效率不同</li><li>尽可能扫描少的数据库行纪录</li></ol><p><em><strong>优化器是在表里面有多个索引的时候，决定使用哪个索引；</strong></em></p><h3 id="执行器"><a href="#执行器" class="headerlink" title="执行器"></a>执行器</h3><ul><li><p>判断是否对 表 T 有执行查询的权限</p></li><li><p>权限验证不仅再执行器这里，再分析器知道要做什么之后，也会做一次权限校验叫precheck</p></li><li><p>precheck 无法对运行时涉及到的表进行权限验证所以再执行器这里还需要验证。</p></li><li><p>判断拥有权限后，根据表定义的引擎，使用执行器使用对应引擎提供的接口。</p></li></ul>]]></content>
-      
-      
+      <tags>
+        <tag>mysql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>递归（Recurtion）</title>
+    <url>/8bf709ac.html</url>
+    <content><![CDATA[<hr>
+<p>递归的本质和基本实现形式</p>
+<span id="more"></span>
+
+<h1 id="递归（Recurtion）"><a href="#递归（Recurtion）" class="headerlink" title="递归（Recurtion）"></a>递归（Recurtion）</h1><h2 id="递归的本质和基本实现形式"><a href="#递归的本质和基本实现形式" class="headerlink" title="递归的本质和基本实现形式"></a>递归的本质和基本实现形式</h2><h3 id="什么是递归"><a href="#什么是递归" class="headerlink" title="什么是递归"></a><strong>什么是递归</strong></h3><ul>
+<li>函数自身调用自身</li>
+<li>通过函数体来进行循环</li>
+<li>以自相似的方法重复进行的过程</li>
+</ul>
+<h3 id="计算-n-n的阶乘"><a href="#计算-n-n的阶乘" class="headerlink" title="计算 n! n的阶乘"></a><strong>计算 n! n的阶乘</strong></h3><blockquote>
+<p>n! = 1 * 2 * 3 * 4 * n</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Factorial</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> N = <span class="number">5</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> n = <span class="number">0</span>; n &lt;= N; n++)&#123;</span><br><span class="line">            <span class="keyword">int</span> fact = factorial(n);</span><br><span class="line">            System.out.println(n + <span class="string">&quot; 的阶乘值是： &quot;</span> + fact);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">factorial</span><span class="params">(<span class="keyword">int</span> n)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(n &lt; <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> factorial(n-<span class="number">1</span>) * n;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">0 的阶乘值是： 1</span><br><span class="line">1 的阶乘值是： 1</span><br><span class="line">2 的阶乘值是： 2</span><br><span class="line">3 的阶乘值是： 6</span><br><span class="line">4 的阶乘值是： 24</span><br><span class="line">5 的阶乘值是： 120</span><br></pre></td></tr></table></figure>
+<h3 id="图解-阶乘"><a href="#图解-阶乘" class="headerlink" title="图解 阶乘"></a>图解 阶乘</h3><p><img src="/8bf709ac/image-20211122230840070.png" alt="image-20211122230840070"></p>
+<p>递归分为了两个部分</p>
+<ul>
+<li>解析路径部分 即： factorial(6) 到 6 * (5 * (4 * (3 * (2 * factorial(1)))) 目的展开路径。</li>
+<li>计算结果部分 即：6 * (5 * (4 * (3 * (2 * 1))) 到 6 * 120  结果叠加回去 最后得到 720</li>
+</ul>
+<h3 id="什么时候用递归-什么时候用递推"><a href="#什么时候用递归-什么时候用递推" class="headerlink" title="什么时候用递归 什么时候用递推"></a>什么时候用递归 什么时候用递推</h3><p>递推：如阶乘明显算5的阶乘 可以用递推 他的推导路径一目了然 1 * 2 * 3 * 4 … * n 等等 用 for 即可<br>递归：当推导路径不明确的时候可以使用递归，如计算一棵树的时候，取得某些节点符合条件节点，但是树并不一定就是平衡二叉树，不能确定他长什么样子的时候就可以使用递归。先探索树的路径，然后返回结果。</p>
+<h3 id="递归的三个关键"><a href="#递归的三个关键" class="headerlink" title="递归的三个关键"></a>递归的三个关键</h3><p>1.定义需要递归的问题（重叠子问题）<br>2.确定递归边界<br>3.保护和还原现场</p>
+<h3 id="保护和还原现场"><a href="#保护和还原现场" class="headerlink" title="保护和还原现场"></a>保护和还原现场</h3><blockquote>
+<p>当使用了全局变量的时候，才退出当前方法的时候要还原，因为这是所有重叠方法都需要使用的。<br>相对而言，局部变量和参数。就不需要还原了，因为每一次递归方法的时候他都会创建一个新的，重写方法之间没有关联。</p>
+</blockquote>
+<h3 id="递归模板"><a href="#递归模板" class="headerlink" title="递归模板"></a>递归模板</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">方法名</span><br><span class="line">	终止条件</span><br><span class="line">	本层处理</span><br><span class="line">	递归子问题</span><br><span class="line">	还原现场</span><br></pre></td></tr></table></figure>
+
+<h2 id="递归实例"><a href="#递归实例" class="headerlink" title="递归实例"></a>递归实例</h2><p><a href="https://leetcode-cn.com/problems/subsets/">78.子集</a></p>
+<ul>
+<li>子集是指数型的枚举/递归(元素的 选择与不选择 2^n 元素个数n)<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 作为最后的返回值</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;List&lt;Integer&gt;&gt; ans = <span class="keyword">new</span> ArrayList();;</span><br><span class="line">    <span class="keyword">private</span> List&lt;Integer&gt; set = <span class="keyword">new</span> ArrayList();</span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; subsets(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">        findSubsets(nums,<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">findSubsets</span><span class="params">(<span class="keyword">int</span>[] nums,<span class="keyword">int</span> index)</span></span>&#123;</span><br><span class="line">        <span class="comment">// 设置边界</span></span><br><span class="line">        <span class="keyword">if</span>(index == nums.length)&#123;</span><br><span class="line">            ans.add(<span class="keyword">new</span> ArrayList&lt;Integer&gt;(set));</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 本层处理</span></span><br><span class="line">        <span class="comment">// 本层两种处理 选择/不选择</span></span><br><span class="line">        <span class="comment">// 不选择</span></span><br><span class="line">        findSubsets(nums,index+<span class="number">1</span>);</span><br><span class="line">        <span class="comment">// 选择</span></span><br><span class="line">        set.add(nums[index]);</span><br><span class="line">        findSubsets(nums,index+<span class="number">1</span>);</span><br><span class="line">        <span class="comment">// 还原现场</span></span><br><span class="line">        set.remove(set.size() - <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+]]></content>
       <categories>
-          
-          <category> 数据库 </category>
-          
+        <category>算法</category>
       </categories>
-      
-      
-        <tags>
-            
-            <tag> mysql </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-  
-  
+      <tags>
+        <tag>算法</tag>
+      </tags>
+  </entry>
 </search>

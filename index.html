@@ -608,7 +608,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-25 17:05:24" itemprop="dateModified" datetime="2021-11-25T17:05:24+08:00">2021-11-25</time>
+                <time title="修改时间：2021-11-25 18:23:54" itemprop="dateModified" datetime="2021-11-25T18:23:54+08:00">2021-11-25</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -658,73 +658,14 @@
 <ul>
 <li>数据的存储和提取。</li>
 </ul>
-<h2 id="mysql-的默认引擎"><a href="#mysql-的默认引擎" class="headerlink" title="mysql 的默认引擎"></a>mysql 的默认引擎</h2><blockquote>
-<p>MySQL 默认存储引擎是 InnoDB ，创建表的时候，如不指定引擎类型，默认InnoDB</p>
-</blockquote>
-<h2 id="mysql的小知识点"><a href="#mysql的小知识点" class="headerlink" title="mysql的小知识点"></a>mysql的小知识点</h2><h3 id="连接器"><a href="#连接器" class="headerlink" title="连接器"></a>连接器</h3><ol>
-<li>连接器负责对客户端建立链接，获取权限，维持和管理连接<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql <span class="operator">-</span>h ip <span class="operator">-</span>P port <span class="operator">-</span>u <span class="keyword">user</span> <span class="operator">-</span>p</span><br></pre></td></tr></table></figure></li>
-<li>账户密&amp;码正确，连接器查询权限获得权限，自此，断开连接之前都是该权限。</li>
-</ol>
-<p><strong>完成连接后的小知识点</strong></p>
-<ul>
-<li>连接完成后，没有动作，即 sleep 处于空闲状态。可以使用 show processlist 查看</li>
-<li>默认断开时间 8 小时 由 wait_timeout 控制，当断开后继续执行，抛出错误信息 lost connection 需要重新连接。</li>
-<li>长连接：客户持续有请求，则一直使用同一个连接</li>
-<li>短连接：每次执行完很少几次查询就会断开，下次查询重新建立</li>
-<li>减少建立连接，尽量使用长连接。</li>
-</ul>
-<p><strong>若都是长连接，MySQL 占用内存涨的很快，因为 MySQL 执行过程中临时使用的内存管理在连接对象里面，要在断开连接时才会释放。长期积累 可能会 OOM MySQL 异常重启。</strong></p>
-<ul>
-<li>定期断开长连接。</li>
-<li>使用mysql_reset_connection来重新初始化连接资源</li>
-</ul>
-<h3 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h3><ol>
-<li>MySQL建立连接后，执行sql</li>
-<li>执行前，判断之前是否执行过</li>
-<li>执行过，通过sql(key)直接返回数据（value）</li>
-<li>没有执行过，查询出结果，并放到缓存中</li>
-<li>多命中缓存，效率高</li>
-</ol>
-<p><strong>大多数情况不建议使用查询缓存，因为可能弊大于利</strong></p>
-<ol>
-<li>缓存需要语句完全相等，包括参数。</li>
-<li>表更新后就会失效 因此，只有在表更新频率不高，查询语句完全一致的情况下，可以手动开启缓存，其他一律关闭。 </li>
-</ol>
-<p><strong>注意：mysql8之后，取消了缓存功能。</strong></p>
-<p>可以使用 <em><strong>query_cache_type</strong></em> 设置成 <em><strong>DEMAND</strong></em> 来进行按需缓存 通过 SQL_CACHE 显示执行。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> SQL_CACHE <span class="operator">*</span> <span class="keyword">from</span> T <span class="keyword">where</span> ID<span class="operator">=</span><span class="number">10</span>；</span><br></pre></td></tr></table></figure>
-<p><strong>可是使用 show variables 来查看服务器配置信息。</strong></p>
-<h3 id="分析器"><a href="#分析器" class="headerlink" title="分析器"></a>分析器</h3><ol>
-<li>未命中缓存，进入分析器，进行查询。</li>
-<li>分析器首先做词法分析，它要知道这个语句中的单词是什么意思</li>
-<li>分析器再进行语法分析，词法分析结果，语法分析器根据语法规则判断 SQL 语句是否满足 SQL 语法</li>
-<li>表名和列名在分析语法时就已经确定过了</li>
-</ol>
-<p><strong>tips:</strong> You have an error in your SQL syntax  关注 use near 的解析</p>
-<p><strong>分析器干两件事：</strong></p>
-<ol>
-<li>解析语句，生成解析树 </li>
-<li>检查语句中的关键词，表，字段是否存在</li>
-</ol>
-<h3 id="优化器"><a href="#优化器" class="headerlink" title="优化器"></a>优化器</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t1 <span class="keyword">join</span> t2 <span class="keyword">using</span>(ID)  <span class="keyword">where</span> t1.c<span class="operator">=</span><span class="number">10</span> <span class="keyword">and</span> t2.d<span class="operator">=</span><span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-<p>既可以先从表 t1 里面取出 c=10 的记录的 ID 值，再根据 ID 值关联到表 t2，再判断 t2 里面 d 的值是否等于 20。</p>
-<p>也可以先从表 t2 里面取出 d=20 的记录的 ID 值，再根据 ID 值关联到 t1，再判断 t1 里面 c 的值是否等于 10。<br><strong>区别:</strong></p>
-<ol>
-<li>执行效率不同</li>
-<li>尽可能扫描少的数据库行纪录</li>
-</ol>
-<p><em><strong>优化器是在表里面有多个索引的时候，决定使用哪个索引；</strong></em></p>
-<h3 id="执行器"><a href="#执行器" class="headerlink" title="执行器"></a>执行器</h3><ul>
-<li><p>判断是否对 表 T 有执行查询的权限</p>
-</li>
-<li><p>权限验证不仅再执行器这里，再分析器知道要做什么之后，也会做一次权限校验叫precheck</p>
-</li>
-<li><p>precheck 无法对运行时涉及到的表进行权限验证所以再执行器这里还需要验证。</p>
-</li>
-<li><p>判断拥有权限后，根据表定义的引擎，使用执行器使用对应引擎提供的接口。</p>
-</li>
-</ul>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/183e61db.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
