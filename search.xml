@@ -1,6 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Servlet规范和Servlet容器</title>
+    <url>/1c68dade.html</url>
+    <content><![CDATA[<h1 id="Servlet规范和Servlet容器"><a href="#Servlet规范和Servlet容器" class="headerlink" title="Servlet规范和Servlet容器"></a>Servlet规范和Servlet容器</h1><h2 id="HTTP-服务器-怎么调用对应-Java-类的哪个方法？"><a href="#HTTP-服务器-怎么调用对应-Java-类的哪个方法？" class="headerlink" title="HTTP 服务器 怎么调用对应 Java 类的哪个方法？"></a>HTTP 服务器 怎么调用对应 Java 类的哪个方法？</h2><p>❌</p>
+<blockquote>
+<p>方式：通过一堆if-else进行判断<br>问题：HTTP 服务器的代码跟业务逻辑耦合在一起了，如果新加一个业务方法还要改 HTTP 服务器的代码。</p>
+</blockquote>
+<p>✔️</p>
+<blockquote>
+<p>方式：通过接口进行解耦，各种业务类都必须实现这个接口(Servlet 接口)</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？"><a href="#HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？" class="headerlink" title="HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？"></a>HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？</h2><p>❌</p>
+<blockquote>
+<p>方式：使用 HTTP 服务器进行<br>问题：HTTP 服务器 和 业务类耦合</p>
+</blockquote>
+<p>✔️</p>
+<blockquote>
+<p>方式：添加 Servlet 容器，Servlet 容器用来加载和管理业务类</p>
+</blockquote>
+<h2 id="Servlet-接口"><a href="#Servlet-接口" class="headerlink" title="Servlet 接口"></a>Servlet 接口</h2><blockquote>
+<p>Servlet 接口是 Servlet 容器跟具体业务类之间的接口。<br>Servlet 接口和 Servlet 容器这一整套规范叫作 Servlet 规范</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Servlet</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(ServletConfig config)</span> <span class="keyword">throws</span> ServletException</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function">ServletConfig <span class="title">getServletConfig</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">service</span><span class="params">(ServletRequest req, ServletResponse res）<span class="keyword">throws</span> ServletException, IOException;</span></span></span><br><span class="line"><span class="params"><span class="function">    </span></span></span><br><span class="line"><span class="params"><span class="function">    String getServletInfo()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="重点方法：service"><a href="#重点方法：service" class="headerlink" title="重点方法：service"></a>重点方法：<em><strong>service</strong></em></h3><p>service的两个参数</p>
+<ul>
+<li><p>ServletRequest 用来封装请求信息</p>
+</li>
+<li><p>ServletResponse 用来封装响应信息</p>
+</li>
+</ul>
+<blockquote>
+<p>本质上这两个类是对通信协议的封装</p>
+</blockquote>
+<h3 id="其余方法"><a href="#其余方法" class="headerlink" title="其余方法"></a>其余方法</h3><p>生命周期相关方法：<strong>init</strong> 和 <strong>destroy</strong></p>
+<ul>
+<li>Servlet 容器在加载 Servlet 类的时候会调用 <strong>init</strong> 方法</li>
+<li>Servlet 容器在卸载 Servlet 类的时候会调用 <strong>destroy</strong> 方法</li>
+</ul>
+<p>Servlet 配置相关方法：<strong>getServletConfig</strong></p>
+<ul>
+<li>ServletConfig 的作用就是封装 Servlet 的初始化参数</li>
+<li>可以在web.xml给 Servlet 配置参数，并在程序里通过 getServletConfig 方法拿到这些参数。</li>
+</ul>
+<p>Servlet 的 <strong>GenericServlet</strong> 抽象类 和 <strong>HttpServlet</strong> 类</p>
+<ul>
+<li>GenericServlet 实现了 Servlet 的通用方法 而 HttpServlet 是在 GenericServlet 基础上进行了封装加入了 HTTP 特性</li>
+</ul>
+<p>HttpServlet 只需要重写 doGet 和 doPost。</p>
+<h2 id="Servlet-容器"><a href="#Servlet-容器" class="headerlink" title="Servlet 容器"></a>Servlet 容器</h2><p>整体工作流程</p>
+<ol>
+<li>客户端发起 HTTP 请求</li>
+<li>HTTP 服务器使用 ServletRequest 讲请求封装</li>
+<li>调用 Servlet 容器的 service 方法</li>
+<li>Servlet 容器，根据请求的 URL 和 Servlet 的映射关系，找到相应的 Servlet</li>
+<li>如果 Servlet 还没有被加载，就用反射机制创建这个 Servlet，并调用 Servlet 的 init 方法来完成初始化</li>
+<li>调用 Servlet 的 service 方法来处理请求，把 ServletResponse 对象返回给 HTTP 服务器</li>
+<li>讲响应返回给客户端</li>
+</ol>
+<p><strong>Web 应用层级</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">| - MyWebApp </span><br><span class="line">| - WEB-INF/web.xml -- 配置文件，用来配置Servlet等 </span><br><span class="line">| - WEB-INF/lib/ -- 存放Web应用所需各种JAR包 </span><br><span class="line">| - WEB-INF/classes/ -- 存放你的应用类，比如Servlet类 </span><br><span class="line">| - META-INF/ -- 目录存放工程的一些信息</span><br></pre></td></tr></table></figure>
+
+<p>Servlet 容器顺序</p>
+<ol>
+<li>实例化 Servlet</li>
+<li>调用 Servlet</li>
+</ol>
+<p><strong>Servlet 是怎么注册到 Servlet 容器中</strong></p>
+<ol>
+<li>以 Web 应用程序的方式来部署 Servlet </li>
+<li>Servlet 规范里定义了 ServletContext 这个接口来对应一个 Web 应用</li>
+<li>Servlet 容器在启动时会加载 Web 应用，并为每个 Web 应用创建唯一的 ServletContext 对象</li>
+<li>由于 ServletContext 持有所有 Servlet 实例，你还可以通过它来实现 Servlet 请求的转发。扩展机制</li>
+</ol>
+<p><strong>扩展机制</strong></p>
+<p>Servlet 规范提供了两种扩展机制：</p>
+<ul>
+<li>Filter  过滤器</li>
+<li>Listener 监听器</li>
+</ul>
+<p><strong>Filter 过滤器的流程</strong></p>
+<ol>
+<li>Web 应用部署完成</li>
+<li>Servlet 容器需要实例化 Filter 并把 Filter 链接成一个 FilterChain。</li>
+<li>请求进来，获取第一个 Filter 并调用 doFilter 方法，doFilter 方法负责调用这个 FilterChain 中的下一个 Filter。</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Tomcat</category>
+      </categories>
+      <tags>
+        <tag>Tomcat</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Tomcat基础</title>
     <url>/530cfffd.html</url>
     <content><![CDATA[<h1 id="Tomcat基础"><a href="#Tomcat基础" class="headerlink" title="Tomcat基础"></a>Tomcat基础</h1><h2 id="Web-容器是什么"><a href="#Web-容器是什么" class="headerlink" title="Web 容器是什么"></a>Web 容器是什么</h2><ul>
@@ -84,9 +180,7 @@
   <entry>
     <title>Tomcat容器的设计</title>
     <url>/210d100c.html</url>
-    <content><![CDATA[<h1 id="Tomcat-容器的设计"><a href="#Tomcat-容器的设计" class="headerlink" title="Tomcat 容器的设计"></a>Tomcat 容器的设计</h1><h2 id="容器的层次结构"><a href="#容器的层次结构" class="headerlink" title="容器的层次结构"></a>容器的层次结构</h2><p><img src="/210d100c/tu1.png" alt="tu1.png"></p>
-<hr>
-<p>由上图可以知 ：层级由高到低 1 - 4 展示如下</p>
+    <content><![CDATA[<h1 id="Tomcat-容器的设计"><a href="#Tomcat-容器的设计" class="headerlink" title="Tomcat 容器的设计"></a>Tomcat 容器的设计</h1><h2 id="容器的层次结构"><a href="#容器的层次结构" class="headerlink" title="容器的层次结构"></a>容器的层次结构</h2><p>层级由高到低 1 - 4 展示如下</p>
 <ol>
 <li>Engine [ 表示引擎 ]  </li>
 <li>Host [ 表示一个虚拟主机/站点 ]</li>
@@ -100,6 +194,7 @@
 <li>一个 Service 只能有一个 Engine</li>
 <li>一个 Server 可以有多个 Service</li>
 </ul>
+<p><img src="/210d100c/tu1.png" alt="tu1.png"></p>
 <p>⭐4 种容器不是平行关系，而是父子关系，而设计这么多容器的目的是通过分层架构，使 Servlet 容器更具灵活性</p>
 <h2 id="Tomcat-容器对容器的管理"><a href="#Tomcat-容器对容器的管理" class="headerlink" title="Tomcat 容器对容器的管理**"></a>Tomcat 容器对容器的管理**</h2><p>容器之间是父子关系，即树形结构，即 TomCat 可使用组合模式来进行管理的容器的</p>
 <p>具体组合模式的实现</p>
@@ -384,102 +479,6 @@
 <li>SocketProcessor 的 run 方法会调用 Processor 组件去解析应用层协议</li>
 <li>Processor 通过解析生成 Request 对象后，会调用 Adapter 的 Service 方法。</li>
 </ul>
-]]></content>
-      <categories>
-        <category>Tomcat</category>
-      </categories>
-      <tags>
-        <tag>Tomcat</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Servlet规范和Servlet容器</title>
-    <url>/1c68dade.html</url>
-    <content><![CDATA[<h1 id="Servlet规范和Servlet容器"><a href="#Servlet规范和Servlet容器" class="headerlink" title="Servlet规范和Servlet容器"></a>Servlet规范和Servlet容器</h1><h2 id="HTTP-服务器-怎么调用对应-Java-类的哪个方法？"><a href="#HTTP-服务器-怎么调用对应-Java-类的哪个方法？" class="headerlink" title="HTTP 服务器 怎么调用对应 Java 类的哪个方法？"></a>HTTP 服务器 怎么调用对应 Java 类的哪个方法？</h2><p>❌</p>
-<blockquote>
-<p>方式：通过一堆if-else进行判断<br>问题：HTTP 服务器的代码跟业务逻辑耦合在一起了，如果新加一个业务方法还要改 HTTP 服务器的代码。</p>
-</blockquote>
-<p>✔️</p>
-<blockquote>
-<p>方式：通过接口进行解耦，各种业务类都必须实现这个接口(Servlet 接口)</p>
-</blockquote>
-<span id="more"></span>
-
-<h2 id="HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？"><a href="#HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？" class="headerlink" title="HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？"></a>HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？</h2><p>❌</p>
-<blockquote>
-<p>方式：使用 HTTP 服务器进行<br>问题：HTTP 服务器 和 业务类耦合</p>
-</blockquote>
-<p>✔️</p>
-<blockquote>
-<p>方式：添加 Servlet 容器，Servlet 容器用来加载和管理业务类</p>
-</blockquote>
-<h2 id="Servlet-接口"><a href="#Servlet-接口" class="headerlink" title="Servlet 接口"></a>Servlet 接口</h2><blockquote>
-<p>Servlet 接口是 Servlet 容器跟具体业务类之间的接口。<br>Servlet 接口和 Servlet 容器这一整套规范叫作 Servlet 规范</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Servlet</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(ServletConfig config)</span> <span class="keyword">throws</span> ServletException</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function">ServletConfig <span class="title">getServletConfig</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">service</span><span class="params">(ServletRequest req, ServletResponse res）<span class="keyword">throws</span> ServletException, IOException;</span></span></span><br><span class="line"><span class="params"><span class="function">    </span></span></span><br><span class="line"><span class="params"><span class="function">    String getServletInfo()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="重点方法：service"><a href="#重点方法：service" class="headerlink" title="重点方法：service"></a>重点方法：<em><strong>service</strong></em></h3><p>service的两个参数</p>
-<ul>
-<li><p>ServletRequest 用来封装请求信息</p>
-</li>
-<li><p>ServletResponse 用来封装响应信息</p>
-</li>
-</ul>
-<blockquote>
-<p>本质上这两个类是对通信协议的封装</p>
-</blockquote>
-<h3 id="其余方法"><a href="#其余方法" class="headerlink" title="其余方法"></a>其余方法</h3><p>生命周期相关方法：<strong>init</strong> 和 <strong>destroy</strong></p>
-<ul>
-<li>Servlet 容器在加载 Servlet 类的时候会调用 <strong>init</strong> 方法</li>
-<li>Servlet 容器在卸载 Servlet 类的时候会调用 <strong>destroy</strong> 方法</li>
-</ul>
-<p>Servlet 配置相关方法：<strong>getServletConfig</strong></p>
-<ul>
-<li>ServletConfig 的作用就是封装 Servlet 的初始化参数</li>
-<li>可以在web.xml给 Servlet 配置参数，并在程序里通过 getServletConfig 方法拿到这些参数。</li>
-</ul>
-<p>Servlet 的 <strong>GenericServlet</strong> 抽象类 和 <strong>HttpServlet</strong> 类</p>
-<ul>
-<li>GenericServlet 实现了 Servlet 的通用方法 而 HttpServlet 是在 GenericServlet 基础上进行了封装加入了 HTTP 特性</li>
-</ul>
-<p>HttpServlet 只需要重写 doGet 和 doPost。</p>
-<h2 id="Servlet-容器"><a href="#Servlet-容器" class="headerlink" title="Servlet 容器"></a>Servlet 容器</h2><p>整体工作流程</p>
-<ol>
-<li>客户端发起 HTTP 请求</li>
-<li>HTTP 服务器使用 ServletRequest 讲请求封装</li>
-<li>调用 Servlet 容器的 service 方法</li>
-<li>Servlet 容器，根据请求的 URL 和 Servlet 的映射关系，找到相应的 Servlet</li>
-<li>如果 Servlet 还没有被加载，就用反射机制创建这个 Servlet，并调用 Servlet 的 init 方法来完成初始化</li>
-<li>调用 Servlet 的 service 方法来处理请求，把 ServletResponse 对象返回给 HTTP 服务器</li>
-<li>讲响应返回给客户端</li>
-</ol>
-<p><strong>Web 应用层级</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">| - MyWebApp </span><br><span class="line">| - WEB-INF/web.xml -- 配置文件，用来配置Servlet等 </span><br><span class="line">| - WEB-INF/lib/ -- 存放Web应用所需各种JAR包 </span><br><span class="line">| - WEB-INF/classes/ -- 存放你的应用类，比如Servlet类 </span><br><span class="line">| - META-INF/ -- 目录存放工程的一些信息</span><br></pre></td></tr></table></figure>
-
-<p>Servlet 容器顺序</p>
-<ol>
-<li>实例化 Servlet</li>
-<li>调用 Servlet</li>
-</ol>
-<p><strong>Servlet 是怎么注册到 Servlet 容器中</strong></p>
-<ol>
-<li>以 Web 应用程序的方式来部署 Servlet </li>
-<li>Servlet 规范里定义了 ServletContext 这个接口来对应一个 Web 应用</li>
-<li>Servlet 容器在启动时会加载 Web 应用，并为每个 Web 应用创建唯一的 ServletContext 对象</li>
-<li>由于 ServletContext 持有所有 Servlet 实例，你还可以通过它来实现 Servlet 请求的转发。扩展机制</li>
-</ol>
-<p><strong>扩展机制</strong></p>
-<p>Servlet 规范提供了两种扩展机制：</p>
-<ul>
-<li>Filter  过滤器</li>
-<li>Listener 监听器</li>
-</ul>
-<p><strong>Filter 过滤器的流程</strong></p>
-<ol>
-<li>Web 应用部署完成</li>
-<li>Servlet 容器需要实例化 Filter 并把 Filter 链接成一个 FilterChain。</li>
-<li>请求进来，获取第一个 Filter 并调用 doFilter 方法，doFilter 方法负责调用这个 FilterChain 中的下一个 Filter。</li>
-</ol>
 ]]></content>
       <categories>
         <category>Tomcat</category>
