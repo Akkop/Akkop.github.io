@@ -136,7 +136,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档<span class="badge">5</span></a>
+    <a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档<span class="badge">6</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -191,6 +191,168 @@
 
           <div class="content index posts-expand">
             
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://guohaojie.com/210d100c.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/abcd.png">
+      <meta itemprop="name" content="akkS">
+      <meta itemprop="description" content="我们提着过去，走入人群">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一盘团子的博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/210d100c.html" class="post-title-link" itemprop="url">Tomcat容器的设计</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-11-26 15:43:32 / 修改时间：17:30:00" itemprop="dateCreated datePublished" datetime="2021-11-26T15:43:32+08:00">2021-11-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tomcat/" itemprop="url" rel="index"><span itemprop="name">Tomcat</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Tomcat-容器的设计"><a href="#Tomcat-容器的设计" class="headerlink" title="Tomcat 容器的设计"></a>Tomcat 容器的设计</h1><h2 id="容器的层次结构"><a href="#容器的层次结构" class="headerlink" title="容器的层次结构"></a>容器的层次结构</h2><p><img src="/210d100c/tu1.png" alt="tu1.png"></p>
+<hr>
+<p>由上图可以知 ：层级由高到低 1 - 4 展示如下</p>
+<ol>
+<li>Engine [ 表示引擎 ]  </li>
+<li>Host [ 表示一个虚拟主机/站点 ]</li>
+<li>Context  [ 表示一个 Web 应用程序 ]</li>
+<li>Wrapper [ 表示一个 Servlet ]<br>👆🏻<br>👇🏻</li>
+</ol>
+<ul>
+<li>一个 Web 应用程序可以有多个 Servlet</li>
+<li>一个虚拟机可以部署多个 Web 应用程序</li>
+<li>一个 Service 只能有一个 Engine</li>
+<li>一个 Server 可以有多个 Service</li>
+</ul>
+<p>⭐4 种容器不是平行关系，而是父子关系，而设计这么多容器的目的是通过分层架构，使 Servlet 容器更具灵活性</p>
+<h2 id="Tomcat-容器对容器的管理"><a href="#Tomcat-容器对容器的管理" class="headerlink" title="Tomcat 容器对容器的管理**"></a>Tomcat 容器对容器的管理**</h2><p>容器之间是父子关系，即树形结构，即 TomCat 可使用组合模式来进行管理的容器的</p>
+<p>具体组合模式的实现</p>
+<ul>
+<li>所有容器实现 Container 接口<blockquote>
+<p>用户对单容器对象和组合容器对象的使用具有一致性<br>单容器对象指的是最底层的 Wrapper，组合容器对象指的是上面的 Context、Host 或者 Engine</p>
+</blockquote>
+</li>
+</ul>
+<p>Container 接口定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Container</span> <span class="keyword">extends</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">getParent</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setParent</span><span class="params">(Container container)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addChild</span><span class="params">(Container child)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeChild</span><span class="params">(Container child)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">findChild</span><span class="params">(String name)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>⭐Container 接口 提供了对父容器，子容器的操作，同时扩展了 Lifecycle，而 Lifecycle 是用来统一管理各组件的生命周期</p>
+<h2 id="请求定位-Servlet-的过程"><a href="#请求定位-Servlet-的过程" class="headerlink" title="请求定位 Servlet 的过程"></a>请求定位 Servlet 的过程</h2><p>❓<strong>疑问点</strong></p>
+<blockquote>
+<p>Tomcat 是怎么确定请求是由哪个 Wrapper 容器里的 Servlet 来处理的？</p>
+</blockquote>
+<p>❗<strong>答案</strong></p>
+<blockquote>
+<p>Tomcat 是用 Mapper 组件来完成这个任务的。</p>
+<p>Mapper 组件的功能就是将用户请求的 URL 定位到一个 Servlet</p>
+</blockquote>
+<h3 id="Mapper-组件"><a href="#Mapper-组件" class="headerlink" title="Mapper 组件"></a>Mapper 组件</h3><p>Mapper 组件的工作原理</p>
+<ul>
+<li>Mapper 组件里保存了 Web 应用的配置信息 ( 容器组件与访问路径的映射关系 )</li>
+</ul>
+<p><strong>首先，根据协议和端口号选定 Service 和 Engine</strong></p>
+<blockquote>
+<p>Tomcat 的每个连接器都监听不同的端口，而连接器属于一个 Service 组件<br>Service 组件中包含了多个连接器和一个容器组件<br>一个容器组件具体体现就是 Engine 引擎<br>即Service 组件确认 等于 Engine 引擎确认</p>
+</blockquote>
+<p><strong>根据域名选定 Host</strong></p>
+<blockquote>
+<p>Mapper 组件通过 URL 中的域名去查找相应的 Host 容器</p>
+</blockquote>
+<p><strong>根据 URL 路径找到 Context 组件</strong></p>
+<blockquote>
+<p>Host 确定以后，Mapper 根据 URL 的路径来匹配相应的 Web 应用的路径</p>
+</blockquote>
+<p><strong>最后，根据 URL 路径找到 Wrapper（Servlet）</strong></p>
+<blockquote>
+<p>Context 确定后，Mapper 再根据web.xml中配置的 Servlet 映射路径来找到具体的 Wrapper 和 Servlet。</p>
+</blockquote>
+<h2 id="Pipeline-Valve-管道"><a href="#Pipeline-Valve-管道" class="headerlink" title="Pipeline-Valve 管道"></a>Pipeline-Valve 管道</h2><p>上述的 Mapper 组件是告诉我们怎么找到 Servlet，然后 Servlet 去做请求</p>
+<p>⭐<strong>而实际上这个查找路径上的父子容器都会对请求做一些处理，各容器处理事务遵循责任链模式</strong></p>
+<ul>
+<li>连接器中的 Adapter 会调用容器的 Service 方法来执行 Servlet</li>
+<li>最先拿到请求的是 Engine 容器，对请求做一些处理后，会把请求传给自己子容器 Host 继续处- = 理，依次类推</li>
+<li>最后交由 Wrapper 容器，Wrapper 调用最终的 Servlet 来处理</li>
+</ul>
+<p>👐🏻<strong>Pipeline-Valve 是责任链模式</strong></p>
+<blockquote>
+<p>责任链模式是指在一个请求处理的过程中有很多处理者依次对请求进行处理，每个处理者负责做自己相应的处理，处理完之后将再调用下一个处理者继续处理。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Valve</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getNext</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNext</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">invoke</span><span class="params">(Request request, Response response)</span></span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>Valve 是一个处理点 可以想象一下链表，invoke 就是处理，通过 getNext 和 setNext 组成一个链表</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Pipeline</span> <span class="keyword">extends</span> <span class="title">Contained</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addValve</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getBasic</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBasic</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getFirst</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Pipeline 中 维护了 Valve 链表，并且其中并没有 invoke 方法，这是因为实际出发还是在 Valve 中的 invoke中，Valve 完成自己的处理后，调用getNext.invoke来触发下一个 Valve 调用。</p>
+<hr>
+<p>但是上述显的 Pipeline 并没有发挥作用，Pipeline 每个容器都有一个，其中getFirst 和 getBasic 就是来串联 不同容器的，他们分别可以取得 Valve 的第一个节点和最后一个节点 如下图所示</p>
+<p><img src="/210d100c/tu2.png" alt="tu2.png"></p>
+<p>⭐整个调用过程由连接器中的 Adapter 触发的，它会调用 Engine 的第一个 Valve</p>
+<p>⭐Wrapper 容器的最后一个 Valve 会创建一个 Filter 链，并调用 doFilter 方法，最终会调到 Servlet 的 service 方法。</p>
+<h3 id="Valve-和-Filter"><a href="#Valve-和-Filter" class="headerlink" title="Valve 和 Filter"></a>Valve 和 Filter</h3><ul>
+<li>Valve 是 Tomcat 的私有机制，与 Tomcat 的基础架构 /API 是紧耦合的。Servlet API 是公有的标准，所有的 Web 容器包括 Jetty 都支持 Filter 机制。</li>
+<li> Valve 工作在 Web 容器级别，拦截所有应用的请求；而 Servlet Filter 工作在应用级别，只能拦截某个 Web 应用的所有请求。如果想做整个 Web 容器的拦截器，必须通过 Valve 来实现。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
       
   
   
@@ -754,7 +916,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -811,12 +973,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">8k</span>
+    <span title="站点总字数">11k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">8 分钟</span>
+    <span title="站点阅读时长">10 分钟</span>
 </div>
 <!--
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
