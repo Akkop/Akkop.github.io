@@ -1,93 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Servlet规范和Servlet容器</title>
-    <url>/1c68dade.html</url>
-    <content><![CDATA[<h1 id="Servlet规范和Servlet容器"><a href="#Servlet规范和Servlet容器" class="headerlink" title="Servlet规范和Servlet容器"></a>Servlet规范和Servlet容器</h1><h2 id="HTTP-服务器-怎么调用对应-Java-类的哪个方法？"><a href="#HTTP-服务器-怎么调用对应-Java-类的哪个方法？" class="headerlink" title="HTTP 服务器 怎么调用对应 Java 类的哪个方法？"></a>HTTP 服务器 怎么调用对应 Java 类的哪个方法？</h2><p>❌</p>
-<blockquote>
-<p>方式：通过一堆if-else进行判断<br>问题：HTTP 服务器的代码跟业务逻辑耦合在一起了，如果新加一个业务方法还要改 HTTP 服务器的代码。</p>
-</blockquote>
-<p>✔️</p>
-<blockquote>
-<p>方式：通过接口进行解耦，各种业务类都必须实现这个接口(Servlet 接口)</p>
-</blockquote>
+    <title>Tomcat基础</title>
+    <url>/530cfffd.html</url>
+    <content><![CDATA[<h1 id="Tomcat基础"><a href="#Tomcat基础" class="headerlink" title="Tomcat基础"></a>Tomcat基础</h1><h2 id="Web-容器是什么"><a href="#Web-容器是什么" class="headerlink" title="Web 容器是什么"></a>Web 容器是什么</h2><ul>
+<li>Servlet 是可以视作没有 main 方法的 java 程序，没有 mian 方法需要部署到 Servlet 容器中，由容器来实例化并调用Servlet</li>
+<li>为了方便使用，他们需要具有 HTTP 服务器功能</li>
+<li>Tomcat 或者 Jetty 就是 HTTP 服务器 + Servlet 容器</li>
+<li>Web 容器 = HTTP 服务器 + Servlet 容器 </li>
+</ul>
 <span id="more"></span>
 
-<h2 id="HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？"><a href="#HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？" class="headerlink" title="HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？"></a>HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？</h2><p>❌</p>
 <blockquote>
-<p>方式：使用 HTTP 服务器进行<br>问题：HTTP 服务器 和 业务类耦合</p>
+<p>如今的 SpringBoot 是内嵌的 Web 容器(Tomcat)，因为当前大环境为微服务(将大而全的单体应用拆分成一个个功能单一的微服务)，这也就需要更多的 Web 容器来启动，自然需要轻量级的 Web 容器，以减少资源的消耗，降低部署的成本，而选择内嵌，降低应用部署的复杂度。</p>
 </blockquote>
-<p>✔️</p>
-<blockquote>
-<p>方式：添加 Servlet 容器，Servlet 容器用来加载和管理业务类</p>
-</blockquote>
-<h2 id="Servlet-接口"><a href="#Servlet-接口" class="headerlink" title="Servlet 接口"></a>Servlet 接口</h2><blockquote>
-<p>Servlet 接口是 Servlet 容器跟具体业务类之间的接口。<br>Servlet 接口和 Servlet 容器这一整套规范叫作 Servlet 规范</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Servlet</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(ServletConfig config)</span> <span class="keyword">throws</span> ServletException</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function">ServletConfig <span class="title">getServletConfig</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">service</span><span class="params">(ServletRequest req, ServletResponse res）<span class="keyword">throws</span> ServletException, IOException;</span></span></span><br><span class="line"><span class="params"><span class="function">    </span></span></span><br><span class="line"><span class="params"><span class="function">    String getServletInfo()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="怎么学习-Web-容器"><a href="#怎么学习-Web-容器" class="headerlink" title="怎么学习 Web 容器"></a>怎么学习 Web 容器</h2><p><strong>HTTP 的本质</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">HTTP 协议是浏览器与服务器之间的数据传送协议</span><br><span class="line">HTTP 协议的本质就是一种浏览器与服务器之间约定好的通信格式</span><br></pre></td></tr></table></figure>
 
-<h3 id="重点方法：service"><a href="#重点方法：service" class="headerlink" title="重点方法：service"></a>重点方法：<em><strong>service</strong></em></h3><p>service的两个参数</p>
+<p>获取远端 HTTP 服务器的数据时</p>
+<ol>
+<li>与 HTTP 服务器建立 Socket 连接。 ip + 端口</li>
+<li>生成请求数据并通过Socket发送出去</li>
+</ol>
+<p><strong>HTTP 协议做的事情</strong></p>
 <ul>
-<li><p>ServletRequest 用来封装请求信息</p>
-</li>
-<li><p>ServletResponse 用来封装响应信息</p>
-</li>
+<li>获取还是提交内容</li>
+<li>想要的内容是什么</li>
+<li>这些内容以一种什么样的格式放到请求</li>
 </ul>
-<blockquote>
-<p>本质上这两个类是对通信协议的封装</p>
+<p><strong>HTTP 工作原理</strong></p>
+<ol>
+<li>用户发起请求_输入网址回车</li>
+<li>浏览器发起 TCP 请求连接_经过 TCP 三次握手建立连接</li>
+<li>服务器接收并建立连接</li>
+<li>浏览器生成 HTTP 格式的数据包</li>
+<li>浏览器发送HTTP 格式的请求数据包</li>
+<li>服务器解析 HTTP 格式的数据包_得知客户端的意图</li>
+<li>服务器执行请求</li>
+<li>服务器生成 HTTP 格式的数据包</li>
+<li>发送响应数据包</li>
+<li>浏览器解析 HTTP 格式的数据包</li>
+<li>浏览器呈现 HTML 响应给用户</li>
+</ol>
+<p><strong>做了哪些事情</strong></p>
+<ul>
+<li>Tomcat 将 HTTP 请求数据字节解析成 Request 对象</li>
+<li>Request 对象 封装了 HTTP 所有的请求信息,此后交给 Web 应用处理</li>
+<li>处理后得到 Response 对象</li>
+<li>Tomcat 将 Response 对象转成 HTTP 格式得响应数据并返回给浏览器</li>
+</ul>
+<h2 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h2><p><strong>什么是Cookie</strong></p>
+<ul>
+<li>Cookie 是 HTTP 报文得一个请求头</li>
+<li>Cookie 本质上就是一份存储在用户本地的文件，里面包含了每次请求中都需要传递的信息</li>
+<li>服务器可以通过读取 Cookie 请求头就知道用户是谁(用户的标识信息)</li>
+</ul>
+<h2 id="Session"><a href="#Session" class="headerlink" title="Session"></a>Session</h2><blockquote>
+<p>好处只发送 Sessoion ID 相对安全，节省网络流量，重点是不需要在 Cookie 中保存大量用户信息。<br><strong>Session和Cookie的关系</strong></p>
 </blockquote>
-<h3 id="其余方法"><a href="#其余方法" class="headerlink" title="其余方法"></a>其余方法</h3><p>生命周期相关方法：<strong>init</strong> 和 <strong>destroy</strong></p>
 <ul>
-<li>Servlet 容器在加载 Servlet 类的时候会调用 <strong>init</strong> 方法</li>
-<li>Servlet 容器在卸载 Servlet 类的时候会调用 <strong>destroy</strong> 方法</li>
+<li>Cookie 是明文保存，是存在隐患得，Session 是保存在服务器上得，里面保存着用户得状态。</li>
+<li>当用户请求到来时，服务端可以通过 Cookie 把用户的请求和用户的 Session 对应起来</li>
+<li>浏览器在 Cookie 中填充了一个 Session ID 之类的字段用来标识请求。</li>
 </ul>
-<p>Servlet 配置相关方法：<strong>getServletConfig</strong></p>
-<ul>
-<li>ServletConfig 的作用就是封装 Servlet 的初始化参数</li>
-<li>可以在web.xml给 Servlet 配置参数，并在程序里通过 getServletConfig 方法拿到这些参数。</li>
-</ul>
-<p>Servlet 的 <strong>GenericServlet</strong> 抽象类 和 <strong>HttpServlet</strong> 类</p>
-<ul>
-<li>GenericServlet 实现了 Servlet 的通用方法 而 HttpServlet 是在 GenericServlet 基础上进行了封装加入了 HTTP 特性</li>
-</ul>
-<p>HttpServlet 只需要重写 doGet 和 doPost。</p>
-<h2 id="Servlet-容器"><a href="#Servlet-容器" class="headerlink" title="Servlet 容器"></a>Servlet 容器</h2><p>整体工作流程</p>
+<p><strong>Session的创建</strong></p>
 <ol>
-<li>客户端发起 HTTP 请求</li>
-<li>HTTP 服务器使用 ServletRequest 讲请求封装</li>
-<li>调用 Servlet 容器的 service 方法</li>
-<li>Servlet 容器，根据请求的 URL 和 Servlet 的映射关系，找到相应的 Servlet</li>
-<li>如果 Servlet 还没有被加载，就用反射机制创建这个 Servlet，并调用 Servlet 的 init 方法来完成初始化</li>
-<li>调用 Servlet 的 service 方法来处理请求，把 ServletResponse 对象返回给 HTTP 服务器</li>
-<li>讲响应返回给客户端</li>
+<li>浏览器发起请求 服务器 创建 Session，生成唯一 Session ID 给浏览器带回去。</li>
+<li>浏览器发起请求 ，服务器依据带来得 SessionID 找对对应 Session，找到session后 就可以获取或者添加内容</li>
 </ol>
-<p><strong>Web 应用层级</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">| - MyWebApp </span><br><span class="line">| - WEB-INF/web.xml -- 配置文件，用来配置Servlet等 </span><br><span class="line">| - WEB-INF/lib/ -- 存放Web应用所需各种JAR包 </span><br><span class="line">| - WEB-INF/classes/ -- 存放你的应用类，比如Servlet类 </span><br><span class="line">| - META-INF/ -- 目录存放工程的一些信息</span><br></pre></td></tr></table></figure>
+<p><strong>Tomcat 对 Session 得处理</strong></p>
+<ul>
+<li>Session 有过期时间，因此 Tomcat 会开启后台线程定期轮询，如果 Session 过期就会将 Session 失效掉。</li>
+<li>使用长连接的 HTTP 协议，会在响应头加入 Connection:keep-alive</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Tomcat</category>
+      </categories>
+      <tags>
+        <tag>Tomcat</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Tomcat容器的设计</title>
+    <url>/210d100c.html</url>
+    <content><![CDATA[<h1 id="Tomcat-容器的设计"><a href="#Tomcat-容器的设计" class="headerlink" title="Tomcat 容器的设计"></a>Tomcat 容器的设计</h1><h2 id="容器的层次结构"><a href="#容器的层次结构" class="headerlink" title="容器的层次结构"></a>容器的层次结构</h2><p><img src="/210d100c/tu1.png" alt="tu1.png"></p>
+<hr>
+<p>由上图可以知 ：层级由高到低 1 - 4 展示如下</p>
+<ol>
+<li>Engine [ 表示引擎 ]  </li>
+<li>Host [ 表示一个虚拟主机/站点 ]</li>
+<li>Context  [ 表示一个 Web 应用程序 ]</li>
+<li>Wrapper [ 表示一个 Servlet ]<span id="more"></span>
+👆🏻<br>👇🏻</li>
+</ol>
+<ul>
+<li>一个 Web 应用程序可以有多个 Servlet</li>
+<li>一个虚拟机可以部署多个 Web 应用程序</li>
+<li>一个 Service 只能有一个 Engine</li>
+<li>一个 Server 可以有多个 Service</li>
+</ul>
+<p>⭐4 种容器不是平行关系，而是父子关系，而设计这么多容器的目的是通过分层架构，使 Servlet 容器更具灵活性</p>
+<h2 id="Tomcat-容器对容器的管理"><a href="#Tomcat-容器对容器的管理" class="headerlink" title="Tomcat 容器对容器的管理**"></a>Tomcat 容器对容器的管理**</h2><p>容器之间是父子关系，即树形结构，即 TomCat 可使用组合模式来进行管理的容器的</p>
+<p>具体组合模式的实现</p>
+<ul>
+<li>所有容器实现 Container 接口<blockquote>
+<p>用户对单容器对象和组合容器对象的使用具有一致性<br>单容器对象指的是最底层的 Wrapper，组合容器对象指的是上面的 Context、Host 或者 Engine</p>
+</blockquote>
+</li>
+</ul>
+<p>Container 接口定义如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Container</span> <span class="keyword">extends</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">getParent</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setParent</span><span class="params">(Container container)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addChild</span><span class="params">(Container child)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeChild</span><span class="params">(Container child)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">findChild</span><span class="params">(String name)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>Servlet 容器顺序</p>
-<ol>
-<li>实例化 Servlet</li>
-<li>调用 Servlet</li>
-</ol>
-<p><strong>Servlet 是怎么注册到 Servlet 容器中</strong></p>
-<ol>
-<li>以 Web 应用程序的方式来部署 Servlet </li>
-<li>Servlet 规范里定义了 ServletContext 这个接口来对应一个 Web 应用</li>
-<li>Servlet 容器在启动时会加载 Web 应用，并为每个 Web 应用创建唯一的 ServletContext 对象</li>
-<li>由于 ServletContext 持有所有 Servlet 实例，你还可以通过它来实现 Servlet 请求的转发。扩展机制</li>
-</ol>
-<p><strong>扩展机制</strong></p>
-<p>Servlet 规范提供了两种扩展机制：</p>
+<p>⭐Container 接口 提供了对父容器，子容器的操作，同时扩展了 Lifecycle，而 Lifecycle 是用来统一管理各组件的生命周期</p>
+<h2 id="请求定位-Servlet-的过程"><a href="#请求定位-Servlet-的过程" class="headerlink" title="请求定位 Servlet 的过程"></a>请求定位 Servlet 的过程</h2><p>❓<strong>疑问点</strong></p>
+<blockquote>
+<p>Tomcat 是怎么确定请求是由哪个 Wrapper 容器里的 Servlet 来处理的？</p>
+</blockquote>
+<p>❗<strong>答案</strong></p>
+<blockquote>
+<p>Tomcat 是用 Mapper 组件来完成这个任务的。</p>
+<p>Mapper 组件的功能就是将用户请求的 URL 定位到一个 Servlet</p>
+</blockquote>
+<h3 id="Mapper-组件"><a href="#Mapper-组件" class="headerlink" title="Mapper 组件"></a>Mapper 组件</h3><p>Mapper 组件的工作原理</p>
 <ul>
-<li>Filter  过滤器</li>
-<li>Listener 监听器</li>
+<li>Mapper 组件里保存了 Web 应用的配置信息 ( 容器组件与访问路径的映射关系 )</li>
 </ul>
-<p><strong>Filter 过滤器的流程</strong></p>
-<ol>
-<li>Web 应用部署完成</li>
-<li>Servlet 容器需要实例化 Filter 并把 Filter 链接成一个 FilterChain。</li>
-<li>请求进来，获取第一个 Filter 并调用 doFilter 方法，doFilter 方法负责调用这个 FilterChain 中的下一个 Filter。</li>
-</ol>
+<p><strong>首先，根据协议和端口号选定 Service 和 Engine</strong></p>
+<blockquote>
+<p>Tomcat 的每个连接器都监听不同的端口，而连接器属于一个 Service 组件<br>Service 组件中包含了多个连接器和一个容器组件<br>一个容器组件具体体现就是 Engine 引擎<br>即Service 组件确认 等于 Engine 引擎确认</p>
+</blockquote>
+<p><strong>根据域名选定 Host</strong></p>
+<blockquote>
+<p>Mapper 组件通过 URL 中的域名去查找相应的 Host 容器</p>
+</blockquote>
+<p><strong>根据 URL 路径找到 Context 组件</strong></p>
+<blockquote>
+<p>Host 确定以后，Mapper 根据 URL 的路径来匹配相应的 Web 应用的路径</p>
+</blockquote>
+<p><strong>最后，根据 URL 路径找到 Wrapper（Servlet）</strong></p>
+<blockquote>
+<p>Context 确定后，Mapper 再根据web.xml中配置的 Servlet 映射路径来找到具体的 Wrapper 和 Servlet。</p>
+</blockquote>
+<h2 id="Pipeline-Valve-管道"><a href="#Pipeline-Valve-管道" class="headerlink" title="Pipeline-Valve 管道"></a>Pipeline-Valve 管道</h2><p>上述的 Mapper 组件是告诉我们怎么找到 Servlet，然后 Servlet 去做请求</p>
+<p>⭐<strong>而实际上这个查找路径上的父子容器都会对请求做一些处理，各容器处理事务遵循责任链模式</strong></p>
+<ul>
+<li>连接器中的 Adapter 会调用容器的 Service 方法来执行 Servlet</li>
+<li>最先拿到请求的是 Engine 容器，对请求做一些处理后，会把请求传给自己子容器 Host 继续处理，依次类推</li>
+<li>最后交由 Wrapper 容器，Wrapper 调用最终的 Servlet 来处理</li>
+</ul>
+<p>👐🏻<strong>Pipeline-Valve 是责任链模式</strong></p>
+<blockquote>
+<p>责任链模式是指在一个请求处理的过程中有很多处理者依次对请求进行处理，每个处理者负责做自己相应的处理，处理完之后将再调用下一个处理者继续处理。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Valve</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getNext</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNext</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">invoke</span><span class="params">(Request request, Response response)</span></span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>Valve 是一个处理点 可以想象一下链表，invoke 就是处理，通过 getNext 和 setNext 组成一个链表</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Pipeline</span> <span class="keyword">extends</span> <span class="title">Contained</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addValve</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getBasic</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBasic</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getFirst</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Pipeline 中 维护了 Valve 链表，并且其中并没有 invoke 方法，这是因为实际出发还是在 Valve 中的 invoke中，Valve 完成自己的处理后，调用getNext.invoke来触发下一个 Valve 调用。</p>
+<hr>
+<p>但是上述显的 Pipeline 并没有发挥作用，Pipeline 每个容器都有一个，其中getFirst 和 getBasic 就是来串联 不同容器的，他们分别可以取得 Valve 的第一个节点和最后一个节点 如下图所示</p>
+<p><img src="/210d100c/tu2.png" alt="tu2.png"></p>
+<p>⭐整个调用过程由连接器中的 Adapter 触发的，它会调用 Engine 的第一个 Valve</p>
+<p>⭐Wrapper 容器的最后一个 Valve 会创建一个 Filter 链，并调用 doFilter 方法，最终会调到 Servlet 的 service 方法。</p>
+<h3 id="Valve-和-Filter"><a href="#Valve-和-Filter" class="headerlink" title="Valve 和 Filter"></a>Valve 和 Filter</h3><ul>
+<li>Valve 是 Tomcat 的私有机制，与 Tomcat 的基础架构 /API 是紧耦合的。Servlet API 是公有的标准，所有的 Web 容器包括 Jetty 都支持 Filter 机制。</li>
+<li> Valve 工作在 Web 容器级别，拦截所有应用的请求；而 Servlet Filter 工作在应用级别，只能拦截某个 Web 应用的所有请求。如果想做整个 Web 容器的拦截器，必须通过 Valve 来实现。</li>
+</ul>
 ]]></content>
       <categories>
         <category>Tomcat</category>
@@ -186,87 +264,6 @@
       </categories>
       <tags>
         <tag>mysql</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Tomcat基础</title>
-    <url>/530cfffd.html</url>
-    <content><![CDATA[<h1 id="Tomcat基础"><a href="#Tomcat基础" class="headerlink" title="Tomcat基础"></a>Tomcat基础</h1><h2 id="Web-容器是什么"><a href="#Web-容器是什么" class="headerlink" title="Web 容器是什么"></a>Web 容器是什么</h2><ul>
-<li>Servlet 是可以视作没有 main 方法的 java 程序，没有 mian 方法需要部署到 Servlet 容器中，由容器来实例化并调用Servlet</li>
-<li>为了方便使用，他们需要具有 HTTP 服务器功能</li>
-<li>Tomcat 或者 Jetty 就是 HTTP 服务器 + Servlet 容器</li>
-<li>Web 容器 = HTTP 服务器 + Servlet 容器 </li>
-</ul>
-<span id="more"></span>
-
-<blockquote>
-<p>如今的 SpringBoot 是内嵌的 Web 容器(Tomcat)，因为当前大环境为微服务(将大而全的单体应用拆分成一个个功能单一的微服务)，这也就需要更多的 Web 容器来启动，自然需要轻量级的 Web 容器，以减少资源的消耗，降低部署的成本，而选择内嵌，降低应用部署的复杂度。</p>
-</blockquote>
-<h2 id="怎么学习-Web-容器"><a href="#怎么学习-Web-容器" class="headerlink" title="怎么学习 Web 容器"></a>怎么学习 Web 容器</h2><p><strong>HTTP 的本质</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">HTTP 协议是浏览器与服务器之间的数据传送协议</span><br><span class="line">HTTP 协议的本质就是一种浏览器与服务器之间约定好的通信格式</span><br></pre></td></tr></table></figure>
-
-<p>获取远端 HTTP 服务器的数据时</p>
-<ol>
-<li>与 HTTP 服务器建立 Socket 连接。 ip + 端口</li>
-<li>生成请求数据并通过Socket发送出去</li>
-</ol>
-<p><strong>HTTP 协议做的事情</strong></p>
-<ul>
-<li>获取还是提交内容</li>
-<li>想要的内容是什么</li>
-<li>这些内容以一种什么样的格式放到请求</li>
-</ul>
-<p><strong>HTTP 工作原理</strong></p>
-<ol>
-<li>用户发起请求_输入网址回车</li>
-<li>浏览器发起 TCP 请求连接_经过 TCP 三次握手建立连接</li>
-<li>服务器接收并建立连接</li>
-<li>浏览器生成 HTTP 格式的数据包</li>
-<li>浏览器发送HTTP 格式的请求数据包</li>
-<li>服务器解析 HTTP 格式的数据包_得知客户端的意图</li>
-<li>服务器执行请求</li>
-<li>服务器生成 HTTP 格式的数据包</li>
-<li>发送响应数据包</li>
-<li>浏览器解析 HTTP 格式的数据包</li>
-<li>浏览器呈现 HTML 响应给用户</li>
-</ol>
-<p><strong>做了哪些事情</strong></p>
-<ul>
-<li>Tomcat 将 HTTP 请求数据字节解析成 Request 对象</li>
-<li>Request 对象 封装了 HTTP 所有的请求信息,此后交给 Web 应用处理</li>
-<li>处理后得到 Response 对象</li>
-<li>Tomcat 将 Response 对象转成 HTTP 格式得响应数据并返回给浏览器</li>
-</ul>
-<h2 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h2><p><strong>什么是Cookie</strong></p>
-<ul>
-<li>Cookie 是 HTTP 报文得一个请求头</li>
-<li>Cookie 本质上就是一份存储在用户本地的文件，里面包含了每次请求中都需要传递的信息</li>
-<li>服务器可以通过读取 Cookie 请求头就知道用户是谁(用户的标识信息)</li>
-</ul>
-<h2 id="Session"><a href="#Session" class="headerlink" title="Session"></a>Session</h2><blockquote>
-<p>好处只发送 Sessoion ID 相对安全，节省网络流量，重点是不需要在 Cookie 中保存大量用户信息。<br><strong>Session和Cookie的关系</strong></p>
-</blockquote>
-<ul>
-<li>Cookie 是明文保存，是存在隐患得，Session 是保存在服务器上得，里面保存着用户得状态。</li>
-<li>当用户请求到来时，服务端可以通过 Cookie 把用户的请求和用户的 Session 对应起来</li>
-<li>浏览器在 Cookie 中填充了一个 Session ID 之类的字段用来标识请求。</li>
-</ul>
-<p><strong>Session的创建</strong></p>
-<ol>
-<li>浏览器发起请求 服务器 创建 Session，生成唯一 Session ID 给浏览器带回去。</li>
-<li>浏览器发起请求 ，服务器依据带来得 SessionID 找对对应 Session，找到session后 就可以获取或者添加内容</li>
-</ol>
-<p><strong>Tomcat 对 Session 得处理</strong></p>
-<ul>
-<li>Session 有过期时间，因此 Tomcat 会开启后台线程定期轮询，如果 Session 过期就会将 Session 失效掉。</li>
-<li>使用长连接的 HTTP 协议，会在响应头加入 Connection:keep-alive</li>
-</ul>
-]]></content>
-      <categories>
-        <category>Tomcat</category>
-      </categories>
-      <tags>
-        <tag>Tomcat</tag>
       </tags>
   </entry>
   <entry>
@@ -396,6 +393,102 @@
       </tags>
   </entry>
   <entry>
+    <title>Servlet规范和Servlet容器</title>
+    <url>/1c68dade.html</url>
+    <content><![CDATA[<h1 id="Servlet规范和Servlet容器"><a href="#Servlet规范和Servlet容器" class="headerlink" title="Servlet规范和Servlet容器"></a>Servlet规范和Servlet容器</h1><h2 id="HTTP-服务器-怎么调用对应-Java-类的哪个方法？"><a href="#HTTP-服务器-怎么调用对应-Java-类的哪个方法？" class="headerlink" title="HTTP 服务器 怎么调用对应 Java 类的哪个方法？"></a>HTTP 服务器 怎么调用对应 Java 类的哪个方法？</h2><p>❌</p>
+<blockquote>
+<p>方式：通过一堆if-else进行判断<br>问题：HTTP 服务器的代码跟业务逻辑耦合在一起了，如果新加一个业务方法还要改 HTTP 服务器的代码。</p>
+</blockquote>
+<p>✔️</p>
+<blockquote>
+<p>方式：通过接口进行解耦，各种业务类都必须实现这个接口(Servlet 接口)</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？"><a href="#HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？" class="headerlink" title="HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？"></a>HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？</h2><p>❌</p>
+<blockquote>
+<p>方式：使用 HTTP 服务器进行<br>问题：HTTP 服务器 和 业务类耦合</p>
+</blockquote>
+<p>✔️</p>
+<blockquote>
+<p>方式：添加 Servlet 容器，Servlet 容器用来加载和管理业务类</p>
+</blockquote>
+<h2 id="Servlet-接口"><a href="#Servlet-接口" class="headerlink" title="Servlet 接口"></a>Servlet 接口</h2><blockquote>
+<p>Servlet 接口是 Servlet 容器跟具体业务类之间的接口。<br>Servlet 接口和 Servlet 容器这一整套规范叫作 Servlet 规范</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Servlet</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(ServletConfig config)</span> <span class="keyword">throws</span> ServletException</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function">ServletConfig <span class="title">getServletConfig</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">service</span><span class="params">(ServletRequest req, ServletResponse res）<span class="keyword">throws</span> ServletException, IOException;</span></span></span><br><span class="line"><span class="params"><span class="function">    </span></span></span><br><span class="line"><span class="params"><span class="function">    String getServletInfo()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="重点方法：service"><a href="#重点方法：service" class="headerlink" title="重点方法：service"></a>重点方法：<em><strong>service</strong></em></h3><p>service的两个参数</p>
+<ul>
+<li><p>ServletRequest 用来封装请求信息</p>
+</li>
+<li><p>ServletResponse 用来封装响应信息</p>
+</li>
+</ul>
+<blockquote>
+<p>本质上这两个类是对通信协议的封装</p>
+</blockquote>
+<h3 id="其余方法"><a href="#其余方法" class="headerlink" title="其余方法"></a>其余方法</h3><p>生命周期相关方法：<strong>init</strong> 和 <strong>destroy</strong></p>
+<ul>
+<li>Servlet 容器在加载 Servlet 类的时候会调用 <strong>init</strong> 方法</li>
+<li>Servlet 容器在卸载 Servlet 类的时候会调用 <strong>destroy</strong> 方法</li>
+</ul>
+<p>Servlet 配置相关方法：<strong>getServletConfig</strong></p>
+<ul>
+<li>ServletConfig 的作用就是封装 Servlet 的初始化参数</li>
+<li>可以在web.xml给 Servlet 配置参数，并在程序里通过 getServletConfig 方法拿到这些参数。</li>
+</ul>
+<p>Servlet 的 <strong>GenericServlet</strong> 抽象类 和 <strong>HttpServlet</strong> 类</p>
+<ul>
+<li>GenericServlet 实现了 Servlet 的通用方法 而 HttpServlet 是在 GenericServlet 基础上进行了封装加入了 HTTP 特性</li>
+</ul>
+<p>HttpServlet 只需要重写 doGet 和 doPost。</p>
+<h2 id="Servlet-容器"><a href="#Servlet-容器" class="headerlink" title="Servlet 容器"></a>Servlet 容器</h2><p>整体工作流程</p>
+<ol>
+<li>客户端发起 HTTP 请求</li>
+<li>HTTP 服务器使用 ServletRequest 讲请求封装</li>
+<li>调用 Servlet 容器的 service 方法</li>
+<li>Servlet 容器，根据请求的 URL 和 Servlet 的映射关系，找到相应的 Servlet</li>
+<li>如果 Servlet 还没有被加载，就用反射机制创建这个 Servlet，并调用 Servlet 的 init 方法来完成初始化</li>
+<li>调用 Servlet 的 service 方法来处理请求，把 ServletResponse 对象返回给 HTTP 服务器</li>
+<li>讲响应返回给客户端</li>
+</ol>
+<p><strong>Web 应用层级</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">| - MyWebApp </span><br><span class="line">| - WEB-INF/web.xml -- 配置文件，用来配置Servlet等 </span><br><span class="line">| - WEB-INF/lib/ -- 存放Web应用所需各种JAR包 </span><br><span class="line">| - WEB-INF/classes/ -- 存放你的应用类，比如Servlet类 </span><br><span class="line">| - META-INF/ -- 目录存放工程的一些信息</span><br></pre></td></tr></table></figure>
+
+<p>Servlet 容器顺序</p>
+<ol>
+<li>实例化 Servlet</li>
+<li>调用 Servlet</li>
+</ol>
+<p><strong>Servlet 是怎么注册到 Servlet 容器中</strong></p>
+<ol>
+<li>以 Web 应用程序的方式来部署 Servlet </li>
+<li>Servlet 规范里定义了 ServletContext 这个接口来对应一个 Web 应用</li>
+<li>Servlet 容器在启动时会加载 Web 应用，并为每个 Web 应用创建唯一的 ServletContext 对象</li>
+<li>由于 ServletContext 持有所有 Servlet 实例，你还可以通过它来实现 Servlet 请求的转发。扩展机制</li>
+</ol>
+<p><strong>扩展机制</strong></p>
+<p>Servlet 规范提供了两种扩展机制：</p>
+<ul>
+<li>Filter  过滤器</li>
+<li>Listener 监听器</li>
+</ul>
+<p><strong>Filter 过滤器的流程</strong></p>
+<ol>
+<li>Web 应用部署完成</li>
+<li>Servlet 容器需要实例化 Filter 并把 Filter 链接成一个 FilterChain。</li>
+<li>请求进来，获取第一个 Filter 并调用 doFilter 方法，doFilter 方法负责调用这个 FilterChain 中的下一个 Filter。</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Tomcat</category>
+      </categories>
+      <tags>
+        <tag>Tomcat</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>递归（Recurtion）</title>
     <url>/8bf709ac.html</url>
     <content><![CDATA[<hr>
@@ -436,98 +529,6 @@
       </categories>
       <tags>
         <tag>算法</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Tomcat容器的设计</title>
-    <url>/210d100c.html</url>
-    <content><![CDATA[<h1 id="Tomcat-容器的设计"><a href="#Tomcat-容器的设计" class="headerlink" title="Tomcat 容器的设计"></a>Tomcat 容器的设计</h1><h2 id="容器的层次结构"><a href="#容器的层次结构" class="headerlink" title="容器的层次结构"></a>容器的层次结构</h2><p><img src="/210d100c/tu1.png" alt="tu1.png"></p>
-<hr>
-<p>由上图可以知 ：层级由高到低 1 - 4 展示如下</p>
-<ol>
-<li>Engine [ 表示引擎 ]  </li>
-<li>Host [ 表示一个虚拟主机/站点 ]</li>
-<li>Context  [ 表示一个 Web 应用程序 ]</li>
-<li>Wrapper [ 表示一个 Servlet ]<br>👆🏻<br>👇🏻</li>
-</ol>
-<ul>
-<li>一个 Web 应用程序可以有多个 Servlet</li>
-<li>一个虚拟机可以部署多个 Web 应用程序</li>
-<li>一个 Service 只能有一个 Engine</li>
-<li>一个 Server 可以有多个 Service</li>
-</ul>
-<p>⭐4 种容器不是平行关系，而是父子关系，而设计这么多容器的目的是通过分层架构，使 Servlet 容器更具灵活性</p>
-<h2 id="Tomcat-容器对容器的管理"><a href="#Tomcat-容器对容器的管理" class="headerlink" title="Tomcat 容器对容器的管理**"></a>Tomcat 容器对容器的管理**</h2><p>容器之间是父子关系，即树形结构，即 TomCat 可使用组合模式来进行管理的容器的</p>
-<p>具体组合模式的实现</p>
-<ul>
-<li>所有容器实现 Container 接口<blockquote>
-<p>用户对单容器对象和组合容器对象的使用具有一致性<br>单容器对象指的是最底层的 Wrapper，组合容器对象指的是上面的 Context、Host 或者 Engine</p>
-</blockquote>
-</li>
-</ul>
-<p>Container 接口定义如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Container</span> <span class="keyword">extends</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">getParent</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setParent</span><span class="params">(Container container)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addChild</span><span class="params">(Container child)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeChild</span><span class="params">(Container child)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">findChild</span><span class="params">(String name)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>⭐Container 接口 提供了对父容器，子容器的操作，同时扩展了 Lifecycle，而 Lifecycle 是用来统一管理各组件的生命周期</p>
-<h2 id="请求定位-Servlet-的过程"><a href="#请求定位-Servlet-的过程" class="headerlink" title="请求定位 Servlet 的过程"></a>请求定位 Servlet 的过程</h2><p>❓<strong>疑问点</strong></p>
-<blockquote>
-<p>Tomcat 是怎么确定请求是由哪个 Wrapper 容器里的 Servlet 来处理的？</p>
-</blockquote>
-<p>❗<strong>答案</strong></p>
-<blockquote>
-<p>Tomcat 是用 Mapper 组件来完成这个任务的。</p>
-<p>Mapper 组件的功能就是将用户请求的 URL 定位到一个 Servlet</p>
-</blockquote>
-<h3 id="Mapper-组件"><a href="#Mapper-组件" class="headerlink" title="Mapper 组件"></a>Mapper 组件</h3><p>Mapper 组件的工作原理</p>
-<ul>
-<li>Mapper 组件里保存了 Web 应用的配置信息 ( 容器组件与访问路径的映射关系 )</li>
-</ul>
-<p><strong>首先，根据协议和端口号选定 Service 和 Engine</strong></p>
-<blockquote>
-<p>Tomcat 的每个连接器都监听不同的端口，而连接器属于一个 Service 组件<br>Service 组件中包含了多个连接器和一个容器组件<br>一个容器组件具体体现就是 Engine 引擎<br>即Service 组件确认 等于 Engine 引擎确认</p>
-</blockquote>
-<p><strong>根据域名选定 Host</strong></p>
-<blockquote>
-<p>Mapper 组件通过 URL 中的域名去查找相应的 Host 容器</p>
-</blockquote>
-<p><strong>根据 URL 路径找到 Context 组件</strong></p>
-<blockquote>
-<p>Host 确定以后，Mapper 根据 URL 的路径来匹配相应的 Web 应用的路径</p>
-</blockquote>
-<p><strong>最后，根据 URL 路径找到 Wrapper（Servlet）</strong></p>
-<blockquote>
-<p>Context 确定后，Mapper 再根据web.xml中配置的 Servlet 映射路径来找到具体的 Wrapper 和 Servlet。</p>
-</blockquote>
-<h2 id="Pipeline-Valve-管道"><a href="#Pipeline-Valve-管道" class="headerlink" title="Pipeline-Valve 管道"></a>Pipeline-Valve 管道</h2><p>上述的 Mapper 组件是告诉我们怎么找到 Servlet，然后 Servlet 去做请求</p>
-<p>⭐<strong>而实际上这个查找路径上的父子容器都会对请求做一些处理，各容器处理事务遵循责任链模式</strong></p>
-<ul>
-<li>连接器中的 Adapter 会调用容器的 Service 方法来执行 Servlet</li>
-<li>最先拿到请求的是 Engine 容器，对请求做一些处理后，会把请求传给自己子容器 Host 继续处- = 理，依次类推</li>
-<li>最后交由 Wrapper 容器，Wrapper 调用最终的 Servlet 来处理</li>
-</ul>
-<p>👐🏻<strong>Pipeline-Valve 是责任链模式</strong></p>
-<blockquote>
-<p>责任链模式是指在一个请求处理的过程中有很多处理者依次对请求进行处理，每个处理者负责做自己相应的处理，处理完之后将再调用下一个处理者继续处理。</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Valve</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getNext</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNext</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">invoke</span><span class="params">(Request request, Response response)</span></span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
-<p>Valve 是一个处理点 可以想象一下链表，invoke 就是处理，通过 getNext 和 setNext 组成一个链表</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Pipeline</span> <span class="keyword">extends</span> <span class="title">Contained</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addValve</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getBasic</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBasic</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getFirst</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Pipeline 中 维护了 Valve 链表，并且其中并没有 invoke 方法，这是因为实际出发还是在 Valve 中的 invoke中，Valve 完成自己的处理后，调用getNext.invoke来触发下一个 Valve 调用。</p>
-<hr>
-<p>但是上述显的 Pipeline 并没有发挥作用，Pipeline 每个容器都有一个，其中getFirst 和 getBasic 就是来串联 不同容器的，他们分别可以取得 Valve 的第一个节点和最后一个节点 如下图所示</p>
-<p><img src="/210d100c/tu2.png" alt="tu2.png"></p>
-<p>⭐整个调用过程由连接器中的 Adapter 触发的，它会调用 Engine 的第一个 Valve</p>
-<p>⭐Wrapper 容器的最后一个 Valve 会创建一个 Filter 链，并调用 doFilter 方法，最终会调到 Servlet 的 service 方法。</p>
-<h3 id="Valve-和-Filter"><a href="#Valve-和-Filter" class="headerlink" title="Valve 和 Filter"></a>Valve 和 Filter</h3><ul>
-<li>Valve 是 Tomcat 的私有机制，与 Tomcat 的基础架构 /API 是紧耦合的。Servlet API 是公有的标准，所有的 Web 容器包括 Jetty 都支持 Filter 机制。</li>
-<li> Valve 工作在 Web 容器级别，拦截所有应用的请求；而 Servlet Filter 工作在应用级别，只能拦截某个 Web 应用的所有请求。如果想做整个 Web 容器的拦截器，必须通过 Valve 来实现。</li>
-</ul>
-]]></content>
-      <categories>
-        <category>Tomcat</category>
-      </categories>
-      <tags>
-        <tag>Tomcat</tag>
       </tags>
   </entry>
 </search>
