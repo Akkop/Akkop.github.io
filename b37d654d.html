@@ -22,30 +22,35 @@
     var CONFIG = {"hostname":"guohaojie.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true,"b2t":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="我们提着过去，走入人群">
-<meta property="og:type" content="website">
-<meta property="og:title" content="一盘团子的博客">
-<meta property="og:url" content="http://guohaojie.com/index.html">
+  <meta name="description" content="Redis的特性Redis 是远程字典服务器，是以字典结构存储数据，允许其他应用通过 TCP 协议读写字典内容 存储结构 Redis 支持的键值类型如下  字符串类型 散列类型 列表类型 集合类型 有序集合类型内存存储和持久化   Redis 的数据都是存储在内存中  优点: 读写比之读写硬盘快了非常多缺点: 程序退出,内存数据丢失  Redis 提供了持久化支持，内存中的数据异步写入硬盘，同时不">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis-1">
+<meta property="og:url" content="http://guohaojie.com/b37d654d.html">
 <meta property="og:site_name" content="一盘团子的博客">
-<meta property="og:description" content="我们提着过去，走入人群">
+<meta property="og:description" content="Redis的特性Redis 是远程字典服务器，是以字典结构存储数据，允许其他应用通过 TCP 协议读写字典内容 存储结构 Redis 支持的键值类型如下  字符串类型 散列类型 列表类型 集合类型 有序集合类型内存存储和持久化   Redis 的数据都是存储在内存中  优点: 读写比之读写硬盘快了非常多缺点: 程序退出,内存数据丢失  Redis 提供了持久化支持，内存中的数据异步写入硬盘，同时不">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://guohaojie.com/undefined/tu1.png">
+<meta property="article:published_time" content="2021-11-29T07:51:28.000Z">
+<meta property="article:modified_time" content="2021-12-06T03:49:19.396Z">
 <meta property="article:author" content="akkS">
+<meta property="article:tag" content="redis">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://guohaojie.com/undefined/tu1.png">
 
-<link rel="canonical" href="http://guohaojie.com/">
+<link rel="canonical" href="http://guohaojie.com/b37d654d.html">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>一盘团子的博客</title>
+  <title>redis-1 | 一盘团子的博客</title>
   
 
 
@@ -189,9 +194,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
@@ -207,10 +213,9 @@
       <meta itemprop="name" content="一盘团子的博客">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/b37d654d.html" class="post-title-link" itemprop="url">redis-1</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          redis-1
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -263,7 +268,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="Redis的特性"><a href="#Redis的特性" class="headerlink" title="Redis的特性"></a>Redis的特性</h2><p>Redis 是远程字典服务器，是以字典结构存储数据，允许其他应用通过 TCP 协议读写字典内容</p>
+        <h2 id="Redis的特性"><a href="#Redis的特性" class="headerlink" title="Redis的特性"></a>Redis的特性</h2><p>Redis 是远程字典服务器，是以字典结构存储数据，允许其他应用通过 TCP 协议读写字典内容</p>
 <h3 id="存储结构"><a href="#存储结构" class="headerlink" title="存储结构"></a>存储结构</h3><hr>
 <p>Redis 支持的键值类型如下</p>
 <ul>
@@ -526,706 +531,44 @@
 <p>删除列表中指定的值</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LREM key count <span class="keyword">value</span></span><br></pre></td></tr></table></figure>
 
-      
     </div>
 
     
     
     
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
       
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://guohaojie.com/2e20d1b4.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/abcd.png">
-      <meta itemprop="name" content="akkS">
-      <meta itemprop="description" content="我们提着过去，走入人群">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一盘团子的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2e20d1b4.html" class="post-title-link" itemprop="url">centosRedis安装</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-11-29 14:26:54 / 修改时间：15:06:41" itemprop="dateCreated datePublished" datetime="2021-11-29T14:26:54+08:00">2021-11-29</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Centos/" itemprop="url" rel="index"><span itemprop="name">Centos</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>435</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="查看-Centos-版本"><a href="#查看-Centos-版本" class="headerlink" title="查看 Centos 版本"></a>查看 Centos 版本</h3><hr>
-<blockquote>
-<p>cat /etc/redhat-release</p>
-</blockquote>
-<h3 id="添加EPEL仓库-自由开源的附加软件包仓库"><a href="#添加EPEL仓库-自由开源的附加软件包仓库" class="headerlink" title="添加EPEL仓库 (自由开源的附加软件包仓库)"></a>添加EPEL仓库 (自由开源的附加软件包仓库)</h3><hr>
-<blockquote>
-<p>sudo yum install epel-release</p>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2e20d1b4.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
+      <div>
         
-      
-    </div>
-
+          <div>
     
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
     
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
+</div>
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://guohaojie.com/210d100c.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/abcd.png">
-      <meta itemprop="name" content="akkS">
-      <meta itemprop="description" content="我们提着过去，走入人群">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一盘团子的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/210d100c.html" class="post-title-link" itemprop="url">Tomcat容器的设计</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-11-26 15:43:32 / 修改时间：17:43:20" itemprop="dateCreated datePublished" datetime="2021-11-26T15:43:32+08:00">2021-11-26</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Tomcat/" itemprop="url" rel="index"><span itemprop="name">Tomcat</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Tomcat-容器的设计"><a href="#Tomcat-容器的设计" class="headerlink" title="Tomcat 容器的设计"></a>Tomcat 容器的设计</h1><h2 id="容器的层次结构"><a href="#容器的层次结构" class="headerlink" title="容器的层次结构"></a>容器的层次结构</h2><p>层级由高到低 1 - 4 展示如下</p>
-<ol>
-<li>Engine [ 表示引擎 ]  </li>
-<li>Host [ 表示一个虚拟主机/站点 ]</li>
-<li>Context  [ 表示一个 Web 应用程序 ]</li>
-<li>Wrapper [ 表示一个 Servlet ]
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/210d100c.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
+      </div>
 
-    
-    
-    
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
+          <div class="post-tags">
+              <a href="/tags/redis/" rel="tag"># redis</a>
+          </div>
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://guohaojie.com/d2d77b8f.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/abcd.png">
-      <meta itemprop="name" content="akkS">
-      <meta itemprop="description" content="我们提着过去，走入人群">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一盘团子的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/d2d77b8f.html" class="post-title-link" itemprop="url">Tomcat连接器的设计</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-11-25 16:15:54" itemprop="dateCreated datePublished" datetime="2021-11-25T16:15:54+08:00">2021-11-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-26 15:35:00" itemprop="dateModified" datetime="2021-11-26T15:35:00+08:00">2021-11-26</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Tomcat/" itemprop="url" rel="index"><span itemprop="name">Tomcat</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Tomcat连接器的设计"><a href="#Tomcat连接器的设计" class="headerlink" title="Tomcat连接器的设计"></a>Tomcat连接器的设计</h1><h2 id="Tomcat-总体架构"><a href="#Tomcat-总体架构" class="headerlink" title="Tomcat 总体架构"></a>Tomcat 总体架构</h2><p>Tomcat 要实现 <em><strong>2 个核心功能</strong></em>：</p>
-<blockquote>
-<p>处理 Socket 连接，负责网络字节流与 Request 和 Response 对象的转化。<br>加载和管理 Servlet，以及具体处理 Request 请求。</p>
-</blockquote>
-<p>对应2个核心功能 Tomcat 设计的组件</p>
-<blockquote>
-<p>连接器（connector）👈  <strong>对外交流(本节内容)</strong><br>容器（container）👈 对内处理</p>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/d2d77b8f.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
 
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://guohaojie.com/1c68dade.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/abcd.png">
-      <meta itemprop="name" content="akkS">
-      <meta itemprop="description" content="我们提着过去，走入人群">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一盘团子的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/1c68dade.html" class="post-title-link" itemprop="url">Servlet规范和Servlet容器</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-11-25 15:15:09 / 修改时间：18:10:07" itemprop="dateCreated datePublished" datetime="2021-11-25T15:15:09+08:00">2021-11-25</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Tomcat/" itemprop="url" rel="index"><span itemprop="name">Tomcat</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.8k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Servlet规范和Servlet容器"><a href="#Servlet规范和Servlet容器" class="headerlink" title="Servlet规范和Servlet容器"></a>Servlet规范和Servlet容器</h1><h2 id="HTTP-服务器-怎么调用对应-Java-类的哪个方法？"><a href="#HTTP-服务器-怎么调用对应-Java-类的哪个方法？" class="headerlink" title="HTTP 服务器 怎么调用对应 Java 类的哪个方法？"></a>HTTP 服务器 怎么调用对应 Java 类的哪个方法？</h2><p>❌</p>
-<blockquote>
-<p>方式：通过一堆if-else进行判断<br>问题：HTTP 服务器的代码跟业务逻辑耦合在一起了，如果新加一个业务方法还要改 HTTP 服务器的代码。</p>
-</blockquote>
-<p>✔️</p>
-<blockquote>
-<p>方式：通过接口进行解耦，各种业务类都必须实现这个接口(Servlet 接口)</p>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/1c68dade.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2e20d1b4.html" rel="prev" title="centosRedis安装">
+      <i class="fa fa-chevron-left"></i> centosRedis安装
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://guohaojie.com/530cfffd.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/abcd.png">
-      <meta itemprop="name" content="akkS">
-      <meta itemprop="description" content="我们提着过去，走入人群">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一盘团子的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/530cfffd.html" class="post-title-link" itemprop="url">Tomcat基础</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-11-25 15:09:06 / 修改时间：18:10:01" itemprop="dateCreated datePublished" datetime="2021-11-25T15:09:06+08:00">2021-11-25</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Tomcat/" itemprop="url" rel="index"><span itemprop="name">Tomcat</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Tomcat基础"><a href="#Tomcat基础" class="headerlink" title="Tomcat基础"></a>Tomcat基础</h1><h2 id="Web-容器是什么"><a href="#Web-容器是什么" class="headerlink" title="Web 容器是什么"></a>Web 容器是什么</h2><ul>
-<li>Servlet 是可以视作没有 main 方法的 java 程序，没有 mian 方法需要部署到 Servlet 容器中，由容器来实例化并调用Servlet</li>
-<li>为了方便使用，他们需要具有 HTTP 服务器功能</li>
-<li>Tomcat 或者 Jetty 就是 HTTP 服务器 + Servlet 容器</li>
-<li>Web 容器 = HTTP 服务器 + Servlet 容器 </li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/530cfffd.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://guohaojie.com/8bf709ac.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/abcd.png">
-      <meta itemprop="name" content="akkS">
-      <meta itemprop="description" content="我们提着过去，走入人群">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一盘团子的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/8bf709ac.html" class="post-title-link" itemprop="url">递归（Recurtion）</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-11-23 00:47:42" itemprop="dateCreated datePublished" datetime="2021-11-23T00:47:42+08:00">2021-11-23</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-25 18:09:27" itemprop="dateModified" datetime="2021-11-25T18:09:27+08:00">2021-11-25</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.5k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <hr>
-<p>递归的本质和基本实现形式</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/8bf709ac.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://guohaojie.com/183e61db.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/abcd.png">
-      <meta itemprop="name" content="akkS">
-      <meta itemprop="description" content="我们提着过去，走入人群">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一盘团子的博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/183e61db.html" class="post-title-link" itemprop="url">基础架构:一条SQL查询语句是如何执行的</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-11-22 02:35:08" itemprop="dateCreated datePublished" datetime="2021-11-22T02:35:08+08:00">2021-11-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-25 18:23:54" itemprop="dateModified" datetime="2021-11-25T18:23:54+08:00">2021-11-25</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="基础结构"><a href="#基础结构" class="headerlink" title="基础结构"></a>基础结构</h1><h2 id="功能模块划"><a href="#功能模块划" class="headerlink" title="功能模块划"></a>功能模块划</h2><p><strong>Server层</strong></p>
-<ul>
-<li>连接器（管理接连，权限验证）</li>
-<li>查询缓存</li>
-<li>分析器（词法分析，语法分析）</li>
-<li>优化器（执行计划生成，索引选择）</li>
-<li>执行器（操作引擎，返回结果）</li>
-<li>存储过程，触发器，视图等等。</li>
-</ul>
-<p><strong>存储引擎层</strong></p>
-<ul>
-<li>数据的存储和提取。</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/183e61db.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-
   
 
 
@@ -1278,6 +621,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis%E7%9A%84%E7%89%B9%E6%80%A7"><span class="nav-text">Redis的特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84"><span class="nav-text">存储结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E5%AD%98%E5%82%A8%E5%92%8C%E6%8C%81%E4%B9%85%E5%8C%96"><span class="nav-text">内存存储和持久化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-%E5%8A%9F%E8%83%BD%E4%B8%B0%E5%AF%8C"><span class="nav-text">Redis 功能丰富</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-text">Redis 命令行客户端</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%91%E9%80%81%E5%91%BD%E4%BB%A4"><span class="nav-text">发送命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="nav-text">命令返回值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-text">多数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-%E7%9A%84%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4"><span class="nav-text">Redis 的基础命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B-%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%B1%BB%E5%9E%8B"><span class="nav-text">数据类型 - 字符串类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B-%E6%95%A3%E5%88%97%E7%B1%BB%E5%9E%8B"><span class="nav-text">数据类型 - 散列类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B-%E5%88%97%E8%A1%A8%E7%B1%BB%E5%9E%8B"><span class="nav-text">数据类型 - 列表类型</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
