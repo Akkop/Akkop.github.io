@@ -226,7 +226,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-06 11:49:19" itemprop="dateModified" datetime="2021-12-06T11:49:19+08:00">2021-12-06</time>
+                <time title="修改时间：2021-12-06 13:50:58" itemprop="dateModified" datetime="2021-12-06T13:50:58+08:00">2021-12-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -271,261 +271,16 @@
 <li>散列类型</li>
 <li>列表类型</li>
 <li>集合类型</li>
-<li>有序集合类型<h3 id="内存存储和持久化"><a href="#内存存储和持久化" class="headerlink" title="内存存储和持久化"></a>内存存储和持久化</h3></li>
+<li>有序集合类型</li>
 </ul>
-<hr>
-<p>Redis 的数据都是存储在内存中</p>
-<blockquote>
-<p>优点: 读写比之读写硬盘快了非常多<br>缺点: 程序退出,内存数据丢失</p>
-</blockquote>
-<p><strong>Redis 提供了持久化支持，内存中的数据异步写入硬盘，同时不影响继续提供服务</strong></p>
-<h3 id="Redis-功能丰富"><a href="#Redis-功能丰富" class="headerlink" title="Redis 功能丰富"></a>Redis 功能丰富</h3><hr>
-<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Redis 是作为数据库开发的，但可以作为缓存，队列等等</span><br><span class="line">Redis 可以为每个键设置生存时间(TTL)	,到期自动删除(可作为缓存)</span><br><span class="line">Redis 可以限定数据占用的最大内存空间，数据达到空间限制后，按照规则删除</span><br><span class="line">Redis 的列表类型键可以用来实现队列，并且支持阻塞式读取</span><br><span class="line">Redis 支持“发布/订阅”的消息模式， 可以基于此构建聊天室等系统</span><br></pre></td></tr></table></figure>
-
-<h2 id="Redis-命令行客户端"><a href="#Redis-命令行客户端" class="headerlink" title="Redis 命令行客户端"></a>Redis 命令行客户端</h2><h3 id="发送命令"><a href="#发送命令" class="headerlink" title="发送命令"></a>发送命令</h3><hr>
-<p>通过 <strong>redis-cli</strong> 向 Redis 发送命令有两种方式</p>
-<ol>
-<li>将命令作为 redis-cli 的参数执行 如: redis-cli -h 127.0.0.1 -p 6379</li>
-<li>不附带参数运行redis-cli 如ping 如 ECHO hi</li>
-</ol>
-<h3 id="命令返回值"><a href="#命令返回值" class="headerlink" title="命令返回值"></a>命令返回值</h3><hr>
-<p><strong>命令的返回值有5种类型</strong></p>
-<ol>
-<li>状态回复<ul>
-<li>如使用 SET 设置了某个键，Redis 回复 OK</li>
-</ul>
-</li>
-<li>错误回复<ul>
-<li>如命令不存在或命令格式有错误等情况时返回</li>
-</ul>
-</li>
-<li>整数回复<ul>
-<li>如递增键值的 INCR 命令会以整数形式返回递增后的键值，又如获取数据库中键的个数 DBSIZE 命令</li>
-</ul>
-</li>
-<li>字符串回复<ul>
-<li>如请求一个字符串类型键的键值，字符串回复以双引号包裹</li>
-<li>特殊情况下无键值  nil</li>
-</ul>
-</li>
-<li>多行字符串回复<ul>
-<li>请求一个非字符串类型键的元素 列表时就会收到多行字符串回复</li>
-<li>如 KEYS ＊</li>
-</ul>
-</li>
-</ol>
-<h2 id="多数据库"><a href="#多数据库" class="headerlink" title="多数据库"></a>多数据库</h2><p>Redis 的数据库是从0-15标识<br>Redis 默认有16个数据库 可以使用select 1-15<br>Redis 之间并不是完全隔离的 如使用 FLUSHALL 会清空所有数据库的数据</p>
-<h2 id="Redis-的基础命令"><a href="#Redis-的基础命令" class="headerlink" title="Redis 的基础命令"></a>Redis 的基础命令</h2><table>
-<thead>
-<tr>
-<th>命令</th>
-<th>解释</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>KEYS pattern</td>
-<td>获得符合规则的键名列表</td>
-</tr>
-<tr>
-<td>SET key value</td>
-<td>设置键值</td>
-</tr>
-<tr>
-<td>KEYS *</td>
-<td>查看所有键</td>
-</tr>
-<tr>
-<td>EXISTS key</td>
-<td>判断键是否存在 存在返回1 否则返回0</td>
-</tr>
-<tr>
-<td>DEL key [key …]</td>
-<td>删除一个或多个键，返回删除数量</td>
-</tr>
-<tr>
-<td>TYPE key</td>
-<td>获得所有键值的类型</td>
-</tr>
-</tbody></table>
-<ul>
-<li>[ keys * ] 是遍历所有键，当键数量多的时候会影响性能</li>
-</ul>
-<h2 id="数据类型-字符串类型"><a href="#数据类型-字符串类型" class="headerlink" title="数据类型 - 字符串类型"></a>数据类型 - 字符串类型</h2><p>字符串类型是最基础的数据类型，能够存储任何形式的字符串，如二进制，邮箱，json，图片。<br>字符串类型最大可以存储 512M<br><strong>字符串类型是其他四种类型的基础</strong></p>
-<p>赋值</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span> key hello</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; set key hello<br>OK</p>
-</blockquote>
-<hr>
-<p>取值</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">get</span> key</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; set key hello<br>OK<br>127.0.0.1:6379&gt; get key<br>“hello”</p>
-</blockquote>
-<hr>
-<p>取值 <strong>当键不存在 返回 nil</strong></p>
-<blockquote>
-<p>127.0.0.1:6379&gt; get aakkakaa<br>(nil)</p>
-</blockquote>
-<hr>
-<p>增加指定的整数（num 为数量）</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">incrby key num</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; get akk<br>“1”<br>127.0.0.1:6379&gt; incrby akk 2<br>(integer) 3<br>127.0.0.1:6379&gt; get akk<br>“3”</p>
-</blockquote>
-<hr>
-<p>减少指定的整数</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">decrby key num</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; get akk<br>“3”<br>127.0.0.1:6379&gt; DECRBY akk 3<br>(integer) 0<br>127.0.0.1:6379&gt; get akk<br>“0”</p>
-</blockquote>
-<hr>
-<p>自增1</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">incr key</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; get akk<br>“1”<br>127.0.0.1:6379&gt; incr akk<br>(integer) 2<br>127.0.0.1:6379&gt; get akk<br>“2”</p>
-</blockquote>
-<hr>
-<p>自减1</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">decr key</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; get akk<br>“2”<br>127.0.0.1:6379&gt; DECR akk<br>(integer) 1<br>127.0.0.1:6379&gt; get akk<br>“1”</p>
-</blockquote>
-<hr>
-<p>增加指定浮点数</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">incrbyfloat key <span class="number">0.0</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; get akk<br>“0.5”<br>127.0.0.1:6379&gt; incrbyfloat akk 0.66<br>“1.16”<br>127.0.0.1:6379&gt; get akk<br>“1.16”</p>
-</blockquote>
-<hr>
-<p>向尾部追加值</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">APPEND key <span class="keyword">value</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; get akk<br>“10.111”<br>127.0.0.1:6379&gt; APPEND akk 66<br>(integer) 8<br>127.0.0.1:6379&gt; get akk<br>“10.11166”</p>
-</blockquote>
-<hr>
-<p>获取字符串长度</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">STRLEN key</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; get akk<br>“10.11166”<br>127.0.0.1:6379&gt; strlen akk<br>(integer) 8</p>
-</blockquote>
-<hr>
-<p>同时获取多个键值</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MGET KEY [key ...]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; keys *<br>“key”<br>“pushkey”<br>“akk”<br>“1”<br>127.0.0.1:6379&gt; mget key akk<br>“hello”<br>“1.16”</p>
-</blockquote>
-<hr>
-<p>同时设置多个键值</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mset key <span class="keyword">value</span> [key <span class="keyword">value</span> ...]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; mset key1 v2 key2 v2 key3 v3<br>OK<br>127.0.0.1:6379&gt; mget key1 key2 key3<br>“v2”<br>“v2”<br>“v3”</p>
-</blockquote>
-<hr>
-<h2 id="数据类型-散列类型"><a href="#数据类型-散列类型" class="headerlink" title="数据类型 - 散列类型"></a>数据类型 - 散列类型</h2><p>散列类型( hash )  由  **存储字段(field) ** 和 <strong>字段值映射</strong>组成<br>Redis 不支持数据类型嵌套,如不能集合中嵌套散列表</p>
-<p><strong>散列表适用环境</strong><br>⭐散列表适合存储对象</p>
-<blockquote>
-<p>使用对象类别和ID构成键名,使用字段标识对象的属性,而字段值和存储属性值</p>
-</blockquote>
-<p><img src="/undefined/tu1.png" alt="tu1.png"></p>
-<p>赋值</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HSET key field <span class="keyword">value</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; hset car color red<br>(integer) 1<br>127.0.0.1:6379&gt; hset car name QQ<br>(integer) 1<br>127.0.0.1:6379&gt; hset car price 100<br>(integer) 1</p>
-</blockquote>
-<hr>
-<p>取值</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HGET key field <span class="keyword">value</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; hget car name<br>“QQ”</p>
-</blockquote>
-<hr>
-<p>同时设置多个键值</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HMSET key field <span class="keyword">value</span>[field <span class="keyword">value</span> ...]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; hmset car2.0 color black name QQ2.0 price 200<br>OK</p>
-</blockquote>
-<hr>
-<p>同时取多个值</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HMGET key field <span class="keyword">value</span>[field <span class="keyword">value</span> ...]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; hmget car2.0 color name price<br>“black”<br>“QQ2.0”<br>“200”</p>
-</blockquote>
-<hr>
-<p>取得某个散列全部键值</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HGETALL KEY</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; HGETALL car2.0<br>“color”<br>“black”<br>“name”<br>“QQ2.0”<br>“price”<br>“200</p>
-</blockquote>
-<hr>
-<p>判断字段是否存在</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HEXISTS KEY FIELD</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; HEXISTS car name<br>(integer) 1<br>127.0.0.1:6379&gt; HEXISTS car nane<br>(integer) 0</p>
-</blockquote>
-<hr>
-<p>当字段不存在时赋值 </p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HSETNX key field <span class="keyword">value</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; HGETALL car<br>“color”<br>“red”<br>“name”<br>“TT”<br>“price”<br>“100”<br>127.0.0.1:6379&gt; HSETNX car name UU<br>(integer) 0<br>127.0.0.1:6379&gt; HGET car name<br>“TT”<br>127.0.0.1:6379&gt; HSET car name UU<br>(integer) 0<br>127.0.0.1:6379&gt; HGET car name<br>“UU”<br>127.0.0.1:6379&gt; </p>
-</blockquote>
-<hr>
-<p>增加数字 </p>
-<p>❗散列没有 INCRBY 但是可以通过HINCRBY 指定 1来实现</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HINCRBY key field increment</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; hget car price<br>“100”<br>127.0.0.1:6379&gt; HINCRBY car price 400<br>(integer) 500<br>127.0.0.1:6379&gt; hget car price<br>“500”</p>
-</blockquote>
-<hr>
-<p>删除字段</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HDEL key field [field ...]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; HDEL car name color<br>(integer) 2<br>127.0.0.1:6379&gt; HGETALL car<br> “price”<br> “500”</p>
-</blockquote>
-<hr>
-<p>只获取字段名或字段值</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HKEYS key</span><br><span class="line">HVALS KEY</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; hkeys car<br> “price”<br>127.0.0.1:6379&gt; HVALS car<br> “500”</p>
-</blockquote>
-<hr>
-<p>获取字段数量</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HLEN key</span><br></pre></td></tr></table></figure>
-<p>127.0.0.1:6379&gt; HKEYS car<br> “price”<br> “name”<br>127.0.0.1:6379&gt; HLEN car<br>(integer) 2</p>
-<h2 id="数据类型-列表类型"><a href="#数据类型-列表类型" class="headerlink" title="数据类型 - 列表类型"></a>数据类型 - 列表类型</h2><p>列表类型（list）可以存储一个有序的字符串列表，常用的操作是向列表两端添加元素， </p>
-<p>或者获得列表的某一个片段。 </p>
-<p>列表类型内部是使用双向链表（double linked list）实现的</p>
-<hr>
-<p>向列表两端增加元素</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- LPUSH 命令用来向列表左边添加元素，返回值标识增加元素后列表长度</span></span><br><span class="line">LPUSH key <span class="keyword">value</span> [<span class="keyword">value</span>]</span><br><span class="line"><span class="comment">-- RPUSH 命令用来向列表右边添加元素，返回值标识增加元素后列表长度</span></span><br><span class="line">RPUSH key <span class="keyword">value</span> [<span class="keyword">value</span>]</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>127.0.0.1:6379&gt; LPUSH num 4<br>(integer) 4</p>
-</blockquote>
-<hr>
-<p>从列表两端弹出元素</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">LPOP KEY</span><br><span class="line">RPOP KEY</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; LRANGE num 0 -1<br> “4”<br> “1”<br> “2”<br> “3”<br>127.0.0.1:6379&gt; LPOP num<br>“4”<br>127.0.0.1:6379&gt; LRANGE num 0 -1<br> “1”<br> “2”<br> “3”</p>
-</blockquote>
-<hr>
-<p>获取列表的元素个数</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LLEN key</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; LRANGE num 0 -1<br> “1”<br> “2”<br> “3”<br>127.0.0.1:6379&gt; LLEN num<br>(integer) 3</p>
-</blockquote>
-<hr>
-<p>获取列表片段</p>
-<p>⭐<strong>LRANGE 支持负索引， -1 表示最右元素，-2表示最右倒数第二元素</strong></p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LRANGE key <span class="keyword">start</span> stop</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>127.0.0.1:6379&gt; LRANGE num 0 -1<br>“1”<br>“2”<br>“3”<br>127.0.0.1:6379&gt; LRANGE num 0 1<br>“1”<br>“2”</p>
-</blockquote>
-<hr>
-<p>删除列表中指定的值</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LREM key count <span class="keyword">value</span></span><br></pre></td></tr></table></figure>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/b37d654d.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1361,8 +1116,6 @@
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
 -->
-
-
         
 
 
