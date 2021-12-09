@@ -270,67 +270,6 @@
       </tags>
   </entry>
   <entry>
-    <title>centosRedis安装</title>
-    <url>/2e20d1b4.html</url>
-    <content><![CDATA[<h3 id="查看-Centos-版本"><a href="#查看-Centos-版本" class="headerlink" title="查看 Centos 版本"></a>查看 Centos 版本</h3><hr>
-<blockquote>
-<p>cat /etc/redhat-release</p>
-</blockquote>
-<h3 id="添加EPEL仓库-自由开源的附加软件包仓库"><a href="#添加EPEL仓库-自由开源的附加软件包仓库" class="headerlink" title="添加EPEL仓库 (自由开源的附加软件包仓库)"></a>添加EPEL仓库 (自由开源的附加软件包仓库)</h3><hr>
-<blockquote>
-<p>sudo yum install epel-release</p>
-</blockquote>
-<span id="more"></span>
-
-<h3 id="更新yum源"><a href="#更新yum源" class="headerlink" title="更新yum源"></a>更新yum源</h3><hr>
-<blockquote>
-<p>sudo yum update</p>
-</blockquote>
-<h3 id="安装-redis"><a href="#安装-redis" class="headerlink" title="安装 redis"></a>安装 redis</h3><hr>
-<blockquote>
-<p>yum install redis</p>
-</blockquote>
-<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><hr>
-<blockquote>
-<p>systemctl start redis</p>
-</blockquote>
-<h3 id="设置开机自启"><a href="#设置开机自启" class="headerlink" title="设置开机自启"></a>设置开机自启</h3><hr>
-<blockquote>
-<p>systemctl enable redis</p>
-</blockquote>
-<h3 id="查看是否启动"><a href="#查看是否启动" class="headerlink" title="查看是否启动"></a>查看是否启动</h3><hr>
-<blockquote>
-<p>sudo systemctl status redis</p>
-</blockquote>
-<p>⭐ 到这里位置服务端的 redis 已经启动好了。接下来需要配置的是远程连接。</p>
-<h3 id="修改配置"><a href="#修改配置" class="headerlink" title="修改配置"></a>修改配置</h3><hr>
-<blockquote>
-<ol>
-<li>注释掉 bind 127.0.0.1 启用远程连接</li>
-<li>解开注释 # requirepass foobared 将 foodared 替换成自己的密码 启用密码</li>
-</ol>
-</blockquote>
-<h3 id="开放端口"><a href="#开放端口" class="headerlink" title="开放端口"></a>开放端口</h3><hr>
-<p>可以通过对应平台的防火墙进行设置<br><img src="/2e20d1b4/tu1.png" alt="tu1.png"></p>
-<p>可以通过命令设置防火墙</p>
-<ul>
-<li>sudo firewall-cmd –add-port=6379/tcp –permanent </li>
-<li>sudo firewall-cmd –reload </li>
-</ul>
-<h3 id="重启-redis"><a href="#重启-redis" class="headerlink" title="重启 redis"></a>重启 redis</h3><blockquote>
-<p>systemctl restart redis</p>
-</blockquote>
-<h3 id="连接成功"><a href="#连接成功" class="headerlink" title="连接成功"></a>连接成功</h3><hr>
-<p><img src="/2e20d1b4/tu2.png" alt="tu2.png"></p>
-]]></content>
-      <categories>
-        <category>Centos</category>
-      </categories>
-      <tags>
-        <tag>redis</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Tomcat连接器的设计</title>
     <url>/d2d77b8f.html</url>
     <content><![CDATA[<h1 id="Tomcat连接器的设计"><a href="#Tomcat连接器的设计" class="headerlink" title="Tomcat连接器的设计"></a>Tomcat连接器的设计</h1><h2 id="Tomcat-总体架构"><a href="#Tomcat-总体架构" class="headerlink" title="Tomcat 总体架构"></a>Tomcat 总体架构</h2><p>Tomcat 要实现 <em><strong>2 个核心功能</strong></em>：</p>
@@ -454,6 +393,67 @@
       </categories>
       <tags>
         <tag>Tomcat</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>centosRedis安装</title>
+    <url>/2e20d1b4.html</url>
+    <content><![CDATA[<h3 id="查看-Centos-版本"><a href="#查看-Centos-版本" class="headerlink" title="查看 Centos 版本"></a>查看 Centos 版本</h3><hr>
+<blockquote>
+<p>cat /etc/redhat-release</p>
+</blockquote>
+<h3 id="添加EPEL仓库-自由开源的附加软件包仓库"><a href="#添加EPEL仓库-自由开源的附加软件包仓库" class="headerlink" title="添加EPEL仓库 (自由开源的附加软件包仓库)"></a>添加EPEL仓库 (自由开源的附加软件包仓库)</h3><hr>
+<blockquote>
+<p>sudo yum install epel-release</p>
+</blockquote>
+<span id="more"></span>
+
+<h3 id="更新yum源"><a href="#更新yum源" class="headerlink" title="更新yum源"></a>更新yum源</h3><hr>
+<blockquote>
+<p>sudo yum update</p>
+</blockquote>
+<h3 id="安装-redis"><a href="#安装-redis" class="headerlink" title="安装 redis"></a>安装 redis</h3><hr>
+<blockquote>
+<p>yum install redis</p>
+</blockquote>
+<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><hr>
+<blockquote>
+<p>systemctl start redis</p>
+</blockquote>
+<h3 id="设置开机自启"><a href="#设置开机自启" class="headerlink" title="设置开机自启"></a>设置开机自启</h3><hr>
+<blockquote>
+<p>systemctl enable redis</p>
+</blockquote>
+<h3 id="查看是否启动"><a href="#查看是否启动" class="headerlink" title="查看是否启动"></a>查看是否启动</h3><hr>
+<blockquote>
+<p>sudo systemctl status redis</p>
+</blockquote>
+<p>⭐ 到这里位置服务端的 redis 已经启动好了。接下来需要配置的是远程连接。</p>
+<h3 id="修改配置"><a href="#修改配置" class="headerlink" title="修改配置"></a>修改配置</h3><hr>
+<blockquote>
+<ol>
+<li>注释掉 bind 127.0.0.1 启用远程连接</li>
+<li>解开注释 # requirepass foobared 将 foodared 替换成自己的密码 启用密码</li>
+</ol>
+</blockquote>
+<h3 id="开放端口"><a href="#开放端口" class="headerlink" title="开放端口"></a>开放端口</h3><hr>
+<p>可以通过对应平台的防火墙进行设置<br><img src="/2e20d1b4/tu1.png" alt="tu1.png"></p>
+<p>可以通过命令设置防火墙</p>
+<ul>
+<li>sudo firewall-cmd –add-port=6379/tcp –permanent </li>
+<li>sudo firewall-cmd –reload </li>
+</ul>
+<h3 id="重启-redis"><a href="#重启-redis" class="headerlink" title="重启 redis"></a>重启 redis</h3><blockquote>
+<p>systemctl restart redis</p>
+</blockquote>
+<h3 id="连接成功"><a href="#连接成功" class="headerlink" title="连接成功"></a>连接成功</h3><hr>
+<p><img src="/2e20d1b4/tu2.png" alt="tu2.png"></p>
+]]></content>
+      <categories>
+        <category>Centos</category>
+      </categories>
+      <tags>
+        <tag>redis</tag>
       </tags>
   </entry>
   <entry>

@@ -1243,7 +1243,7 @@ pre .javascript .function {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #47ff66;
+  background: #ffff65;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
@@ -2740,11 +2740,19 @@ ul.breadcrumb li + li:last-child {
 .sidebar {
   background-color: transparent;
 }
-body {
+body::before {
   background: url("/images/background.jpg");
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-position: 50% 50%;
+  background-size: cover;
+  content: " ";
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: -2;
 }
 .post {
   margin-top: 0px;
