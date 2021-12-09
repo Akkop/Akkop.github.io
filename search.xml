@@ -1,6 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Tomcat基础</title>
+    <url>/530cfffd.html</url>
+    <content><![CDATA[<h1 id="Tomcat基础"><a href="#Tomcat基础" class="headerlink" title="Tomcat基础"></a>Tomcat基础</h1><h2 id="Web-容器是什么"><a href="#Web-容器是什么" class="headerlink" title="Web 容器是什么"></a>Web 容器是什么</h2><ul>
+<li>Servlet 是可以视作没有 main 方法的 java 程序，没有 mian 方法需要部署到 Servlet 容器中，由容器来实例化并调用Servlet</li>
+<li>为了方便使用，他们需要具有 HTTP 服务器功能</li>
+<li>Tomcat 或者 Jetty 就是 HTTP 服务器 + Servlet 容器</li>
+<li>Web 容器 = HTTP 服务器 + Servlet 容器 </li>
+</ul>
+<span id="more"></span>
+
+<blockquote>
+<p>如今的 SpringBoot 是内嵌的 Web 容器(Tomcat)，因为当前大环境为微服务(将大而全的单体应用拆分成一个个功能单一的微服务)，这也就需要更多的 Web 容器来启动，自然需要轻量级的 Web 容器，以减少资源的消耗，降低部署的成本，而选择内嵌，降低应用部署的复杂度。</p>
+</blockquote>
+<h2 id="怎么学习-Web-容器"><a href="#怎么学习-Web-容器" class="headerlink" title="怎么学习 Web 容器"></a>怎么学习 Web 容器</h2><p><strong>HTTP 的本质</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">HTTP 协议是浏览器与服务器之间的数据传送协议</span><br><span class="line">HTTP 协议的本质就是一种浏览器与服务器之间约定好的通信格式</span><br></pre></td></tr></table></figure>
+
+<p>获取远端 HTTP 服务器的数据时</p>
+<ol>
+<li>与 HTTP 服务器建立 Socket 连接。 ip + 端口</li>
+<li>生成请求数据并通过Socket发送出去</li>
+</ol>
+<p><strong>HTTP 协议做的事情</strong></p>
+<ul>
+<li>获取还是提交内容</li>
+<li>想要的内容是什么</li>
+<li>这些内容以一种什么样的格式放到请求</li>
+</ul>
+<p><strong>HTTP 工作原理</strong></p>
+<ol>
+<li>用户发起请求_输入网址回车</li>
+<li>浏览器发起 TCP 请求连接_经过 TCP 三次握手建立连接</li>
+<li>服务器接收并建立连接</li>
+<li>浏览器生成 HTTP 格式的数据包</li>
+<li>浏览器发送HTTP 格式的请求数据包</li>
+<li>服务器解析 HTTP 格式的数据包_得知客户端的意图</li>
+<li>服务器执行请求</li>
+<li>服务器生成 HTTP 格式的数据包</li>
+<li>发送响应数据包</li>
+<li>浏览器解析 HTTP 格式的数据包</li>
+<li>浏览器呈现 HTML 响应给用户</li>
+</ol>
+<p><strong>做了哪些事情</strong></p>
+<ul>
+<li>Tomcat 将 HTTP 请求数据字节解析成 Request 对象</li>
+<li>Request 对象 封装了 HTTP 所有的请求信息,此后交给 Web 应用处理</li>
+<li>处理后得到 Response 对象</li>
+<li>Tomcat 将 Response 对象转成 HTTP 格式得响应数据并返回给浏览器</li>
+</ul>
+<h2 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h2><p><strong>什么是Cookie</strong></p>
+<ul>
+<li>Cookie 是 HTTP 报文得一个请求头</li>
+<li>Cookie 本质上就是一份存储在用户本地的文件，里面包含了每次请求中都需要传递的信息</li>
+<li>服务器可以通过读取 Cookie 请求头就知道用户是谁(用户的标识信息)</li>
+</ul>
+<h2 id="Session"><a href="#Session" class="headerlink" title="Session"></a>Session</h2><blockquote>
+<p>好处只发送 Sessoion ID 相对安全，节省网络流量，重点是不需要在 Cookie 中保存大量用户信息。<br><strong>Session和Cookie的关系</strong></p>
+</blockquote>
+<ul>
+<li>Cookie 是明文保存，是存在隐患得，Session 是保存在服务器上得，里面保存着用户得状态。</li>
+<li>当用户请求到来时，服务端可以通过 Cookie 把用户的请求和用户的 Session 对应起来</li>
+<li>浏览器在 Cookie 中填充了一个 Session ID 之类的字段用来标识请求。</li>
+</ul>
+<p><strong>Session的创建</strong></p>
+<ol>
+<li>浏览器发起请求 服务器 创建 Session，生成唯一 Session ID 给浏览器带回去。</li>
+<li>浏览器发起请求 ，服务器依据带来得 SessionID 找对对应 Session，找到session后 就可以获取或者添加内容</li>
+</ol>
+<p><strong>Tomcat 对 Session 得处理</strong></p>
+<ul>
+<li>Session 有过期时间，因此 Tomcat 会开启后台线程定期轮询，如果 Session 过期就会将 Session 失效掉。</li>
+<li>使用长连接的 HTTP 协议，会在响应头加入 Connection:keep-alive</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Tomcat</category>
+      </categories>
+      <tags>
+        <tag>Tomcat</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Servlet规范和Servlet容器</title>
     <url>/1c68dade.html</url>
     <content><![CDATA[<h1 id="Servlet规范和Servlet容器"><a href="#Servlet规范和Servlet容器" class="headerlink" title="Servlet规范和Servlet容器"></a>Servlet规范和Servlet容器</h1><h2 id="HTTP-服务器-怎么调用对应-Java-类的哪个方法？"><a href="#HTTP-服务器-怎么调用对应-Java-类的哪个方法？" class="headerlink" title="HTTP 服务器 怎么调用对应 Java 类的哪个方法？"></a>HTTP 服务器 怎么调用对应 Java 类的哪个方法？</h2><p>❌</p>
@@ -88,87 +169,6 @@
 <li>Servlet 容器需要实例化 Filter 并把 Filter 链接成一个 FilterChain。</li>
 <li>请求进来，获取第一个 Filter 并调用 doFilter 方法，doFilter 方法负责调用这个 FilterChain 中的下一个 Filter。</li>
 </ol>
-]]></content>
-      <categories>
-        <category>Tomcat</category>
-      </categories>
-      <tags>
-        <tag>Tomcat</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Tomcat基础</title>
-    <url>/530cfffd.html</url>
-    <content><![CDATA[<h1 id="Tomcat基础"><a href="#Tomcat基础" class="headerlink" title="Tomcat基础"></a>Tomcat基础</h1><h2 id="Web-容器是什么"><a href="#Web-容器是什么" class="headerlink" title="Web 容器是什么"></a>Web 容器是什么</h2><ul>
-<li>Servlet 是可以视作没有 main 方法的 java 程序，没有 mian 方法需要部署到 Servlet 容器中，由容器来实例化并调用Servlet</li>
-<li>为了方便使用，他们需要具有 HTTP 服务器功能</li>
-<li>Tomcat 或者 Jetty 就是 HTTP 服务器 + Servlet 容器</li>
-<li>Web 容器 = HTTP 服务器 + Servlet 容器 </li>
-</ul>
-<span id="more"></span>
-
-<blockquote>
-<p>如今的 SpringBoot 是内嵌的 Web 容器(Tomcat)，因为当前大环境为微服务(将大而全的单体应用拆分成一个个功能单一的微服务)，这也就需要更多的 Web 容器来启动，自然需要轻量级的 Web 容器，以减少资源的消耗，降低部署的成本，而选择内嵌，降低应用部署的复杂度。</p>
-</blockquote>
-<h2 id="怎么学习-Web-容器"><a href="#怎么学习-Web-容器" class="headerlink" title="怎么学习 Web 容器"></a>怎么学习 Web 容器</h2><p><strong>HTTP 的本质</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">HTTP 协议是浏览器与服务器之间的数据传送协议</span><br><span class="line">HTTP 协议的本质就是一种浏览器与服务器之间约定好的通信格式</span><br></pre></td></tr></table></figure>
-
-<p>获取远端 HTTP 服务器的数据时</p>
-<ol>
-<li>与 HTTP 服务器建立 Socket 连接。 ip + 端口</li>
-<li>生成请求数据并通过Socket发送出去</li>
-</ol>
-<p><strong>HTTP 协议做的事情</strong></p>
-<ul>
-<li>获取还是提交内容</li>
-<li>想要的内容是什么</li>
-<li>这些内容以一种什么样的格式放到请求</li>
-</ul>
-<p><strong>HTTP 工作原理</strong></p>
-<ol>
-<li>用户发起请求_输入网址回车</li>
-<li>浏览器发起 TCP 请求连接_经过 TCP 三次握手建立连接</li>
-<li>服务器接收并建立连接</li>
-<li>浏览器生成 HTTP 格式的数据包</li>
-<li>浏览器发送HTTP 格式的请求数据包</li>
-<li>服务器解析 HTTP 格式的数据包_得知客户端的意图</li>
-<li>服务器执行请求</li>
-<li>服务器生成 HTTP 格式的数据包</li>
-<li>发送响应数据包</li>
-<li>浏览器解析 HTTP 格式的数据包</li>
-<li>浏览器呈现 HTML 响应给用户</li>
-</ol>
-<p><strong>做了哪些事情</strong></p>
-<ul>
-<li>Tomcat 将 HTTP 请求数据字节解析成 Request 对象</li>
-<li>Request 对象 封装了 HTTP 所有的请求信息,此后交给 Web 应用处理</li>
-<li>处理后得到 Response 对象</li>
-<li>Tomcat 将 Response 对象转成 HTTP 格式得响应数据并返回给浏览器</li>
-</ul>
-<h2 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h2><p><strong>什么是Cookie</strong></p>
-<ul>
-<li>Cookie 是 HTTP 报文得一个请求头</li>
-<li>Cookie 本质上就是一份存储在用户本地的文件，里面包含了每次请求中都需要传递的信息</li>
-<li>服务器可以通过读取 Cookie 请求头就知道用户是谁(用户的标识信息)</li>
-</ul>
-<h2 id="Session"><a href="#Session" class="headerlink" title="Session"></a>Session</h2><blockquote>
-<p>好处只发送 Sessoion ID 相对安全，节省网络流量，重点是不需要在 Cookie 中保存大量用户信息。<br><strong>Session和Cookie的关系</strong></p>
-</blockquote>
-<ul>
-<li>Cookie 是明文保存，是存在隐患得，Session 是保存在服务器上得，里面保存着用户得状态。</li>
-<li>当用户请求到来时，服务端可以通过 Cookie 把用户的请求和用户的 Session 对应起来</li>
-<li>浏览器在 Cookie 中填充了一个 Session ID 之类的字段用来标识请求。</li>
-</ul>
-<p><strong>Session的创建</strong></p>
-<ol>
-<li>浏览器发起请求 服务器 创建 Session，生成唯一 Session ID 给浏览器带回去。</li>
-<li>浏览器发起请求 ，服务器依据带来得 SessionID 找对对应 Session，找到session后 就可以获取或者添加内容</li>
-</ol>
-<p><strong>Tomcat 对 Session 得处理</strong></p>
-<ul>
-<li>Session 有过期时间，因此 Tomcat 会开启后台线程定期轮询，如果 Session 过期就会将 Session 失效掉。</li>
-<li>使用长连接的 HTTP 协议，会在响应头加入 Connection:keep-alive</li>
-</ul>
 ]]></content>
       <categories>
         <category>Tomcat</category>
