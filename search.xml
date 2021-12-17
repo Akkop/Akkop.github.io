@@ -1,6 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Servlet规范和Servlet容器</title>
+    <url>/1c68dade.html</url>
+    <content><![CDATA[<hr>
+<ul>
+<li>HTTP 服务器调用java类的方法</li>
+<li>HTTP 选择Servlet以及Servlet的实例化</li>
+</ul>
+<span id="more"></span>
+
+<h1 id="Servlet规范和Servlet容器"><a href="#Servlet规范和Servlet容器" class="headerlink" title="Servlet规范和Servlet容器"></a>Servlet规范和Servlet容器</h1><h2 id="HTTP-服务器-怎么调用对应-Java-类的哪个方法？"><a href="#HTTP-服务器-怎么调用对应-Java-类的哪个方法？" class="headerlink" title="HTTP 服务器 怎么调用对应 Java 类的哪个方法？"></a>HTTP 服务器 怎么调用对应 Java 类的哪个方法？</h2><p>❌</p>
+<blockquote>
+<p>方式：通过一堆if-else进行判断<br>问题：HTTP 服务器的代码跟业务逻辑耦合在一起了，如果新加一个业务方法还要改 HTTP 服务器的代码。</p>
+</blockquote>
+<p>✔️</p>
+<blockquote>
+<p>方式：通过接口进行解耦，各种业务类都必须实现这个接口(Servlet 接口)</p>
+</blockquote>
+<h2 id="HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？"><a href="#HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？" class="headerlink" title="HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？"></a>HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？</h2><p>❌</p>
+<blockquote>
+<p>方式：使用 HTTP 服务器进行<br>问题：HTTP 服务器 和 业务类耦合</p>
+</blockquote>
+<p>✔️</p>
+<blockquote>
+<p>方式：添加 Servlet 容器，Servlet 容器用来加载和管理业务类</p>
+</blockquote>
+<h2 id="Servlet-接口"><a href="#Servlet-接口" class="headerlink" title="Servlet 接口"></a>Servlet 接口</h2><blockquote>
+<p>Servlet 接口是 Servlet 容器跟具体业务类之间的接口。<br>Servlet 接口和 Servlet 容器这一整套规范叫作 Servlet 规范</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Servlet</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(ServletConfig config)</span> <span class="keyword">throws</span> ServletException</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function">ServletConfig <span class="title">getServletConfig</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">service</span><span class="params">(ServletRequest req, ServletResponse res）<span class="keyword">throws</span> ServletException, IOException;</span></span></span><br><span class="line"><span class="params"><span class="function">    </span></span></span><br><span class="line"><span class="params"><span class="function">    String getServletInfo()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="重点方法：service"><a href="#重点方法：service" class="headerlink" title="重点方法：service"></a>重点方法：<em><strong>service</strong></em></h3><p>service的两个参数</p>
+<ul>
+<li><p>ServletRequest 用来封装请求信息</p>
+</li>
+<li><p>ServletResponse 用来封装响应信息</p>
+</li>
+</ul>
+<blockquote>
+<p>本质上这两个类是对通信协议的封装</p>
+</blockquote>
+<h3 id="其余方法"><a href="#其余方法" class="headerlink" title="其余方法"></a>其余方法</h3><p>生命周期相关方法：<strong>init</strong> 和 <strong>destroy</strong></p>
+<ul>
+<li>Servlet 容器在加载 Servlet 类的时候会调用 <strong>init</strong> 方法</li>
+<li>Servlet 容器在卸载 Servlet 类的时候会调用 <strong>destroy</strong> 方法</li>
+</ul>
+<p>Servlet 配置相关方法：<strong>getServletConfig</strong></p>
+<ul>
+<li>ServletConfig 的作用就是封装 Servlet 的初始化参数</li>
+<li>可以在web.xml给 Servlet 配置参数，并在程序里通过 getServletConfig 方法拿到这些参数。</li>
+</ul>
+<p>Servlet 的 <strong>GenericServlet</strong> 抽象类 和 <strong>HttpServlet</strong> 类</p>
+<ul>
+<li>GenericServlet 实现了 Servlet 的通用方法 而 HttpServlet 是在 GenericServlet 基础上进行了封装加入了 HTTP 特性</li>
+</ul>
+<p>HttpServlet 只需要重写 doGet 和 doPost。</p>
+<h2 id="Servlet-容器"><a href="#Servlet-容器" class="headerlink" title="Servlet 容器"></a>Servlet 容器</h2><p>整体工作流程</p>
+<ol>
+<li>客户端发起 HTTP 请求</li>
+<li>HTTP 服务器使用 ServletRequest 讲请求封装</li>
+<li>调用 Servlet 容器的 service 方法</li>
+<li>Servlet 容器，根据请求的 URL 和 Servlet 的映射关系，找到相应的 Servlet</li>
+<li>如果 Servlet 还没有被加载，就用反射机制创建这个 Servlet，并调用 Servlet 的 init 方法来完成初始化</li>
+<li>调用 Servlet 的 service 方法来处理请求，把 ServletResponse 对象返回给 HTTP 服务器</li>
+<li>讲响应返回给客户端</li>
+</ol>
+<p><strong>Web 应用层级</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">| - MyWebApp </span><br><span class="line">| - WEB-INF/web.xml -- 配置文件，用来配置Servlet等 </span><br><span class="line">| - WEB-INF/lib/ -- 存放Web应用所需各种JAR包 </span><br><span class="line">| - WEB-INF/classes/ -- 存放你的应用类，比如Servlet类 </span><br><span class="line">| - META-INF/ -- 目录存放工程的一些信息</span><br></pre></td></tr></table></figure>
+
+<p>Servlet 容器顺序</p>
+<ol>
+<li>实例化 Servlet</li>
+<li>调用 Servlet</li>
+</ol>
+<p><strong>Servlet 是怎么注册到 Servlet 容器中</strong></p>
+<ol>
+<li>以 Web 应用程序的方式来部署 Servlet </li>
+<li>Servlet 规范里定义了 ServletContext 这个接口来对应一个 Web 应用</li>
+<li>Servlet 容器在启动时会加载 Web 应用，并为每个 Web 应用创建唯一的 ServletContext 对象</li>
+<li>由于 ServletContext 持有所有 Servlet 实例，你还可以通过它来实现 Servlet 请求的转发。扩展机制</li>
+</ol>
+<p><strong>扩展机制</strong></p>
+<p>Servlet 规范提供了两种扩展机制：</p>
+<ul>
+<li>Filter  过滤器</li>
+<li>Listener 监听器</li>
+</ul>
+<p><strong>Filter 过滤器的流程</strong></p>
+<ol>
+<li>Web 应用部署完成</li>
+<li>Servlet 容器需要实例化 Filter 并把 Filter 链接成一个 FilterChain。</li>
+<li>请求进来，获取第一个 Filter 并调用 doFilter 方法，doFilter 方法负责调用这个 FilterChain 中的下一个 Filter。</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Tomcat</category>
+      </categories>
+      <tags>
+        <tag>tomcat</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>CentOS简易安装Mysql</title>
     <url>/f6937770.html</url>
     <content><![CDATA[<ul>
@@ -105,107 +206,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Servlet规范和Servlet容器</title>
-    <url>/1c68dade.html</url>
-    <content><![CDATA[<hr>
-<ul>
-<li>HTTP 服务器调用java类的方法</li>
-<li>HTTP 选择Servlet以及Servlet的实例化</li>
-</ul>
-<span id="more"></span>
-
-<h1 id="Servlet规范和Servlet容器"><a href="#Servlet规范和Servlet容器" class="headerlink" title="Servlet规范和Servlet容器"></a>Servlet规范和Servlet容器</h1><h2 id="HTTP-服务器-怎么调用对应-Java-类的哪个方法？"><a href="#HTTP-服务器-怎么调用对应-Java-类的哪个方法？" class="headerlink" title="HTTP 服务器 怎么调用对应 Java 类的哪个方法？"></a>HTTP 服务器 怎么调用对应 Java 类的哪个方法？</h2><p>❌</p>
-<blockquote>
-<p>方式：通过一堆if-else进行判断<br>问题：HTTP 服务器的代码跟业务逻辑耦合在一起了，如果新加一个业务方法还要改 HTTP 服务器的代码。</p>
-</blockquote>
-<p>✔️</p>
-<blockquote>
-<p>方式：通过接口进行解耦，各种业务类都必须实现这个接口(Servlet 接口)</p>
-</blockquote>
-<h2 id="HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？"><a href="#HTTP-服务器如何知道由哪个-Servlet-来处理呢？Servlet-又是由谁来实例化呢？" class="headerlink" title="HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？"></a>HTTP 服务器如何知道由哪个 Servlet 来处理呢？Servlet 又是由谁来实例化呢？</h2><p>❌</p>
-<blockquote>
-<p>方式：使用 HTTP 服务器进行<br>问题：HTTP 服务器 和 业务类耦合</p>
-</blockquote>
-<p>✔️</p>
-<blockquote>
-<p>方式：添加 Servlet 容器，Servlet 容器用来加载和管理业务类</p>
-</blockquote>
-<h2 id="Servlet-接口"><a href="#Servlet-接口" class="headerlink" title="Servlet 接口"></a>Servlet 接口</h2><blockquote>
-<p>Servlet 接口是 Servlet 容器跟具体业务类之间的接口。<br>Servlet 接口和 Servlet 容器这一整套规范叫作 Servlet 规范</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Servlet</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(ServletConfig config)</span> <span class="keyword">throws</span> ServletException</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function">ServletConfig <span class="title">getServletConfig</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">service</span><span class="params">(ServletRequest req, ServletResponse res）<span class="keyword">throws</span> ServletException, IOException;</span></span></span><br><span class="line"><span class="params"><span class="function">    </span></span></span><br><span class="line"><span class="params"><span class="function">    String getServletInfo()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="重点方法：service"><a href="#重点方法：service" class="headerlink" title="重点方法：service"></a>重点方法：<em><strong>service</strong></em></h3><p>service的两个参数</p>
-<ul>
-<li><p>ServletRequest 用来封装请求信息</p>
-</li>
-<li><p>ServletResponse 用来封装响应信息</p>
-</li>
-</ul>
-<blockquote>
-<p>本质上这两个类是对通信协议的封装</p>
-</blockquote>
-<h3 id="其余方法"><a href="#其余方法" class="headerlink" title="其余方法"></a>其余方法</h3><p>生命周期相关方法：<strong>init</strong> 和 <strong>destroy</strong></p>
-<ul>
-<li>Servlet 容器在加载 Servlet 类的时候会调用 <strong>init</strong> 方法</li>
-<li>Servlet 容器在卸载 Servlet 类的时候会调用 <strong>destroy</strong> 方法</li>
-</ul>
-<p>Servlet 配置相关方法：<strong>getServletConfig</strong></p>
-<ul>
-<li>ServletConfig 的作用就是封装 Servlet 的初始化参数</li>
-<li>可以在web.xml给 Servlet 配置参数，并在程序里通过 getServletConfig 方法拿到这些参数。</li>
-</ul>
-<p>Servlet 的 <strong>GenericServlet</strong> 抽象类 和 <strong>HttpServlet</strong> 类</p>
-<ul>
-<li>GenericServlet 实现了 Servlet 的通用方法 而 HttpServlet 是在 GenericServlet 基础上进行了封装加入了 HTTP 特性</li>
-</ul>
-<p>HttpServlet 只需要重写 doGet 和 doPost。</p>
-<h2 id="Servlet-容器"><a href="#Servlet-容器" class="headerlink" title="Servlet 容器"></a>Servlet 容器</h2><p>整体工作流程</p>
-<ol>
-<li>客户端发起 HTTP 请求</li>
-<li>HTTP 服务器使用 ServletRequest 讲请求封装</li>
-<li>调用 Servlet 容器的 service 方法</li>
-<li>Servlet 容器，根据请求的 URL 和 Servlet 的映射关系，找到相应的 Servlet</li>
-<li>如果 Servlet 还没有被加载，就用反射机制创建这个 Servlet，并调用 Servlet 的 init 方法来完成初始化</li>
-<li>调用 Servlet 的 service 方法来处理请求，把 ServletResponse 对象返回给 HTTP 服务器</li>
-<li>讲响应返回给客户端</li>
-</ol>
-<p><strong>Web 应用层级</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">| - MyWebApp </span><br><span class="line">| - WEB-INF/web.xml -- 配置文件，用来配置Servlet等 </span><br><span class="line">| - WEB-INF/lib/ -- 存放Web应用所需各种JAR包 </span><br><span class="line">| - WEB-INF/classes/ -- 存放你的应用类，比如Servlet类 </span><br><span class="line">| - META-INF/ -- 目录存放工程的一些信息</span><br></pre></td></tr></table></figure>
-
-<p>Servlet 容器顺序</p>
-<ol>
-<li>实例化 Servlet</li>
-<li>调用 Servlet</li>
-</ol>
-<p><strong>Servlet 是怎么注册到 Servlet 容器中</strong></p>
-<ol>
-<li>以 Web 应用程序的方式来部署 Servlet </li>
-<li>Servlet 规范里定义了 ServletContext 这个接口来对应一个 Web 应用</li>
-<li>Servlet 容器在启动时会加载 Web 应用，并为每个 Web 应用创建唯一的 ServletContext 对象</li>
-<li>由于 ServletContext 持有所有 Servlet 实例，你还可以通过它来实现 Servlet 请求的转发。扩展机制</li>
-</ol>
-<p><strong>扩展机制</strong></p>
-<p>Servlet 规范提供了两种扩展机制：</p>
-<ul>
-<li>Filter  过滤器</li>
-<li>Listener 监听器</li>
-</ul>
-<p><strong>Filter 过滤器的流程</strong></p>
-<ol>
-<li>Web 应用部署完成</li>
-<li>Servlet 容器需要实例化 Filter 并把 Filter 链接成一个 FilterChain。</li>
-<li>请求进来，获取第一个 Filter 并调用 doFilter 方法，doFilter 方法负责调用这个 FilterChain 中的下一个 Filter。</li>
-</ol>
-]]></content>
-      <categories>
-        <category>Tomcat</category>
-      </categories>
-      <tags>
-        <tag>tomcat</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Tomcat容器的设计</title>
     <url>/210d100c.html</url>
     <content><![CDATA[<hr>
@@ -303,78 +303,6 @@
       </categories>
       <tags>
         <tag>tomcat</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>CentOS Redis安装</title>
-    <url>/2e20d1b4.html</url>
-    <content><![CDATA[<hr>
-<ul>
-<li>查看 Centos 版本</li>
-<li>添加EPEL仓库</li>
-<li>更新yum源</li>
-<li>安装redis</li>
-<li>修改配置</li>
-<li>连接redis</li>
-</ul>
-<span id="more"></span>
-
-<h3 id="查看-Centos-版本"><a href="#查看-Centos-版本" class="headerlink" title="查看 Centos 版本"></a>查看 Centos 版本</h3><hr>
-<blockquote>
-<p>cat /etc/redhat-release</p>
-</blockquote>
-<h3 id="添加EPEL仓库-自由开源的附加软件包仓库"><a href="#添加EPEL仓库-自由开源的附加软件包仓库" class="headerlink" title="添加EPEL仓库 (自由开源的附加软件包仓库)"></a>添加EPEL仓库 (自由开源的附加软件包仓库)</h3><hr>
-<blockquote>
-<p>sudo yum install epel-release</p>
-</blockquote>
-<h3 id="更新yum源"><a href="#更新yum源" class="headerlink" title="更新yum源"></a>更新yum源</h3><hr>
-<blockquote>
-<p>sudo yum update</p>
-</blockquote>
-<h3 id="安装-redis"><a href="#安装-redis" class="headerlink" title="安装 redis"></a>安装 redis</h3><hr>
-<blockquote>
-<p>yum install redis</p>
-</blockquote>
-<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><hr>
-<blockquote>
-<p>systemctl start redis</p>
-</blockquote>
-<h3 id="设置开机自启"><a href="#设置开机自启" class="headerlink" title="设置开机自启"></a>设置开机自启</h3><hr>
-<blockquote>
-<p>systemctl enable redis</p>
-</blockquote>
-<h3 id="查看是否启动"><a href="#查看是否启动" class="headerlink" title="查看是否启动"></a>查看是否启动</h3><hr>
-<blockquote>
-<p>sudo systemctl status redis</p>
-</blockquote>
-<p>⭐ 到这里位置服务端的 redis 已经启动好了。接下来需要配置的是远程连接。</p>
-<h3 id="修改配置"><a href="#修改配置" class="headerlink" title="修改配置"></a>修改配置</h3><hr>
-<blockquote>
-<ol>
-<li>vim /etc/redis.conf</li>
-<li>注释掉 bind 127.0.0.1 启用远程连接</li>
-<li>解开注释 # requirepass foobared 将 foodared 替换成自己的密码 启用密码</li>
-</ol>
-</blockquote>
-<h3 id="开放端口"><a href="#开放端口" class="headerlink" title="开放端口"></a>开放端口</h3><hr>
-<p>可以通过对应平台的防火墙进行设置<br><img src="/2e20d1b4/tu1.png" alt="tu1.png"></p>
-<p>可以通过命令设置防火墙</p>
-<ul>
-<li>sudo firewall-cmd –add-port=6379/tcp –permanent </li>
-<li>sudo firewall-cmd –reload </li>
-</ul>
-<h3 id="重启-redis"><a href="#重启-redis" class="headerlink" title="重启 redis"></a>重启 redis</h3><blockquote>
-<p>systemctl restart redis</p>
-</blockquote>
-<h3 id="连接成功"><a href="#连接成功" class="headerlink" title="连接成功"></a>连接成功</h3><hr>
-<p><img src="/2e20d1b4/tu2.png" alt="tu2.png"></p>
-]]></content>
-      <categories>
-        <category>CentOS</category>
-      </categories>
-      <tags>
-        <tag>centos</tag>
-        <tag>redis</tag>
       </tags>
   </entry>
   <entry>
@@ -594,6 +522,78 @@
       </categories>
       <tags>
         <tag>tomcat</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CentOS Redis安装</title>
+    <url>/2e20d1b4.html</url>
+    <content><![CDATA[<hr>
+<ul>
+<li>查看 Centos 版本</li>
+<li>添加EPEL仓库</li>
+<li>更新yum源</li>
+<li>安装redis</li>
+<li>修改配置</li>
+<li>连接redis</li>
+</ul>
+<span id="more"></span>
+
+<h3 id="查看-Centos-版本"><a href="#查看-Centos-版本" class="headerlink" title="查看 Centos 版本"></a>查看 Centos 版本</h3><hr>
+<blockquote>
+<p>cat /etc/redhat-release</p>
+</blockquote>
+<h3 id="添加EPEL仓库-自由开源的附加软件包仓库"><a href="#添加EPEL仓库-自由开源的附加软件包仓库" class="headerlink" title="添加EPEL仓库 (自由开源的附加软件包仓库)"></a>添加EPEL仓库 (自由开源的附加软件包仓库)</h3><hr>
+<blockquote>
+<p>sudo yum install epel-release</p>
+</blockquote>
+<h3 id="更新yum源"><a href="#更新yum源" class="headerlink" title="更新yum源"></a>更新yum源</h3><hr>
+<blockquote>
+<p>sudo yum update</p>
+</blockquote>
+<h3 id="安装-redis"><a href="#安装-redis" class="headerlink" title="安装 redis"></a>安装 redis</h3><hr>
+<blockquote>
+<p>yum install redis</p>
+</blockquote>
+<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><hr>
+<blockquote>
+<p>systemctl start redis</p>
+</blockquote>
+<h3 id="设置开机自启"><a href="#设置开机自启" class="headerlink" title="设置开机自启"></a>设置开机自启</h3><hr>
+<blockquote>
+<p>systemctl enable redis</p>
+</blockquote>
+<h3 id="查看是否启动"><a href="#查看是否启动" class="headerlink" title="查看是否启动"></a>查看是否启动</h3><hr>
+<blockquote>
+<p>sudo systemctl status redis</p>
+</blockquote>
+<p>⭐ 到这里位置服务端的 redis 已经启动好了。接下来需要配置的是远程连接。</p>
+<h3 id="修改配置"><a href="#修改配置" class="headerlink" title="修改配置"></a>修改配置</h3><hr>
+<blockquote>
+<ol>
+<li>vim /etc/redis.conf</li>
+<li>注释掉 bind 127.0.0.1 启用远程连接</li>
+<li>解开注释 # requirepass foobared 将 foodared 替换成自己的密码 启用密码</li>
+</ol>
+</blockquote>
+<h3 id="开放端口"><a href="#开放端口" class="headerlink" title="开放端口"></a>开放端口</h3><hr>
+<p>可以通过对应平台的防火墙进行设置<br><img src="/2e20d1b4/tu1.png" alt="tu1.png"></p>
+<p>可以通过命令设置防火墙</p>
+<ul>
+<li>sudo firewall-cmd –add-port=6379/tcp –permanent </li>
+<li>sudo firewall-cmd –reload </li>
+</ul>
+<h3 id="重启-redis"><a href="#重启-redis" class="headerlink" title="重启 redis"></a>重启 redis</h3><blockquote>
+<p>systemctl restart redis</p>
+</blockquote>
+<h3 id="连接成功"><a href="#连接成功" class="headerlink" title="连接成功"></a>连接成功</h3><hr>
+<p><img src="/2e20d1b4/tu2.png" alt="tu2.png"></p>
+]]></content>
+      <categories>
+        <category>CentOS</category>
+      </categories>
+      <tags>
+        <tag>centos</tag>
+        <tag>redis</tag>
       </tags>
   </entry>
   <entry>
