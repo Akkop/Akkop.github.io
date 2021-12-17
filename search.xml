@@ -102,109 +102,6 @@
       </tags>
   </entry>
   <entry>
-    <title>CentOS简易安装Mysql</title>
-    <url>/f6937770.html</url>
-    <content><![CDATA[<ul>
-<li>删除Mysql配置</li>
-<li>安装mysql</li>
-<li>远程连接</li>
-</ul>
-<span id="more"></span>
-
-<h2 id="删除MySQL配置（重要！）"><a href="#删除MySQL配置（重要！）" class="headerlink" title="删除MySQL配置（重要！）"></a>删除MySQL配置（重要！）</h2><blockquote>
-<p>rpm -qa | grep -i mysql  查看是否安装mysql<br>yum -y remove MySQL-* 删除mysql<br>find / -name mysql 列出mysql rm -rf 删除mysql文件加<br>rm -rf /etc/my.cnf 删除配置<br>rm -rf /root/.mysql_sercret 删除默认密码</p>
-</blockquote>
-<hr>
-<h2 id="安装mysql"><a href="#安装mysql" class="headerlink" title="安装mysql"></a>安装mysql</h2><ol>
-<li><p>配置Mysql 8.0安装源<br>sudo rpm -Uvh <a href="https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm">https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm</a></p>
-</li>
-<li><p>安装Mysql 8.0</p>
-<blockquote>
-<p>sudo yum –enablerepo=mysql80-community install mysql-community-server</p>
-</blockquote>
-</li>
-<li><p>⭐安装server时如报错 </p>
-<blockquote>
-<p>All matches were filtered …. mysql-community-server<br>Error: Unable to find a match: mysql-community-server<br>先执行下面两句<br><strong>yum module disable mysql</strong><br><strong>yum -y install mysql-community-server</strong><br>再重新执行第二步骤</p>
-</blockquote>
-</li>
-<li><p>启动mysql服务(这一步要等待一会会)</p>
-<blockquote>
-<p>sudo service mysqld start</p>
-</blockquote>
-</li>
-<li><p>查看mysql服务运行状态</p>
-<blockquote>
-<p>service mysqld status</p>
-</blockquote>
-</li>
-<li><p>查看root临时密码</p>
-<blockquote>
-<p>grep “A temporary password” /var/log/mysqld.log</p>
-</blockquote>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">A temporary password <span class="keyword">is</span> generated <span class="keyword">for</span> root<span class="variable">@localhost</span>: ilPikNwys1_g</span><br></pre></td></tr></table></figure></li>
-<li><p>更改临时密码</p>
-<blockquote>
-<ol>
-<li>mysql -uroot -p</li>
-<li>输入临时密码</li>
-<li>ALTER USER ‘root’@‘localhost’ IDENTIFIED BY ‘new password’;</li>
-</ol>
-</blockquote>
-</li>
-<li><p>密码的设置有约束,成功设置密码有以下两种方式</p>
-<blockquote>
-<p>设置符合策略的密码(大小写字母+数据+符号)</p>
-<p>密码策略改简单一点</p>
-</blockquote>
-<p>⭐需要注意的是如果需要变更策略首先需要改一次符合策略的密码(可用如下sql先修改)</p>
-<p><strong>ALTER USER ‘root‘@’localhost’ IDENTIFIED BY ‘Root_12root’ PASSWORD EXPIRE NEVER;</strong></p>
-</li>
-<li><p>如果不想输入符合策略的密码</p>
-<blockquote>
-<p>查看当前的密码验证策略(注意密码修改之后才可以查看和第10步修改)</p>
-<p>SHOW VARIABLES LIKE ‘validate_password%’;</p>
-</blockquote>
-</li>
-<li><p>策略说明</p>
-<blockquote>
-<p>validate_password.length 是密码的最小长度，默认是8，我们把它改成6<br>输入：set global validate_password.length=6;<br>validate_password.policy 验证密码的复杂程度，我们把它改成0<br>输入：set global validate_password.policy=0;<br>validate_password.check_user_name 用户名检查，用户名和密码不能相同，我们也把它关掉<br>输入：set global validate_password.check_user_name=off;</p>
-</blockquote>
-</li>
-<li><p>重新设置想要密码</p>
-<blockquote>
-<p>ALTER USER ‘root‘@’localhost’ IDENTIFIED BY ‘XXXXXXX’ PASSWORD EXPIRE NEVER;</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="连接远程"><a href="#连接远程" class="headerlink" title="连接远程"></a>连接远程</h2><ol>
-<li><p>看下默认MySQL用户：</p>
-<blockquote>
-<p>输入：use mysql;</p>
-<p>输入：select host, user, authentication_string, plugin from user;</p>
-<p>查询结果有没有百分号root用户</p>
-</blockquote>
-</li>
-<li><p>没有百分号root用户 执行两面两句</p>
-</li>
-</ol>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">user</span> root@<span class="string">&#x27;%&#x27;</span> identified <span class="keyword">by</span> <span class="string">&#x27;123456&#x27;</span>; </span><br><span class="line"><span class="keyword">grant</span> <span class="keyword">all</span> privileges <span class="keyword">on</span> <span class="operator">*</span>.<span class="operator">*</span> <span class="keyword">to</span> root@<span class="string">&#x27;%&#x27;</span> <span class="keyword">with</span> <span class="keyword">grant</span> option;</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>有百分号root用户 直接执行</li>
-</ol>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">grant</span> <span class="keyword">all</span> privileges <span class="keyword">on</span> <span class="operator">*</span>.<span class="operator">*</span> <span class="keyword">to</span> root@<span class="string">&#x27;%&#x27;</span> <span class="keyword">with</span> <span class="keyword">grant</span> option;</span><br></pre></td></tr></table></figure>
-
-<p>然后去 <strong>开放防火墙 3306端口</strong> 这个很重要  我是在腾讯云直接网页端配置了3306.也可以使用命令我就不找了emm</p>
-]]></content>
-      <categories>
-        <category>CentOS</category>
-      </categories>
-      <tags>
-        <tag>centos</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Tomcat基础</title>
     <url>/530cfffd.html</url>
     <content><![CDATA[<hr>
@@ -289,177 +186,6 @@
       </categories>
       <tags>
         <tag>tomcat</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Tomcat容器的设计</title>
-    <url>/210d100c.html</url>
-    <content><![CDATA[<hr>
-<ul>
-<li>容器的层次结构</li>
-<li>容器的管理</li>
-<li>定位Servlet的过程</li>
-<li>PipeLine-valve 管道</li>
-</ul>
-<span id="more"></span>
-
-<h1 id="Tomcat-容器的设计"><a href="#Tomcat-容器的设计" class="headerlink" title="Tomcat 容器的设计"></a>Tomcat 容器的设计</h1><h2 id="容器的层次结构"><a href="#容器的层次结构" class="headerlink" title="容器的层次结构"></a>容器的层次结构</h2><p>层级由高到低 1 - 4 展示如下</p>
-<ol>
-<li>Engine [ 表示引擎 ]  </li>
-<li>Host [ 表示一个虚拟主机/站点 ]</li>
-<li>Context  [ 表示一个 Web 应用程序 ]</li>
-<li>Wrapper [ 表示一个 Servlet ]<br>👆🏻<br>👇🏻</li>
-</ol>
-<ul>
-<li>一个 Web 应用程序可以有多个 Servlet</li>
-<li>一个虚拟机可以部署多个 Web 应用程序</li>
-<li>一个 Service 只能有一个 Engine</li>
-<li>一个 Server 可以有多个 Service</li>
-</ul>
-<p><img src="/210d100c/tu1.png" alt="tu1.png"></p>
-<p>⭐4 种容器不是平行关系，而是父子关系，而设计这么多容器的目的是通过分层架构，使 Servlet 容器更具灵活性</p>
-<h2 id="Tomcat-容器对容器的管理"><a href="#Tomcat-容器对容器的管理" class="headerlink" title="Tomcat 容器对容器的管理**"></a>Tomcat 容器对容器的管理**</h2><p>容器之间是父子关系，即树形结构，即 TomCat 可使用组合模式来进行管理的容器的</p>
-<p>具体组合模式的实现</p>
-<ul>
-<li>所有容器实现 Container 接口<blockquote>
-<p>用户对单容器对象和组合容器对象的使用具有一致性<br>单容器对象指的是最底层的 Wrapper，组合容器对象指的是上面的 Context、Host 或者 Engine</p>
-</blockquote>
-</li>
-</ul>
-<p>Container 接口定义如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Container</span> <span class="keyword">extends</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">getParent</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setParent</span><span class="params">(Container container)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addChild</span><span class="params">(Container child)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeChild</span><span class="params">(Container child)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">findChild</span><span class="params">(String name)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>⭐Container 接口 提供了对父容器，子容器的操作，同时扩展了 Lifecycle，而 Lifecycle 是用来统一管理各组件的生命周期</p>
-<h2 id="请求定位-Servlet-的过程"><a href="#请求定位-Servlet-的过程" class="headerlink" title="请求定位 Servlet 的过程"></a>请求定位 Servlet 的过程</h2><p>❓<strong>疑问点</strong></p>
-<blockquote>
-<p>Tomcat 是怎么确定请求是由哪个 Wrapper 容器里的 Servlet 来处理的？</p>
-</blockquote>
-<p>❗<strong>答案</strong></p>
-<blockquote>
-<p>Tomcat 是用 Mapper 组件来完成这个任务的。</p>
-<p>Mapper 组件的功能就是将用户请求的 URL 定位到一个 Servlet</p>
-</blockquote>
-<h3 id="Mapper-组件"><a href="#Mapper-组件" class="headerlink" title="Mapper 组件"></a>Mapper 组件</h3><p>Mapper 组件的工作原理</p>
-<ul>
-<li>Mapper 组件里保存了 Web 应用的配置信息 ( 容器组件与访问路径的映射关系 )</li>
-</ul>
-<p><strong>首先，根据协议和端口号选定 Service 和 Engine</strong></p>
-<blockquote>
-<p>Tomcat 的每个连接器都监听不同的端口，而连接器属于一个 Service 组件<br>Service 组件中包含了多个连接器和一个容器组件<br>一个容器组件具体体现就是 Engine 引擎<br>即Service 组件确认 等于 Engine 引擎确认</p>
-</blockquote>
-<p><strong>根据域名选定 Host</strong></p>
-<blockquote>
-<p>Mapper 组件通过 URL 中的域名去查找相应的 Host 容器</p>
-</blockquote>
-<p><strong>根据 URL 路径找到 Context 组件</strong></p>
-<blockquote>
-<p>Host 确定以后，Mapper 根据 URL 的路径来匹配相应的 Web 应用的路径</p>
-</blockquote>
-<p><strong>最后，根据 URL 路径找到 Wrapper（Servlet）</strong></p>
-<blockquote>
-<p>Context 确定后，Mapper 再根据web.xml中配置的 Servlet 映射路径来找到具体的 Wrapper 和 Servlet。</p>
-</blockquote>
-<h2 id="Pipeline-Valve-管道"><a href="#Pipeline-Valve-管道" class="headerlink" title="Pipeline-Valve 管道"></a>Pipeline-Valve 管道</h2><p>上述的 Mapper 组件是告诉我们怎么找到 Servlet，然后 Servlet 去做请求</p>
-<p>⭐<strong>而实际上这个查找路径上的父子容器都会对请求做一些处理，各容器处理事务遵循责任链模式</strong></p>
-<ul>
-<li>连接器中的 Adapter 会调用容器的 Service 方法来执行 Servlet</li>
-<li>最先拿到请求的是 Engine 容器，对请求做一些处理后，会把请求传给自己子容器 Host 继续处理，依次类推</li>
-<li>最后交由 Wrapper 容器，Wrapper 调用最终的 Servlet 来处理</li>
-</ul>
-<p>👐🏻<strong>Pipeline-Valve 是责任链模式</strong></p>
-<blockquote>
-<p>责任链模式是指在一个请求处理的过程中有很多处理者依次对请求进行处理，每个处理者负责做自己相应的处理，处理完之后将再调用下一个处理者继续处理。</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Valve</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getNext</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNext</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">invoke</span><span class="params">(Request request, Response response)</span></span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
-<p>Valve 是一个处理点 可以想象一下链表，invoke 就是处理，通过 getNext 和 setNext 组成一个链表</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Pipeline</span> <span class="keyword">extends</span> <span class="title">Contained</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addValve</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getBasic</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBasic</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getFirst</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Pipeline 中 维护了 Valve 链表，并且其中并没有 invoke 方法，这是因为实际出发还是在 Valve 中的 invoke中，Valve 完成自己的处理后，调用getNext.invoke来触发下一个 Valve 调用。</p>
-<hr>
-<p>但是上述显的 Pipeline 并没有发挥作用，Pipeline 每个容器都有一个，其中getFirst 和 getBasic 就是来串联 不同容器的，他们分别可以取得 Valve 的第一个节点和最后一个节点 如下图所示</p>
-<p><img src="/210d100c/tu2.png" alt="tu2.png"></p>
-<p>⭐整个调用过程由连接器中的 Adapter 触发的，它会调用 Engine 的第一个 Valve</p>
-<p>⭐Wrapper 容器的最后一个 Valve 会创建一个 Filter 链，并调用 doFilter 方法，最终会调到 Servlet 的 service 方法。</p>
-<h3 id="Valve-和-Filter"><a href="#Valve-和-Filter" class="headerlink" title="Valve 和 Filter"></a>Valve 和 Filter</h3><ul>
-<li>Valve 是 Tomcat 的私有机制，与 Tomcat 的基础架构 /API 是紧耦合的。Servlet API 是公有的标准，所有的 Web 容器包括 Jetty 都支持 Filter 机制。</li>
-<li> Valve 工作在 Web 容器级别，拦截所有应用的请求；而 Servlet Filter 工作在应用级别，只能拦截某个 Web 应用的所有请求。如果想做整个 Web 容器的拦截器，必须通过 Valve 来实现。</li>
-</ul>
-]]></content>
-      <categories>
-        <category>Tomcat</category>
-      </categories>
-      <tags>
-        <tag>tomcat</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>CentOSRedis安装</title>
-    <url>/2e20d1b4.html</url>
-    <content><![CDATA[<hr>
-<ul>
-<li>查看 Centos 版本</li>
-<li>添加EPEL仓库</li>
-<li>更新yum源</li>
-<li>安装redis</li>
-<li>修改配置</li>
-<li>连接redis</li>
-</ul>
-<span id="more"></span>
-
-<h3 id="查看-Centos-版本"><a href="#查看-Centos-版本" class="headerlink" title="查看 Centos 版本"></a>查看 Centos 版本</h3><hr>
-<blockquote>
-<p>cat /etc/redhat-release</p>
-</blockquote>
-<h3 id="添加EPEL仓库-自由开源的附加软件包仓库"><a href="#添加EPEL仓库-自由开源的附加软件包仓库" class="headerlink" title="添加EPEL仓库 (自由开源的附加软件包仓库)"></a>添加EPEL仓库 (自由开源的附加软件包仓库)</h3><hr>
-<blockquote>
-<p>sudo yum install epel-release</p>
-</blockquote>
-<h3 id="更新yum源"><a href="#更新yum源" class="headerlink" title="更新yum源"></a>更新yum源</h3><hr>
-<blockquote>
-<p>sudo yum update</p>
-</blockquote>
-<h3 id="安装-redis"><a href="#安装-redis" class="headerlink" title="安装 redis"></a>安装 redis</h3><hr>
-<blockquote>
-<p>yum install redis</p>
-</blockquote>
-<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><hr>
-<blockquote>
-<p>systemctl start redis</p>
-</blockquote>
-<h3 id="设置开机自启"><a href="#设置开机自启" class="headerlink" title="设置开机自启"></a>设置开机自启</h3><hr>
-<blockquote>
-<p>systemctl enable redis</p>
-</blockquote>
-<h3 id="查看是否启动"><a href="#查看是否启动" class="headerlink" title="查看是否启动"></a>查看是否启动</h3><hr>
-<blockquote>
-<p>sudo systemctl status redis</p>
-</blockquote>
-<p>⭐ 到这里位置服务端的 redis 已经启动好了。接下来需要配置的是远程连接。</p>
-<h3 id="修改配置"><a href="#修改配置" class="headerlink" title="修改配置"></a>修改配置</h3><hr>
-<blockquote>
-<ol>
-<li>vim /etc/redis.conf</li>
-<li>注释掉 bind 127.0.0.1 启用远程连接</li>
-<li>解开注释 # requirepass foobared 将 foodared 替换成自己的密码 启用密码</li>
-</ol>
-</blockquote>
-<h3 id="开放端口"><a href="#开放端口" class="headerlink" title="开放端口"></a>开放端口</h3><hr>
-<p>可以通过对应平台的防火墙进行设置<br><img src="/2e20d1b4/tu1.png" alt="tu1.png"></p>
-<p>可以通过命令设置防火墙</p>
-<ul>
-<li>sudo firewall-cmd –add-port=6379/tcp –permanent </li>
-<li>sudo firewall-cmd –reload </li>
-</ul>
-<h3 id="重启-redis"><a href="#重启-redis" class="headerlink" title="重启 redis"></a>重启 redis</h3><blockquote>
-<p>systemctl restart redis</p>
-</blockquote>
-<h3 id="连接成功"><a href="#连接成功" class="headerlink" title="连接成功"></a>连接成功</h3><hr>
-<p><img src="/2e20d1b4/tu2.png" alt="tu2.png"></p>
-]]></content>
-      <categories>
-        <category>CentOS</category>
-      </categories>
-      <tags>
-        <tag>centos</tag>
       </tags>
   </entry>
   <entry>
@@ -592,468 +318,6 @@
       </categories>
       <tags>
         <tag>tomcat</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Redis基础知识</title>
-    <url>/b37d654d.html</url>
-    <content><![CDATA[<hr>
-<ul>
-<li>redis 特性</li>
-<li>redis 基础命令</li>
-<li>数据类型 - 字符串类型</li>
-<li>数据类型 - 散列类型</li>
-<li>数据类型 - 列表类型</li>
-<li>数据类型 - 集合类型</li>
-<li>数据类型 - 有序集合类型</li>
-</ul>
-<span id="more"></span>
-
-<h2 id="Redis的特性"><a href="#Redis的特性" class="headerlink" title="Redis的特性"></a>Redis的特性</h2><p>Redis 是远程字典服务器，是以字典结构存储数据，允许其他应用通过 TCP 协议读写字典内容</p>
-<h3 id="存储结构"><a href="#存储结构" class="headerlink" title="存储结构"></a>存储结构</h3><hr>
-<p>Redis 支持的键值类型如下</p>
-<ul>
-<li>字符串类型</li>
-<li>散列类型</li>
-<li>列表类型</li>
-<li>集合类型</li>
-<li>有序集合类型</li>
-</ul>
-<h3 id="内存存储和持久化"><a href="#内存存储和持久化" class="headerlink" title="内存存储和持久化"></a>内存存储和持久化</h3><hr>
-<p>Redis 的数据都是存储在内存中</p>
-<blockquote>
-<p>优点: 读写比之读写硬盘快了非常多<br>缺点: 程序退出,内存数据丢失</p>
-</blockquote>
-<p><strong>Redis 提供了持久化支持，内存中的数据异步写入硬盘，同时不影响继续提供服务</strong></p>
-<h3 id="Redis-功能丰富"><a href="#Redis-功能丰富" class="headerlink" title="Redis 功能丰富"></a>Redis 功能丰富</h3><hr>
-<figure class="highlight tex"><table><tr><td class="code"><pre><span class="line">Redis 是作为数据库开发的，但可以作为缓存，队列等等</span><br><span class="line">Redis 可以为每个键设置生存时间(TTL)	,到期自动删除(可作为缓存)</span><br><span class="line">Redis 可以限定数据占用的最大内存空间，数据达到空间限制后，按照规则删除</span><br><span class="line">Redis 的列表类型键可以用来实现队列，并且支持阻塞式读取</span><br><span class="line">Redis 支持“发布/订阅”的消息模式， 可以基于此构建聊天室等系统</span><br></pre></td></tr></table></figure>
-
-<h2 id="Redis-命令行客户端"><a href="#Redis-命令行客户端" class="headerlink" title="Redis 命令行客户端"></a>Redis 命令行客户端</h2><h3 id="发送命令"><a href="#发送命令" class="headerlink" title="发送命令"></a>发送命令</h3><hr>
-<p>通过 <strong>redis-cli</strong> 向 Redis 发送命令有两种方式</p>
-<ol>
-<li>将命令作为 redis-cli 的参数执行 如: redis-cli -h 127.0.0.1 -p 6379</li>
-<li>不附带参数运行redis-cli 如ping 如 ECHO hi</li>
-</ol>
-<h3 id="命令返回值"><a href="#命令返回值" class="headerlink" title="命令返回值"></a>命令返回值</h3><hr>
-<p><strong>命令的返回值有5种类型</strong></p>
-<ol>
-<li>状态回复<ul>
-<li>如使用 SET 设置了某个键，Redis 回复 OK</li>
-</ul>
-</li>
-<li>错误回复<ul>
-<li>如命令不存在或命令格式有错误等情况时返回</li>
-</ul>
-</li>
-<li>整数回复<ul>
-<li>如递增键值的 INCR 命令会以整数形式返回递增后的键值，又如获取数据库中键的个数 DBSIZE 命令</li>
-</ul>
-</li>
-<li>字符串回复<ul>
-<li>如请求一个字符串类型键的键值，字符串回复以双引号包裹</li>
-<li>特殊情况下无键值  nil</li>
-</ul>
-</li>
-<li>多行字符串回复<ul>
-<li>请求一个非字符串类型键的元素 列表时就会收到多行字符串回复</li>
-<li>如 KEYS ＊</li>
-</ul>
-</li>
-</ol>
-<h2 id="多数据库"><a href="#多数据库" class="headerlink" title="多数据库"></a>多数据库</h2><p>Redis 的数据库是从0-15标识<br>Redis 默认有16个数据库 可以使用select 1-15<br>Redis 之间并不是完全隔离的 如使用 FLUSHALL 会清空所有数据库的数据</p>
-<h2 id="Redis-的基础命令"><a href="#Redis-的基础命令" class="headerlink" title="Redis 的基础命令"></a>Redis 的基础命令</h2><table>
-<thead>
-<tr>
-<th>命令</th>
-<th>解释</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>KEYS pattern</td>
-<td>获得符合规则的键名列表</td>
-</tr>
-<tr>
-<td>SET key value</td>
-<td>设置键值</td>
-</tr>
-<tr>
-<td>KEYS *</td>
-<td>查看所有键</td>
-</tr>
-<tr>
-<td>EXISTS key</td>
-<td>判断键是否存在 存在返回1 否则返回0</td>
-</tr>
-<tr>
-<td>DEL key [key …]</td>
-<td>删除一个或多个键，返回删除数量</td>
-</tr>
-<tr>
-<td>TYPE key</td>
-<td>获得所有键值的类型</td>
-</tr>
-</tbody></table>
-<ul>
-<li>[ keys * ] 是遍历所有键，当键数量多的时候会影响性能</li>
-</ul>
-<h2 id="数据类型-字符串类型"><a href="#数据类型-字符串类型" class="headerlink" title="数据类型 - 字符串类型"></a>数据类型 - 字符串类型</h2><p>字符串类型是最基础的数据类型，能够存储任何形式的字符串，如二进制，邮箱，json，图片。<br>字符串类型最大可以存储 512M<br><strong>字符串类型是其他四种类型的基础</strong></p>
-<p>赋值</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">set</span> key hello</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; set key hello<br>OK</p>
-</blockquote>
-<hr>
-<p>取值</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">get</span> key</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; set key hello<br>OK<br>127.0.0.1:6379&gt; get key<br>“hello”</p>
-</blockquote>
-<hr>
-<p>取值 <strong>当键不存在 返回 nil</strong></p>
-<blockquote>
-<p>127.0.0.1:6379&gt; get aakkakaa<br>(nil)</p>
-</blockquote>
-<hr>
-<p>增加指定的整数（num 为数量）</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">incrby key num</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; get akk<br>“1”<br>127.0.0.1:6379&gt; incrby akk 2<br>(integer) 3<br>127.0.0.1:6379&gt; get akk<br>“3”</p>
-</blockquote>
-<hr>
-<p>减少指定的整数</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">decrby key num</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; get akk<br>“3”<br>127.0.0.1:6379&gt; DECRBY akk 3<br>(integer) 0<br>127.0.0.1:6379&gt; get akk<br>“0”</p>
-</blockquote>
-<hr>
-<p>自增1</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">incr key</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; get akk<br>“1”<br>127.0.0.1:6379&gt; incr akk<br>(integer) 2<br>127.0.0.1:6379&gt; get akk<br>“2”</p>
-</blockquote>
-<hr>
-<p>自减1</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">decr key</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; get akk<br>“2”<br>127.0.0.1:6379&gt; DECR akk<br>(integer) 1<br>127.0.0.1:6379&gt; get akk<br>“1”</p>
-</blockquote>
-<hr>
-<p>增加指定浮点数</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">incrbyfloat key <span class="number">0.0</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; get akk<br>“0.5”<br>127.0.0.1:6379&gt; incrbyfloat akk 0.66<br>“1.16”<br>127.0.0.1:6379&gt; get akk<br>“1.16”</p>
-</blockquote>
-<hr>
-<p>向尾部追加值</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">APPEND key <span class="keyword">value</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; get akk<br>“10.111”<br>127.0.0.1:6379&gt; APPEND akk 66<br>(integer) 8<br>127.0.0.1:6379&gt; get akk<br>“10.11166”</p>
-</blockquote>
-<hr>
-<p>获取字符串长度</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">STRLEN key</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; get akk<br>“10.11166”<br>127.0.0.1:6379&gt; strlen akk<br>(integer) 8</p>
-</blockquote>
-<hr>
-<p>同时获取多个键值</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">MGET KEY [key ...]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; keys *<br>“key”<br>“pushkey”<br>“akk”<br>“1”<br>127.0.0.1:6379&gt; mget key akk<br>“hello”<br>“1.16”</p>
-</blockquote>
-<hr>
-<p>同时设置多个键值</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">mset key <span class="keyword">value</span> [key <span class="keyword">value</span> ...]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; mset key1 v2 key2 v2 key3 v3<br>OK<br>127.0.0.1:6379&gt; mget key1 key2 key3<br>“v2”<br>“v2”<br>“v3”</p>
-</blockquote>
-<hr>
-<h2 id="数据类型-散列类型"><a href="#数据类型-散列类型" class="headerlink" title="数据类型 - 散列类型"></a>数据类型 - 散列类型</h2><p>散列类型( hash )  由  **存储字段(field) ** 和 <strong>字段值映射</strong>组成<br>Redis 不支持数据类型嵌套,如不能集合中嵌套散列表</p>
-<p><strong>散列表适用环境</strong><br>⭐散列表适合存储对象</p>
-<blockquote>
-<p>使用对象类别和ID构成键名,使用字段标识对象的属性,而字段值和存储属性值</p>
-</blockquote>
-<p><img src="/b37d654d/tu1.png" alt="tu1.png"></p>
-<p>赋值</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">HSET key field <span class="keyword">value</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; hset car color red<br>(integer) 1<br>127.0.0.1:6379&gt; hset car name QQ<br>(integer) 1<br>127.0.0.1:6379&gt; hset car price 100<br>(integer) 1</p>
-</blockquote>
-<hr>
-<p>取值</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">HGET key field <span class="keyword">value</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; hget car name<br>“QQ”</p>
-</blockquote>
-<hr>
-<p>同时设置多个键值</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">HMSET key field <span class="keyword">value</span>[field <span class="keyword">value</span> ...]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; hmset car2.0 color black name QQ2.0 price 200<br>OK</p>
-</blockquote>
-<hr>
-<p>同时取多个值</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">HMGET key field <span class="keyword">value</span>[field <span class="keyword">value</span> ...]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; hmget car2.0 color name price<br>“black”<br>“QQ2.0”<br>“200”</p>
-</blockquote>
-<hr>
-<p>取得某个散列全部键值</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">HGETALL KEY</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; HGETALL car2.0<br>“color”<br>“black”<br>“name”<br>“QQ2.0”<br>“price”<br>“200</p>
-</blockquote>
-<hr>
-<p>判断字段是否存在</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">HEXISTS KEY FIELD</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; HEXISTS car name<br>(integer) 1<br>127.0.0.1:6379&gt; HEXISTS car nane<br>(integer) 0</p>
-</blockquote>
-<hr>
-<p>当字段不存在时赋值 </p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">HSETNX key field <span class="keyword">value</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; HGETALL car<br>“color”<br>“red”<br>“name”<br>“TT”<br>“price”<br>“100”<br>127.0.0.1:6379&gt; HSETNX car name UU<br>(integer) 0<br>127.0.0.1:6379&gt; HGET car name<br>“TT”<br>127.0.0.1:6379&gt; HSET car name UU<br>(integer) 0<br>127.0.0.1:6379&gt; HGET car name<br>“UU”<br>127.0.0.1:6379&gt; </p>
-</blockquote>
-<hr>
-<p>增加数字 </p>
-<p>❗散列没有 INCRBY 但是可以通过HINCRBY 指定 1来实现</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">HINCRBY key field increment</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; hget car price<br>“100”<br>127.0.0.1:6379&gt; HINCRBY car price 400<br>(integer) 500<br>127.0.0.1:6379&gt; hget car price<br>“500”</p>
-</blockquote>
-<hr>
-<p>删除字段</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">HDEL key field [field ...]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; HDEL car name color<br>(integer) 2<br>127.0.0.1:6379&gt; HGETALL car<br> “price”<br> “500”</p>
-</blockquote>
-<hr>
-<p>只获取字段名或字段值</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">HKEYS key</span><br><span class="line">HVALS KEY</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; hkeys car<br> “price”<br>127.0.0.1:6379&gt; HVALS car<br> “500”</p>
-</blockquote>
-<hr>
-<p>获取字段数量</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">HLEN key</span><br></pre></td></tr></table></figure>
-<p>127.0.0.1:6379&gt; HKEYS car<br> “price”<br> “name”<br>127.0.0.1:6379&gt; HLEN car<br>(integer) 2</p>
-<h2 id="数据类型-列表类型"><a href="#数据类型-列表类型" class="headerlink" title="数据类型 - 列表类型"></a>数据类型 - 列表类型</h2><p>列表类型（list）可以存储一个有序的字符串列表，常用的操作是向列表两端添加元素， </p>
-<p>或者获得列表的某一个片段。 </p>
-<p>列表类型内部是使用双向链表（double linked list）实现的</p>
-<hr>
-<p>向列表两端增加元素</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- LPUSH 命令用来向列表左边添加元素，返回值标识增加元素后列表长度</span></span><br><span class="line">LPUSH key <span class="keyword">value</span> [<span class="keyword">value</span>]</span><br><span class="line"><span class="comment">-- RPUSH 命令用来向列表右边添加元素，返回值标识增加元素后列表长度</span></span><br><span class="line">RPUSH key <span class="keyword">value</span> [<span class="keyword">value</span>]</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>127.0.0.1:6379&gt; LPUSH num 4<br>(integer) 4</p>
-</blockquote>
-<hr>
-<p>从列表两端弹出元素</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">LPOP KEY</span><br><span class="line">RPOP KEY</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; LRANGE num 0 -1<br> “4”<br> “1”<br> “2”<br> “3”<br>127.0.0.1:6379&gt; LPOP num<br>“4”<br>127.0.0.1:6379&gt; LRANGE num 0 -1<br> “1”<br> “2”<br> “3”</p>
-</blockquote>
-<hr>
-<p>获取列表的元素个数</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">LLEN key</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; LRANGE num 0 -1<br> “1”<br> “2”<br> “3”<br>127.0.0.1:6379&gt; LLEN num<br>(integer) 3</p>
-</blockquote>
-<hr>
-<p>获取列表片段</p>
-<p>⭐<strong>LRANGE 支持负索引， -1 表示最右元素，-2表示最右倒数第二元素</strong></p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">LRANGE key <span class="keyword">start</span> stop</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>127.0.0.1:6379&gt; LRANGE num 0 -1<br>“1”<br>“2”<br>“3”<br>127.0.0.1:6379&gt; LRANGE num 0 1<br>“1”<br>“2”</p>
-</blockquote>
-<hr>
-<p>删除列表中指定的值</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">LREM key count <span class="keyword">value</span></span><br><span class="line"><span class="comment">-- count删除几个，1就是从左删除一个 -1 就是从右删除一个</span></span><br><span class="line"><span class="comment">-- value 就是要删除的元素叫什么</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>127.0.0.1:6379&gt; LRANGE num 0 -1</p>
-<p>“3”</p>
-<p>“1”</p>
-<p>“3”<br>127.0.0.1:6379&gt; LREM num -1 3<br>(integer) 1<br>127.0.0.1:6379&gt; LRANGE num 0 -1</p>
-<p>“3”</p>
-<p>“1”</p>
-</blockquote>
-<hr>
-<p>获得/设置指定索引的元素值</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">LINDEX key index</span><br><span class="line">LSET key index <span class="keyword">value</span></span><br><span class="line"><span class="comment">-- 将列表类型当作数组来用,LINDEX 命令是必不可少的</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; LRANGE num 0 -1<br>  “8”<br>  “7”<br>  “6”<br>  “4”<br>  “3”<br>  “1”<br>  “8”<br>  “7”<br>  “6”<br>  “5”<br>  “4”<br>  “3”<br>  “1”<br>127.0.0.1:6379&gt; LINDEX num 0<br>“8”</p>
-</blockquote>
-<p><strong>LSET key index value</strong></p>
-<blockquote>
-<p>127.0.0.1:6379&gt; LINDEX num 0<br>“8”<br>127.0.0.1:6379&gt; LSET num 0 88<br>OK<br>127.0.0.1:6379&gt; LRANGE num 0 -1<br> “88”<br> “7”<br> “6”<br> “4”<br> “3”<br> “1”<br> “8”<br> “7”<br> “6”<br> “5”<br> “4”<br> “3”<br> “1”</p>
-</blockquote>
-<hr>
-<p>只保留列表指定片段</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">LTRIM key <span class="keyword">start</span> <span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>127.0.0.1:6379&gt; LRANGE num 0 -1</p>
-<p>“88”</p>
-<p>“7”</p>
-<p>“6”</p>
-<p>“4”</p>
-<p>“3”</p>
-<p>“1”<br>127.0.0.1:6379&gt; ltrim num 0 2<br>OK<br>127.0.0.1:6379&gt; LRANGE num 0 -1</p>
-<p>“88”</p>
-<p>“7”</p>
-</blockquote>
-<hr>
-<p>向列表中插入元素</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">LINSERT key BEFORE<span class="operator">|</span> AFTER pivot <span class="keyword">value</span></span><br><span class="line"><span class="comment">-- 从左到右查找 pivot，before pivot之前 after pivot之后插入 value：插入的值</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; LRANGE num 0 -1<br> “88”<br> “7”<br> “6”<br>127.0.0.1:6379&gt; LINSERT num before 88 66<br>(integer) 4<br>127.0.0.1:6379&gt; LRANGE num 0 -1<br> “66”<br> “88”<br> “7”<br> “6”</p>
-</blockquote>
-<hr>
-<p>将元素从一个列表转到另一个列表R</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">RPOPLPUSH source destination</span><br><span class="line"><span class="comment">-- 先rpop 再lpush。</span></span><br><span class="line"><span class="comment">-- 从source右中弹出一个元素，左加入到 destination，并返回这个元素值。</span></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; RPOPLPUSH num num1.1<br>“6”<br>127.0.0.1:6379&gt; RPOPLPUSH num num1.1<br>“7”<br>127.0.0.1:6379&gt; RPOPLPUSH num num1.1<br>“88”<br>127.0.0.1:6379&gt; RPOPLPUSH num num1.1<br>“66”</p>
-</blockquote>
-<h2 id="数据类型-集合类型"><a href="#数据类型-集合类型" class="headerlink" title="数据类型 - 集合类型"></a>数据类型 - 集合类型</h2><p>集合类型的常用操作是向集合中加入或删除元素、判断某个元素是否存在等，由于集合类型在Redis内部是使用值为空的散列表（hash table）实现的，所以这些操作的时间复杂度都 是0(1)。</p>
-<hr>
-<p>增加/删除元素</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">SADD key <span class="keyword">member</span> [<span class="keyword">member</span> …]</span><br><span class="line"><span class="comment">-- SADD 不存在创建。若元素已经存在则忽略，集合中不能有相同元素</span></span><br><span class="line">SREM key <span class="keyword">member</span> [<span class="keyword">member</span> …]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; sadd letter 1<br>(integer) 1<br>127.0.0.1:6379&gt; SADD letter 1<br>(integer) 0<br>127.0.0.1:6379&gt; SREM letter 1<br>(integer) 1<br>127.0.0.1:6379&gt; SREM letter 1<br>(integer) 0</p>
-</blockquote>
-<hr>
-<p>获取集合中的所有元素</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">SMEMBERS key</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; SADD letter 1 2 3 4<br>(integer) 4<br>127.0.0.1:6379&gt; SADD letter a b c d<br>(integer) 4<br>127.0.0.1:6379&gt; smembers letter<br> “1”<br> “b”<br> “3”<br> “c”<br> “4”<br> “d”<br> “2”<br> “a”</p>
-</blockquote>
-<hr>
-<p>⭐集合间运算</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 差集运算</span></span><br><span class="line">SDIFF key [key …] </span><br><span class="line"><span class="comment">-- 交集运算</span></span><br><span class="line">SINTER key [key …] </span><br><span class="line"><span class="comment">-- 并集运算</span></span><br><span class="line">SUNION key [key …]</span><br></pre></td></tr></table></figure>
-<p>sdiff</p>
-<blockquote>
-<p>127.0.0.1:6379&gt; smembers letter<br> “1”<br> “b”<br> “3”<br> “c”<br> “4”<br> “d”<br> “2”<br> “a”<br>127.0.0.1:6379&gt; sadd letter1.0 1 2 3 4<br>(integer) 4<br>127.0.0.1:6379&gt; sdiff letter letter1.0<br> “d”<br> “b”<br> “a”<br> “c”</p>
-</blockquote>
-<p>inter</p>
-<blockquote>
-<p>127.0.0.1:6379&gt; SINTER letter letter1.0<br> “1”<br> “2”<br> “3”<br> “4”</p>
-</blockquote>
-<p>union</p>
-<blockquote>
-<p>127.0.0.1:6379&gt; sunion letter letter1.0<br> “d”<br> “a”<br> “2”<br> “1”<br> “3”<br> “4”<br> “b”<br> “c”</p>
-</blockquote>
-<hr>
-<p>获得集合中元素个数</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">SCARD key</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; SCARD letter<br>(integer) 8</p>
-</blockquote>
-<hr>
-<p>进行集合运算并将结果存储<br>集合间运算结果存储到 destination键 中</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">SDIFFSTORE destination key [key …]</span><br><span class="line">SINTERSTORE destination key [key …]</span><br><span class="line">SUNIONSTORE destination key [key …]</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>随机获得集合中的元素</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">SRANDMEMBER key [count]</span><br><span class="line"><span class="comment">-- count 数字控制取出的数量</span></span><br><span class="line"><span class="comment">-- count 的正负控制是否会抽出重复，正不重复</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>127.0.0.1:6379&gt; SRANDMEMBER letter<br>“1”<br>127.0.0.1:6379&gt; SRANDMEMBER letter<br>“2”<br>127.0.0.1:6379&gt; SRANDMEMBER letter<br>“b”</p>
-</blockquote>
-<hr>
-<p>从集合中弹出一个元素</p>
-<p>⭐集合是随机弹出的</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">SPOP key</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>127.0.0.1:6379&gt; SPOP letter<br>“c”<br>127.0.0.1:6379&gt; SPOP letter<br>“a”<br>127.0.0.1:6379&gt; SPOP letter<br>“2”</p>
-</blockquote>
-<h2 id="数据类型-有序集合类型"><a href="#数据类型-有序集合类型" class="headerlink" title="数据类型 - 有序集合类型"></a>数据类型 - 有序集合类型</h2><p>列表类型是通过链表实现的，获取靠近两端的数据速度极快，而当元素增多后， 访问中间数据的速度会较慢，所以它更加适合实现如“新鲜事”或“日志”这样很少访问中间元素的应用。</p>
-<p>有序集合类型是使用散列表和跳跃表（Skip list）实现的，所以即使读取位于中间部分的数据速度也很快（时间复杂度O(log(N))）。 </p>
-<hr>
-<p>增加元素</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">ZADD key score <span class="keyword">member</span> [score <span class="keyword">member</span> …]</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>127.0.0.1:6379&gt; ZADD xu 13 uu<br>(integer) 1<br>127.0.0.1:6379&gt; ZADD xu 13 kk<br>(integer) 1</p>
-</blockquote>
-<hr>
-<p>查询元素</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span><span class="operator">&gt;</span> ZRANGE xu <span class="number">0</span> <span class="number">-1</span></span><br><span class="line"><span class="number">1</span>) &quot;akk&quot;</span><br><span class="line"><span class="number">2</span>) &quot;jie&quot;</span><br><span class="line"><span class="number">3</span>) &quot;uu&quot;</span><br><span class="line"><span class="number">4</span>) &quot;kk&quot;</span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span><span class="operator">&gt;</span> ZRANGE xu <span class="number">0</span> <span class="number">-1</span> withscores</span><br><span class="line"><span class="number">1</span>) &quot;akk&quot;</span><br><span class="line"><span class="number">2</span>) &quot;11&quot;</span><br><span class="line"><span class="number">3</span>) &quot;jie&quot;</span><br><span class="line"><span class="number">4</span>) &quot;12&quot;</span><br><span class="line"><span class="number">5</span>) &quot;uu&quot;</span><br><span class="line"><span class="number">6</span>) &quot;13&quot;</span><br><span class="line"><span class="number">7</span>) &quot;kk&quot;</span><br><span class="line"><span class="number">8</span>) &quot;18&quot;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>获得元素分数</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">ZSCORE key <span class="keyword">member</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>127.0.0.1:6379&gt; ZSCORE xu akk<br>“11”</p>
-</blockquote>
-<hr>
-<p>获取排名再某个范围的元素列表</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 按照分数大小 从小到大的顺序返回start-stop之间所有元素</span></span><br><span class="line">ZRANGE key <span class="keyword">start</span> stop[WITHSCORES]</span><br><span class="line">ZREVRANGE key <span class="keyword">start</span> stop [WITHSCORES]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; ZRANGE xu 0 -1 withscores<br>“akk”<br>“11”<br>“jie”<br>“12”<br>“uu”<br>“13”<br>“kk”<br>“18”</p>
-</blockquote>
-<hr>
-<p>获得指定分数范围的元素</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 该命令按照元素分数从小到大 的顺序返回分数在min和max之间（包含min和max）的元素</span></span><br><span class="line">ZRANGEBYSCORE key min max [WITHSCORES] [LIMIT <span class="keyword">offset</span> count]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; ZRANGE xu 0 -1 withscores<br> “akk”<br> “11”<br> “jie”<br> “12”<br> “uu”<br> “13”<br> “kk”<br> “18”<br>127.0.0.1:6379&gt; ZRANGEBYSCORE xu 11 13<br> “akk”<br> “jie”<br> “uu”</p>
-</blockquote>
-<hr>
-<p>增加/减少 某个元素的分数</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">ZINCRBY key increment <span class="keyword">member</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>127.0.0.1:6379&gt; ZINCRBY xu 8 akk<br>“19”<br>127.0.0.1:6379&gt; ZINCRBY xu -9 akk<br>“10”</p>
-</blockquote>
-<hr>
-<p>获取集合元素中的数量</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">ZCARD key</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>127.0.0.1:6379&gt; ZCARD xu<br>(integer) 4<br>127.0.0.1:6379&gt; zrange xu 0 -1<br> “akk”<br> “jie”<br> “uu”<br> “kk”</p>
-</blockquote>
-<hr>
-<p>获得指定分数范围內的元素个数 </p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">ZCOUNT key min max</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; zrange xu 0 -1 withscores<br> “akk”<br> “10”<br> “jie”<br> “12”<br> “uu”<br> “13”<br> “kk”<br> “18”<br>127.0.0.1:6379&gt; ZCOUNT xu 10 14<br>(integer) 3</p>
-</blockquote>
-<hr>
-<p>删除一个或多个元素</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">ZREM key <span class="keyword">member</span> [<span class="keyword">member</span> …]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; ZCARD xu<br>(integer) 4<br>127.0.0.1:6379&gt; ZREM xu jie<br>(integer) 1<br>127.0.0.1:6379&gt; ZCARD xu<br>(integer) 3</p>
-</blockquote>
-<hr>
-<p>按照排名范围删除元素</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">ZREMRANGEBYRANK key <span class="keyword">start</span> stop</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>127.0.0.1:6379&gt; zrange xu 0 -1 withscores<br> “qq”<br> “1”<br> “ww”<br> “2”<br> “eee”<br> “3”<br> “akk”<br> “10”<br>127.0.0.1:6379&gt; ZREMRANGEBYRANK xu 2 3<br>(integer) 2<br>127.0.0.1:6379&gt; zrange xu 0 -1<br> “qq”<br> “ww”</p>
-</blockquote>
-<p>按照分数范围删除元素</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">ZREMRANGEBYSCORE key min max</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>127.0.0.1:6379&gt; zrange xu 0 -1 withscores<br>  “qq”<br>  “1”<br>  “ww”<br>  “2”<br>  “ee”<br>  “3”<br>  “rr”<br>  “4”<br>  “tt”<br>  “5”<br>127.0.0.1:6379&gt; ZREMRANGEBYSCORE xu 0 3<br>(integer) 3<br>127.0.0.1:6379&gt; zrange xu 0 -1 withscores<br> “rr”<br> “4”<br> “tt”<br> “5”</p>
-</blockquote>
-<hr>
-<p>获得元素的排名</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- 从小到大获取指定的排名 从0开始</span></span><br><span class="line">ZRANK key <span class="keyword">member</span></span><br><span class="line"><span class="comment">-- 从大到小获取指定的排名</span></span><br><span class="line">ZREVRANK key <span class="keyword">member</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>127.0.0.1:6379&gt; zrange xu 0 -1 withscores<br> “rr”<br> “4”<br> “tt”<br> “5”<br>127.0.0.1:6379&gt; ZRANK xu rr<br>(integer) 0<br>127.0.0.1:6379&gt; ZRANK xu tt<br>(integer) 1</p>
-</blockquote>
-<hr>
-]]></content>
-      <categories>
-        <category>Redis</category>
-      </categories>
-      <tags>
-        <tag>redis</tag>
       </tags>
   </entry>
   <entry>
@@ -1199,6 +463,106 @@
       </categories>
       <tags>
         <tag>算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Tomcat容器的设计</title>
+    <url>/210d100c.html</url>
+    <content><![CDATA[<hr>
+<ul>
+<li>容器的层次结构</li>
+<li>容器的管理</li>
+<li>定位Servlet的过程</li>
+<li>PipeLine-valve 管道</li>
+</ul>
+<span id="more"></span>
+
+<h1 id="Tomcat-容器的设计"><a href="#Tomcat-容器的设计" class="headerlink" title="Tomcat 容器的设计"></a>Tomcat 容器的设计</h1><h2 id="容器的层次结构"><a href="#容器的层次结构" class="headerlink" title="容器的层次结构"></a>容器的层次结构</h2><p>层级由高到低 1 - 4 展示如下</p>
+<ol>
+<li>Engine [ 表示引擎 ]  </li>
+<li>Host [ 表示一个虚拟主机/站点 ]</li>
+<li>Context  [ 表示一个 Web 应用程序 ]</li>
+<li>Wrapper [ 表示一个 Servlet ]<br>👆🏻<br>👇🏻</li>
+</ol>
+<ul>
+<li>一个 Web 应用程序可以有多个 Servlet</li>
+<li>一个虚拟机可以部署多个 Web 应用程序</li>
+<li>一个 Service 只能有一个 Engine</li>
+<li>一个 Server 可以有多个 Service</li>
+</ul>
+<p><img src="/210d100c/tu1.png" alt="tu1.png"></p>
+<p>⭐4 种容器不是平行关系，而是父子关系，而设计这么多容器的目的是通过分层架构，使 Servlet 容器更具灵活性</p>
+<h2 id="Tomcat-容器对容器的管理"><a href="#Tomcat-容器对容器的管理" class="headerlink" title="Tomcat 容器对容器的管理**"></a>Tomcat 容器对容器的管理**</h2><p>容器之间是父子关系，即树形结构，即 TomCat 可使用组合模式来进行管理的容器的</p>
+<p>具体组合模式的实现</p>
+<ul>
+<li>所有容器实现 Container 接口<blockquote>
+<p>用户对单容器对象和组合容器对象的使用具有一致性<br>单容器对象指的是最底层的 Wrapper，组合容器对象指的是上面的 Context、Host 或者 Engine</p>
+</blockquote>
+</li>
+</ul>
+<p>Container 接口定义如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Container</span> <span class="keyword">extends</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">getParent</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setParent</span><span class="params">(Container container)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addChild</span><span class="params">(Container child)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeChild</span><span class="params">(Container child)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">findChild</span><span class="params">(String name)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>⭐Container 接口 提供了对父容器，子容器的操作，同时扩展了 Lifecycle，而 Lifecycle 是用来统一管理各组件的生命周期</p>
+<h2 id="请求定位-Servlet-的过程"><a href="#请求定位-Servlet-的过程" class="headerlink" title="请求定位 Servlet 的过程"></a>请求定位 Servlet 的过程</h2><p>❓<strong>疑问点</strong></p>
+<blockquote>
+<p>Tomcat 是怎么确定请求是由哪个 Wrapper 容器里的 Servlet 来处理的？</p>
+</blockquote>
+<p>❗<strong>答案</strong></p>
+<blockquote>
+<p>Tomcat 是用 Mapper 组件来完成这个任务的。</p>
+<p>Mapper 组件的功能就是将用户请求的 URL 定位到一个 Servlet</p>
+</blockquote>
+<h3 id="Mapper-组件"><a href="#Mapper-组件" class="headerlink" title="Mapper 组件"></a>Mapper 组件</h3><p>Mapper 组件的工作原理</p>
+<ul>
+<li>Mapper 组件里保存了 Web 应用的配置信息 ( 容器组件与访问路径的映射关系 )</li>
+</ul>
+<p><strong>首先，根据协议和端口号选定 Service 和 Engine</strong></p>
+<blockquote>
+<p>Tomcat 的每个连接器都监听不同的端口，而连接器属于一个 Service 组件<br>Service 组件中包含了多个连接器和一个容器组件<br>一个容器组件具体体现就是 Engine 引擎<br>即Service 组件确认 等于 Engine 引擎确认</p>
+</blockquote>
+<p><strong>根据域名选定 Host</strong></p>
+<blockquote>
+<p>Mapper 组件通过 URL 中的域名去查找相应的 Host 容器</p>
+</blockquote>
+<p><strong>根据 URL 路径找到 Context 组件</strong></p>
+<blockquote>
+<p>Host 确定以后，Mapper 根据 URL 的路径来匹配相应的 Web 应用的路径</p>
+</blockquote>
+<p><strong>最后，根据 URL 路径找到 Wrapper（Servlet）</strong></p>
+<blockquote>
+<p>Context 确定后，Mapper 再根据web.xml中配置的 Servlet 映射路径来找到具体的 Wrapper 和 Servlet。</p>
+</blockquote>
+<h2 id="Pipeline-Valve-管道"><a href="#Pipeline-Valve-管道" class="headerlink" title="Pipeline-Valve 管道"></a>Pipeline-Valve 管道</h2><p>上述的 Mapper 组件是告诉我们怎么找到 Servlet，然后 Servlet 去做请求</p>
+<p>⭐<strong>而实际上这个查找路径上的父子容器都会对请求做一些处理，各容器处理事务遵循责任链模式</strong></p>
+<ul>
+<li>连接器中的 Adapter 会调用容器的 Service 方法来执行 Servlet</li>
+<li>最先拿到请求的是 Engine 容器，对请求做一些处理后，会把请求传给自己子容器 Host 继续处理，依次类推</li>
+<li>最后交由 Wrapper 容器，Wrapper 调用最终的 Servlet 来处理</li>
+</ul>
+<p>👐🏻<strong>Pipeline-Valve 是责任链模式</strong></p>
+<blockquote>
+<p>责任链模式是指在一个请求处理的过程中有很多处理者依次对请求进行处理，每个处理者负责做自己相应的处理，处理完之后将再调用下一个处理者继续处理。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Valve</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getNext</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNext</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">invoke</span><span class="params">(Request request, Response response)</span></span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>Valve 是一个处理点 可以想象一下链表，invoke 就是处理，通过 getNext 和 setNext 组成一个链表</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Pipeline</span> <span class="keyword">extends</span> <span class="title">Contained</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addValve</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getBasic</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBasic</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getFirst</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Pipeline 中 维护了 Valve 链表，并且其中并没有 invoke 方法，这是因为实际出发还是在 Valve 中的 invoke中，Valve 完成自己的处理后，调用getNext.invoke来触发下一个 Valve 调用。</p>
+<hr>
+<p>但是上述显的 Pipeline 并没有发挥作用，Pipeline 每个容器都有一个，其中getFirst 和 getBasic 就是来串联 不同容器的，他们分别可以取得 Valve 的第一个节点和最后一个节点 如下图所示</p>
+<p><img src="/210d100c/tu2.png" alt="tu2.png"></p>
+<p>⭐整个调用过程由连接器中的 Adapter 触发的，它会调用 Engine 的第一个 Valve</p>
+<p>⭐Wrapper 容器的最后一个 Valve 会创建一个 Filter 链，并调用 doFilter 方法，最终会调到 Servlet 的 service 方法。</p>
+<h3 id="Valve-和-Filter"><a href="#Valve-和-Filter" class="headerlink" title="Valve 和 Filter"></a>Valve 和 Filter</h3><ul>
+<li>Valve 是 Tomcat 的私有机制，与 Tomcat 的基础架构 /API 是紧耦合的。Servlet API 是公有的标准，所有的 Web 容器包括 Jetty 都支持 Filter 机制。</li>
+<li> Valve 工作在 Web 容器级别，拦截所有应用的请求；而 Servlet Filter 工作在应用级别，只能拦截某个 Web 应用的所有请求。如果想做整个 Web 容器的拦截器，必须通过 Valve 来实现。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Tomcat</category>
+      </categories>
+      <tags>
+        <tag>tomcat</tag>
       </tags>
   </entry>
 </search>
