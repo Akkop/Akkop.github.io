@@ -1,6 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>CentOS简易安装Mysql</title>
+    <url>/f6937770.html</url>
+    <content><![CDATA[<ul>
+<li>删除Mysql配置</li>
+<li>安装mysql</li>
+<li>远程连接</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="删除MySQL配置（重要！）"><a href="#删除MySQL配置（重要！）" class="headerlink" title="删除MySQL配置（重要！）"></a>删除MySQL配置（重要！）</h2><blockquote>
+<p>rpm -qa | grep -i mysql  查看是否安装mysql<br>yum -y remove MySQL-* 删除mysql<br>find / -name mysql 列出mysql rm -rf 删除mysql文件加<br>rm -rf /etc/my.cnf 删除配置<br>rm -rf /root/.mysql_sercret 删除默认密码</p>
+</blockquote>
+<hr>
+<h2 id="安装mysql"><a href="#安装mysql" class="headerlink" title="安装mysql"></a>安装mysql</h2><ol>
+<li><p>配置Mysql 8.0安装源<br>sudo rpm -Uvh <a href="https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm">https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm</a></p>
+</li>
+<li><p>安装Mysql 8.0</p>
+<blockquote>
+<p>sudo yum –enablerepo=mysql80-community install mysql-community-server</p>
+</blockquote>
+</li>
+<li><p>⭐安装server时如报错 </p>
+<blockquote>
+<p>All matches were filtered …. mysql-community-server<br>Error: Unable to find a match: mysql-community-server<br>先执行下面两句<br><strong>yum module disable mysql</strong><br><strong>yum -y install mysql-community-server</strong><br>再重新执行第二步骤</p>
+</blockquote>
+</li>
+<li><p>启动mysql服务(这一步要等待一会会)</p>
+<blockquote>
+<p>sudo service mysqld start</p>
+</blockquote>
+</li>
+<li><p>查看mysql服务运行状态</p>
+<blockquote>
+<p>service mysqld status</p>
+</blockquote>
+</li>
+<li><p>查看root临时密码</p>
+<blockquote>
+<p>grep “A temporary password” /var/log/mysqld.log</p>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">A temporary password <span class="keyword">is</span> generated <span class="keyword">for</span> root<span class="variable">@localhost</span>: ilPikNwys1_g</span><br></pre></td></tr></table></figure></li>
+<li><p>更改临时密码</p>
+<blockquote>
+<ol>
+<li>mysql -uroot -p</li>
+<li>输入临时密码</li>
+<li>ALTER USER ‘root’@‘localhost’ IDENTIFIED BY ‘new password’;</li>
+</ol>
+</blockquote>
+</li>
+<li><p>密码的设置有约束,成功设置密码有以下两种方式</p>
+<blockquote>
+<p>设置符合策略的密码(大小写字母+数据+符号)</p>
+<p>密码策略改简单一点</p>
+</blockquote>
+<p>⭐需要注意的是如果需要变更策略首先需要改一次符合策略的密码(可用如下sql先修改)</p>
+<p><strong>ALTER USER ‘root‘@’localhost’ IDENTIFIED BY ‘Root_12root’ PASSWORD EXPIRE NEVER;</strong></p>
+</li>
+<li><p>如果不想输入符合策略的密码</p>
+<blockquote>
+<p>查看当前的密码验证策略(注意密码修改之后才可以查看和第10步修改)</p>
+<p>SHOW VARIABLES LIKE ‘validate_password%’;</p>
+</blockquote>
+</li>
+<li><p>策略说明</p>
+<blockquote>
+<p>validate_password.length 是密码的最小长度，默认是8，我们把它改成6<br>输入：set global validate_password.length=6;<br>validate_password.policy 验证密码的复杂程度，我们把它改成0<br>输入：set global validate_password.policy=0;<br>validate_password.check_user_name 用户名检查，用户名和密码不能相同，我们也把它关掉<br>输入：set global validate_password.check_user_name=off;</p>
+</blockquote>
+</li>
+<li><p>重新设置想要密码</p>
+<blockquote>
+<p>ALTER USER ‘root‘@’localhost’ IDENTIFIED BY ‘XXXXXXX’ PASSWORD EXPIRE NEVER;</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="连接远程"><a href="#连接远程" class="headerlink" title="连接远程"></a>连接远程</h2><ol>
+<li><p>看下默认MySQL用户：</p>
+<blockquote>
+<p>输入：use mysql;</p>
+<p>输入：select host, user, authentication_string, plugin from user;</p>
+<p>查询结果有没有百分号root用户</p>
+</blockquote>
+</li>
+<li><p>没有百分号root用户 执行两面两句</p>
+</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">user</span> root@<span class="string">&#x27;%&#x27;</span> identified <span class="keyword">by</span> <span class="string">&#x27;123456&#x27;</span>; </span><br><span class="line"><span class="keyword">grant</span> <span class="keyword">all</span> privileges <span class="keyword">on</span> <span class="operator">*</span>.<span class="operator">*</span> <span class="keyword">to</span> root@<span class="string">&#x27;%&#x27;</span> <span class="keyword">with</span> <span class="keyword">grant</span> option;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>有百分号root用户 直接执行</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">grant</span> <span class="keyword">all</span> privileges <span class="keyword">on</span> <span class="operator">*</span>.<span class="operator">*</span> <span class="keyword">to</span> root@<span class="string">&#x27;%&#x27;</span> <span class="keyword">with</span> <span class="keyword">grant</span> option;</span><br></pre></td></tr></table></figure>
+
+<p>然后去 <strong>开放防火墙 3306端口</strong> 这个很重要  我是在腾讯云直接网页端配置了3306.也可以使用命令我就不找了emm</p>
+]]></content>
+      <categories>
+        <category>CentOS</category>
+      </categories>
+      <tags>
+        <tag>centos</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Tomcat基础</title>
     <url>/530cfffd.html</url>
     <content><![CDATA[<hr>
@@ -78,106 +181,6 @@
 <ul>
 <li>Session 有过期时间，因此 Tomcat 会开启后台线程定期轮询，如果 Session 过期就会将 Session 失效掉。</li>
 <li>使用长连接的 HTTP 协议，会在响应头加入 Connection:keep-alive</li>
-</ul>
-]]></content>
-      <categories>
-        <category>Tomcat</category>
-      </categories>
-      <tags>
-        <tag>tomcat</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Tomcat容器的设计</title>
-    <url>/210d100c.html</url>
-    <content><![CDATA[<hr>
-<ul>
-<li>容器的层次结构</li>
-<li>容器的管理</li>
-<li>定位Servlet的过程</li>
-<li>PipeLine-valve 管道</li>
-</ul>
-<span id="more"></span>
-
-<h1 id="Tomcat-容器的设计"><a href="#Tomcat-容器的设计" class="headerlink" title="Tomcat 容器的设计"></a>Tomcat 容器的设计</h1><h2 id="容器的层次结构"><a href="#容器的层次结构" class="headerlink" title="容器的层次结构"></a>容器的层次结构</h2><p>层级由高到低 1 - 4 展示如下</p>
-<ol>
-<li>Engine [ 表示引擎 ]  </li>
-<li>Host [ 表示一个虚拟主机/站点 ]</li>
-<li>Context  [ 表示一个 Web 应用程序 ]</li>
-<li>Wrapper [ 表示一个 Servlet ]<br>👆🏻<br>👇🏻</li>
-</ol>
-<ul>
-<li>一个 Web 应用程序可以有多个 Servlet</li>
-<li>一个虚拟机可以部署多个 Web 应用程序</li>
-<li>一个 Service 只能有一个 Engine</li>
-<li>一个 Server 可以有多个 Service</li>
-</ul>
-<p><img src="/210d100c/tu1.png" alt="tu1.png"></p>
-<p>⭐4 种容器不是平行关系，而是父子关系，而设计这么多容器的目的是通过分层架构，使 Servlet 容器更具灵活性</p>
-<h2 id="Tomcat-容器对容器的管理"><a href="#Tomcat-容器对容器的管理" class="headerlink" title="Tomcat 容器对容器的管理**"></a>Tomcat 容器对容器的管理**</h2><p>容器之间是父子关系，即树形结构，即 TomCat 可使用组合模式来进行管理的容器的</p>
-<p>具体组合模式的实现</p>
-<ul>
-<li>所有容器实现 Container 接口<blockquote>
-<p>用户对单容器对象和组合容器对象的使用具有一致性<br>单容器对象指的是最底层的 Wrapper，组合容器对象指的是上面的 Context、Host 或者 Engine</p>
-</blockquote>
-</li>
-</ul>
-<p>Container 接口定义如下：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Container</span> <span class="keyword">extends</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">getParent</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setParent</span><span class="params">(Container container)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addChild</span><span class="params">(Container child)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeChild</span><span class="params">(Container child)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">findChild</span><span class="params">(String name)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>⭐Container 接口 提供了对父容器，子容器的操作，同时扩展了 Lifecycle，而 Lifecycle 是用来统一管理各组件的生命周期</p>
-<h2 id="请求定位-Servlet-的过程"><a href="#请求定位-Servlet-的过程" class="headerlink" title="请求定位 Servlet 的过程"></a>请求定位 Servlet 的过程</h2><p>❓<strong>疑问点</strong></p>
-<blockquote>
-<p>Tomcat 是怎么确定请求是由哪个 Wrapper 容器里的 Servlet 来处理的？</p>
-</blockquote>
-<p>❗<strong>答案</strong></p>
-<blockquote>
-<p>Tomcat 是用 Mapper 组件来完成这个任务的。</p>
-<p>Mapper 组件的功能就是将用户请求的 URL 定位到一个 Servlet</p>
-</blockquote>
-<h3 id="Mapper-组件"><a href="#Mapper-组件" class="headerlink" title="Mapper 组件"></a>Mapper 组件</h3><p>Mapper 组件的工作原理</p>
-<ul>
-<li>Mapper 组件里保存了 Web 应用的配置信息 ( 容器组件与访问路径的映射关系 )</li>
-</ul>
-<p><strong>首先，根据协议和端口号选定 Service 和 Engine</strong></p>
-<blockquote>
-<p>Tomcat 的每个连接器都监听不同的端口，而连接器属于一个 Service 组件<br>Service 组件中包含了多个连接器和一个容器组件<br>一个容器组件具体体现就是 Engine 引擎<br>即Service 组件确认 等于 Engine 引擎确认</p>
-</blockquote>
-<p><strong>根据域名选定 Host</strong></p>
-<blockquote>
-<p>Mapper 组件通过 URL 中的域名去查找相应的 Host 容器</p>
-</blockquote>
-<p><strong>根据 URL 路径找到 Context 组件</strong></p>
-<blockquote>
-<p>Host 确定以后，Mapper 根据 URL 的路径来匹配相应的 Web 应用的路径</p>
-</blockquote>
-<p><strong>最后，根据 URL 路径找到 Wrapper（Servlet）</strong></p>
-<blockquote>
-<p>Context 确定后，Mapper 再根据web.xml中配置的 Servlet 映射路径来找到具体的 Wrapper 和 Servlet。</p>
-</blockquote>
-<h2 id="Pipeline-Valve-管道"><a href="#Pipeline-Valve-管道" class="headerlink" title="Pipeline-Valve 管道"></a>Pipeline-Valve 管道</h2><p>上述的 Mapper 组件是告诉我们怎么找到 Servlet，然后 Servlet 去做请求</p>
-<p>⭐<strong>而实际上这个查找路径上的父子容器都会对请求做一些处理，各容器处理事务遵循责任链模式</strong></p>
-<ul>
-<li>连接器中的 Adapter 会调用容器的 Service 方法来执行 Servlet</li>
-<li>最先拿到请求的是 Engine 容器，对请求做一些处理后，会把请求传给自己子容器 Host 继续处理，依次类推</li>
-<li>最后交由 Wrapper 容器，Wrapper 调用最终的 Servlet 来处理</li>
-</ul>
-<p>👐🏻<strong>Pipeline-Valve 是责任链模式</strong></p>
-<blockquote>
-<p>责任链模式是指在一个请求处理的过程中有很多处理者依次对请求进行处理，每个处理者负责做自己相应的处理，处理完之后将再调用下一个处理者继续处理。</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Valve</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getNext</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNext</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">invoke</span><span class="params">(Request request, Response response)</span></span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
-<p>Valve 是一个处理点 可以想象一下链表，invoke 就是处理，通过 getNext 和 setNext 组成一个链表</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Pipeline</span> <span class="keyword">extends</span> <span class="title">Contained</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addValve</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getBasic</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBasic</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getFirst</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Pipeline 中 维护了 Valve 链表，并且其中并没有 invoke 方法，这是因为实际出发还是在 Valve 中的 invoke中，Valve 完成自己的处理后，调用getNext.invoke来触发下一个 Valve 调用。</p>
-<hr>
-<p>但是上述显的 Pipeline 并没有发挥作用，Pipeline 每个容器都有一个，其中getFirst 和 getBasic 就是来串联 不同容器的，他们分别可以取得 Valve 的第一个节点和最后一个节点 如下图所示</p>
-<p><img src="/210d100c/tu2.png" alt="tu2.png"></p>
-<p>⭐整个调用过程由连接器中的 Adapter 触发的，它会调用 Engine 的第一个 Valve</p>
-<p>⭐Wrapper 容器的最后一个 Valve 会创建一个 Filter 链，并调用 doFilter 方法，最终会调到 Servlet 的 service 方法。</p>
-<h3 id="Valve-和-Filter"><a href="#Valve-和-Filter" class="headerlink" title="Valve 和 Filter"></a>Valve 和 Filter</h3><ul>
-<li>Valve 是 Tomcat 的私有机制，与 Tomcat 的基础架构 /API 是紧耦合的。Servlet API 是公有的标准，所有的 Web 容器包括 Jetty 都支持 Filter 机制。</li>
-<li> Valve 工作在 Web 容器级别，拦截所有应用的请求；而 Servlet Filter 工作在应用级别，只能拦截某个 Web 应用的所有请求。如果想做整个 Web 容器的拦截器，必须通过 Valve 来实现。</li>
 </ul>
 ]]></content>
       <categories>
@@ -280,6 +283,106 @@
 <li>Servlet 容器需要实例化 Filter 并把 Filter 链接成一个 FilterChain。</li>
 <li>请求进来，获取第一个 Filter 并调用 doFilter 方法，doFilter 方法负责调用这个 FilterChain 中的下一个 Filter。</li>
 </ol>
+]]></content>
+      <categories>
+        <category>Tomcat</category>
+      </categories>
+      <tags>
+        <tag>tomcat</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Tomcat容器的设计</title>
+    <url>/210d100c.html</url>
+    <content><![CDATA[<hr>
+<ul>
+<li>容器的层次结构</li>
+<li>容器的管理</li>
+<li>定位Servlet的过程</li>
+<li>PipeLine-valve 管道</li>
+</ul>
+<span id="more"></span>
+
+<h1 id="Tomcat-容器的设计"><a href="#Tomcat-容器的设计" class="headerlink" title="Tomcat 容器的设计"></a>Tomcat 容器的设计</h1><h2 id="容器的层次结构"><a href="#容器的层次结构" class="headerlink" title="容器的层次结构"></a>容器的层次结构</h2><p>层级由高到低 1 - 4 展示如下</p>
+<ol>
+<li>Engine [ 表示引擎 ]  </li>
+<li>Host [ 表示一个虚拟主机/站点 ]</li>
+<li>Context  [ 表示一个 Web 应用程序 ]</li>
+<li>Wrapper [ 表示一个 Servlet ]<br>👆🏻<br>👇🏻</li>
+</ol>
+<ul>
+<li>一个 Web 应用程序可以有多个 Servlet</li>
+<li>一个虚拟机可以部署多个 Web 应用程序</li>
+<li>一个 Service 只能有一个 Engine</li>
+<li>一个 Server 可以有多个 Service</li>
+</ul>
+<p><img src="/210d100c/tu1.png" alt="tu1.png"></p>
+<p>⭐4 种容器不是平行关系，而是父子关系，而设计这么多容器的目的是通过分层架构，使 Servlet 容器更具灵活性</p>
+<h2 id="Tomcat-容器对容器的管理"><a href="#Tomcat-容器对容器的管理" class="headerlink" title="Tomcat 容器对容器的管理**"></a>Tomcat 容器对容器的管理**</h2><p>容器之间是父子关系，即树形结构，即 TomCat 可使用组合模式来进行管理的容器的</p>
+<p>具体组合模式的实现</p>
+<ul>
+<li>所有容器实现 Container 接口<blockquote>
+<p>用户对单容器对象和组合容器对象的使用具有一致性<br>单容器对象指的是最底层的 Wrapper，组合容器对象指的是上面的 Context、Host 或者 Engine</p>
+</blockquote>
+</li>
+</ul>
+<p>Container 接口定义如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Container</span> <span class="keyword">extends</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">getParent</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setParent</span><span class="params">(Container container)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addChild</span><span class="params">(Container child)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeChild</span><span class="params">(Container child)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Container <span class="title">findChild</span><span class="params">(String name)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>⭐Container 接口 提供了对父容器，子容器的操作，同时扩展了 Lifecycle，而 Lifecycle 是用来统一管理各组件的生命周期</p>
+<h2 id="请求定位-Servlet-的过程"><a href="#请求定位-Servlet-的过程" class="headerlink" title="请求定位 Servlet 的过程"></a>请求定位 Servlet 的过程</h2><p>❓<strong>疑问点</strong></p>
+<blockquote>
+<p>Tomcat 是怎么确定请求是由哪个 Wrapper 容器里的 Servlet 来处理的？</p>
+</blockquote>
+<p>❗<strong>答案</strong></p>
+<blockquote>
+<p>Tomcat 是用 Mapper 组件来完成这个任务的。</p>
+<p>Mapper 组件的功能就是将用户请求的 URL 定位到一个 Servlet</p>
+</blockquote>
+<h3 id="Mapper-组件"><a href="#Mapper-组件" class="headerlink" title="Mapper 组件"></a>Mapper 组件</h3><p>Mapper 组件的工作原理</p>
+<ul>
+<li>Mapper 组件里保存了 Web 应用的配置信息 ( 容器组件与访问路径的映射关系 )</li>
+</ul>
+<p><strong>首先，根据协议和端口号选定 Service 和 Engine</strong></p>
+<blockquote>
+<p>Tomcat 的每个连接器都监听不同的端口，而连接器属于一个 Service 组件<br>Service 组件中包含了多个连接器和一个容器组件<br>一个容器组件具体体现就是 Engine 引擎<br>即Service 组件确认 等于 Engine 引擎确认</p>
+</blockquote>
+<p><strong>根据域名选定 Host</strong></p>
+<blockquote>
+<p>Mapper 组件通过 URL 中的域名去查找相应的 Host 容器</p>
+</blockquote>
+<p><strong>根据 URL 路径找到 Context 组件</strong></p>
+<blockquote>
+<p>Host 确定以后，Mapper 根据 URL 的路径来匹配相应的 Web 应用的路径</p>
+</blockquote>
+<p><strong>最后，根据 URL 路径找到 Wrapper（Servlet）</strong></p>
+<blockquote>
+<p>Context 确定后，Mapper 再根据web.xml中配置的 Servlet 映射路径来找到具体的 Wrapper 和 Servlet。</p>
+</blockquote>
+<h2 id="Pipeline-Valve-管道"><a href="#Pipeline-Valve-管道" class="headerlink" title="Pipeline-Valve 管道"></a>Pipeline-Valve 管道</h2><p>上述的 Mapper 组件是告诉我们怎么找到 Servlet，然后 Servlet 去做请求</p>
+<p>⭐<strong>而实际上这个查找路径上的父子容器都会对请求做一些处理，各容器处理事务遵循责任链模式</strong></p>
+<ul>
+<li>连接器中的 Adapter 会调用容器的 Service 方法来执行 Servlet</li>
+<li>最先拿到请求的是 Engine 容器，对请求做一些处理后，会把请求传给自己子容器 Host 继续处理，依次类推</li>
+<li>最后交由 Wrapper 容器，Wrapper 调用最终的 Servlet 来处理</li>
+</ul>
+<p>👐🏻<strong>Pipeline-Valve 是责任链模式</strong></p>
+<blockquote>
+<p>责任链模式是指在一个请求处理的过程中有很多处理者依次对请求进行处理，每个处理者负责做自己相应的处理，处理完之后将再调用下一个处理者继续处理。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Valve</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getNext</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNext</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">invoke</span><span class="params">(Request request, Response response)</span></span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>Valve 是一个处理点 可以想象一下链表，invoke 就是处理，通过 getNext 和 setNext 组成一个链表</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Pipeline</span> <span class="keyword">extends</span> <span class="title">Contained</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addValve</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getBasic</span><span class="params">()</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setBasic</span><span class="params">(Valve valve)</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> Valve <span class="title">getFirst</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Pipeline 中 维护了 Valve 链表，并且其中并没有 invoke 方法，这是因为实际出发还是在 Valve 中的 invoke中，Valve 完成自己的处理后，调用getNext.invoke来触发下一个 Valve 调用。</p>
+<hr>
+<p>但是上述显的 Pipeline 并没有发挥作用，Pipeline 每个容器都有一个，其中getFirst 和 getBasic 就是来串联 不同容器的，他们分别可以取得 Valve 的第一个节点和最后一个节点 如下图所示</p>
+<p><img src="/210d100c/tu2.png" alt="tu2.png"></p>
+<p>⭐整个调用过程由连接器中的 Adapter 触发的，它会调用 Engine 的第一个 Valve</p>
+<p>⭐Wrapper 容器的最后一个 Valve 会创建一个 Filter 链，并调用 doFilter 方法，最终会调到 Servlet 的 service 方法。</p>
+<h3 id="Valve-和-Filter"><a href="#Valve-和-Filter" class="headerlink" title="Valve 和 Filter"></a>Valve 和 Filter</h3><ul>
+<li>Valve 是 Tomcat 的私有机制，与 Tomcat 的基础架构 /API 是紧耦合的。Servlet API 是公有的标准，所有的 Web 容器包括 Jetty 都支持 Filter 机制。</li>
+<li> Valve 工作在 Web 容器级别，拦截所有应用的请求；而 Servlet Filter 工作在应用级别，只能拦截某个 Web 应用的所有请求。如果想做整个 Web 容器的拦截器，必须通过 Valve 来实现。</li>
+</ul>
 ]]></content>
       <categories>
         <category>Tomcat</category>
@@ -418,176 +521,6 @@
       </categories>
       <tags>
         <tag>tomcat</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>CentOSRedis安装</title>
-    <url>/2e20d1b4.html</url>
-    <content><![CDATA[<hr>
-<ul>
-<li>查看 Centos 版本</li>
-<li>添加EPEL仓库</li>
-<li>更新yum源</li>
-<li>安装redis</li>
-<li>修改配置</li>
-<li>连接redis</li>
-</ul>
-<span id="more"></span>
-
-<h3 id="查看-Centos-版本"><a href="#查看-Centos-版本" class="headerlink" title="查看 Centos 版本"></a>查看 Centos 版本</h3><hr>
-<blockquote>
-<p>cat /etc/redhat-release</p>
-</blockquote>
-<h3 id="添加EPEL仓库-自由开源的附加软件包仓库"><a href="#添加EPEL仓库-自由开源的附加软件包仓库" class="headerlink" title="添加EPEL仓库 (自由开源的附加软件包仓库)"></a>添加EPEL仓库 (自由开源的附加软件包仓库)</h3><hr>
-<blockquote>
-<p>sudo yum install epel-release</p>
-</blockquote>
-<h3 id="更新yum源"><a href="#更新yum源" class="headerlink" title="更新yum源"></a>更新yum源</h3><hr>
-<blockquote>
-<p>sudo yum update</p>
-</blockquote>
-<h3 id="安装-redis"><a href="#安装-redis" class="headerlink" title="安装 redis"></a>安装 redis</h3><hr>
-<blockquote>
-<p>yum install redis</p>
-</blockquote>
-<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><hr>
-<blockquote>
-<p>systemctl start redis</p>
-</blockquote>
-<h3 id="设置开机自启"><a href="#设置开机自启" class="headerlink" title="设置开机自启"></a>设置开机自启</h3><hr>
-<blockquote>
-<p>systemctl enable redis</p>
-</blockquote>
-<h3 id="查看是否启动"><a href="#查看是否启动" class="headerlink" title="查看是否启动"></a>查看是否启动</h3><hr>
-<blockquote>
-<p>sudo systemctl status redis</p>
-</blockquote>
-<p>⭐ 到这里位置服务端的 redis 已经启动好了。接下来需要配置的是远程连接。</p>
-<h3 id="修改配置"><a href="#修改配置" class="headerlink" title="修改配置"></a>修改配置</h3><hr>
-<blockquote>
-<ol>
-<li>vim /etc/redis.conf</li>
-<li>注释掉 bind 127.0.0.1 启用远程连接</li>
-<li>解开注释 # requirepass foobared 将 foodared 替换成自己的密码 启用密码</li>
-</ol>
-</blockquote>
-<h3 id="开放端口"><a href="#开放端口" class="headerlink" title="开放端口"></a>开放端口</h3><hr>
-<p>可以通过对应平台的防火墙进行设置<br><img src="/2e20d1b4/tu1.png" alt="tu1.png"></p>
-<p>可以通过命令设置防火墙</p>
-<ul>
-<li>sudo firewall-cmd –add-port=6379/tcp –permanent </li>
-<li>sudo firewall-cmd –reload </li>
-</ul>
-<h3 id="重启-redis"><a href="#重启-redis" class="headerlink" title="重启 redis"></a>重启 redis</h3><blockquote>
-<p>systemctl restart redis</p>
-</blockquote>
-<h3 id="连接成功"><a href="#连接成功" class="headerlink" title="连接成功"></a>连接成功</h3><hr>
-<p><img src="/2e20d1b4/tu2.png" alt="tu2.png"></p>
-]]></content>
-      <categories>
-        <category>CentOS</category>
-      </categories>
-      <tags>
-        <tag>centos</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MySql基础(一)</title>
-    <url>/183e61db.html</url>
-    <content><![CDATA[<hr>
-<ul>
-<li>mysql 的默认引擎</li>
-<li>mysql的知识点</li>
-</ul>
-<span id="more"></span>
-
-
-
-<h1 id="基础结构"><a href="#基础结构" class="headerlink" title="基础结构"></a>基础结构</h1><h2 id="功能模块划"><a href="#功能模块划" class="headerlink" title="功能模块划"></a>功能模块划</h2><p><strong>Server层</strong></p>
-<ul>
-<li>连接器（管理接连，权限验证）</li>
-<li>查询缓存</li>
-<li>分析器（词法分析，语法分析）</li>
-<li>优化器（执行计划生成，索引选择）</li>
-<li>执行器（操作引擎，返回结果）</li>
-<li>存储过程，触发器，视图等等。</li>
-</ul>
-<p><strong>存储引擎层</strong></p>
-<ul>
-<li>数据的存储和提取。</li>
-</ul>
-<h2 id="mysql-的默认引擎"><a href="#mysql-的默认引擎" class="headerlink" title="mysql 的默认引擎"></a>mysql 的默认引擎</h2><blockquote>
-<p>MySQL 默认存储引擎是 InnoDB ，创建表的时候，如不指定引擎类型，默认InnoDB</p>
-</blockquote>
-<h2 id="mysql的小知识点"><a href="#mysql的小知识点" class="headerlink" title="mysql的小知识点"></a>mysql的小知识点</h2><h3 id="连接器"><a href="#连接器" class="headerlink" title="连接器"></a>连接器</h3><ol>
-<li>连接器负责对客户端建立链接，获取权限，维持和管理连接<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">mysql <span class="operator">-</span>h ip <span class="operator">-</span>P port <span class="operator">-</span>u <span class="keyword">user</span> <span class="operator">-</span>p</span><br></pre></td></tr></table></figure></li>
-<li>账户密&amp;码正确，连接器查询权限获得权限，自此，断开连接之前都是该权限。</li>
-</ol>
-<p><strong>完成连接后的小知识点</strong></p>
-<ul>
-<li>连接完成后，没有动作，即 sleep 处于空闲状态。可以使用 show processlist 查看</li>
-<li>默认断开时间 8 小时 由 wait_timeout 控制，当断开后继续执行，抛出错误信息 lost connection 需要重新连接。</li>
-<li>长连接：客户持续有请求，则一直使用同一个连接</li>
-<li>短连接：每次执行完很少几次查询就会断开，下次查询重新建立</li>
-<li>减少建立连接，尽量使用长连接。</li>
-</ul>
-<p><strong>若都是长连接，MySQL 占用内存涨的很快，因为 MySQL 执行过程中临时使用的内存管理在连接对象里面，要在断开连接时才会释放。长期积累 可能会 OOM MySQL 异常重启。</strong></p>
-<ul>
-<li>定期断开长连接。</li>
-<li>使用mysql_reset_connection来重新初始化连接资源</li>
-</ul>
-<h3 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h3><ol>
-<li>MySQL建立连接后，执行sql</li>
-<li>执行前，判断之前是否执行过</li>
-<li>执行过，通过sql(key)直接返回数据（value）</li>
-<li>没有执行过，查询出结果，并放到缓存中</li>
-<li>多命中缓存，效率高</li>
-</ol>
-<p><strong>大多数情况不建议使用查询缓存，因为可能弊大于利</strong></p>
-<ol>
-<li>缓存需要语句完全相等，包括参数。</li>
-<li>表更新后就会失效 因此，只有在表更新频率不高，查询语句完全一致的情况下，可以手动开启缓存，其他一律关闭。 </li>
-</ol>
-<p><strong>注意：mysql8之后，取消了缓存功能。</strong></p>
-<p>可以使用 <em><strong>query_cache_type</strong></em> 设置成 <em><strong>DEMAND</strong></em> 来进行按需缓存 通过 SQL_CACHE 显示执行。</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> SQL_CACHE <span class="operator">*</span> <span class="keyword">from</span> T <span class="keyword">where</span> ID<span class="operator">=</span><span class="number">10</span>；</span><br></pre></td></tr></table></figure>
-<p><strong>可是使用 show variables 来查看服务器配置信息。</strong></p>
-<h3 id="分析器"><a href="#分析器" class="headerlink" title="分析器"></a>分析器</h3><ol>
-<li>未命中缓存，进入分析器，进行查询。</li>
-<li>分析器首先做词法分析，它要知道这个语句中的单词是什么意思</li>
-<li>分析器再进行语法分析，词法分析结果，语法分析器根据语法规则判断 SQL 语句是否满足 SQL 语法</li>
-<li>表名和列名在分析语法时就已经确定过了</li>
-</ol>
-<p><strong>tips:</strong> You have an error in your SQL syntax  关注 use near 的解析</p>
-<p><strong>分析器干两件事：</strong></p>
-<ol>
-<li>解析语句，生成解析树 </li>
-<li>检查语句中的关键词，表，字段是否存在</li>
-</ol>
-<h3 id="优化器"><a href="#优化器" class="headerlink" title="优化器"></a>优化器</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t1 <span class="keyword">join</span> t2 <span class="keyword">using</span>(ID)  <span class="keyword">where</span> t1.c<span class="operator">=</span><span class="number">10</span> <span class="keyword">and</span> t2.d<span class="operator">=</span><span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-<p>既可以先从表 t1 里面取出 c=10 的记录的 ID 值，再根据 ID 值关联到表 t2，再判断 t2 里面 d 的值是否等于 20。</p>
-<p>也可以先从表 t2 里面取出 d=20 的记录的 ID 值，再根据 ID 值关联到 t1，再判断 t1 里面 c 的值是否等于 10。<br><strong>区别:</strong></p>
-<ol>
-<li>执行效率不同</li>
-<li>尽可能扫描少的数据库行纪录</li>
-</ol>
-<p><em><strong>优化器是在表里面有多个索引的时候，决定使用哪个索引；</strong></em></p>
-<h3 id="执行器"><a href="#执行器" class="headerlink" title="执行器"></a>执行器</h3><ul>
-<li><p>判断是否对 表 T 有执行查询的权限</p>
-</li>
-<li><p>权限验证不仅再执行器这里，再分析器知道要做什么之后，也会做一次权限校验叫precheck</p>
-</li>
-<li><p>precheck 无法对运行时涉及到的表进行权限验证所以再执行器这里还需要验证。</p>
-</li>
-<li><p>判断拥有权限后，根据表定义的引擎，使用执行器使用对应引擎提供的接口。</p>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>MySql</category>
-      </categories>
-      <tags>
-        <tag>mysql</tag>
       </tags>
   </entry>
   <entry>
@@ -1050,6 +983,176 @@
       </categories>
       <tags>
         <tag>redis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CentOSRedis安装</title>
+    <url>/2e20d1b4.html</url>
+    <content><![CDATA[<hr>
+<ul>
+<li>查看 Centos 版本</li>
+<li>添加EPEL仓库</li>
+<li>更新yum源</li>
+<li>安装redis</li>
+<li>修改配置</li>
+<li>连接redis</li>
+</ul>
+<span id="more"></span>
+
+<h3 id="查看-Centos-版本"><a href="#查看-Centos-版本" class="headerlink" title="查看 Centos 版本"></a>查看 Centos 版本</h3><hr>
+<blockquote>
+<p>cat /etc/redhat-release</p>
+</blockquote>
+<h3 id="添加EPEL仓库-自由开源的附加软件包仓库"><a href="#添加EPEL仓库-自由开源的附加软件包仓库" class="headerlink" title="添加EPEL仓库 (自由开源的附加软件包仓库)"></a>添加EPEL仓库 (自由开源的附加软件包仓库)</h3><hr>
+<blockquote>
+<p>sudo yum install epel-release</p>
+</blockquote>
+<h3 id="更新yum源"><a href="#更新yum源" class="headerlink" title="更新yum源"></a>更新yum源</h3><hr>
+<blockquote>
+<p>sudo yum update</p>
+</blockquote>
+<h3 id="安装-redis"><a href="#安装-redis" class="headerlink" title="安装 redis"></a>安装 redis</h3><hr>
+<blockquote>
+<p>yum install redis</p>
+</blockquote>
+<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><hr>
+<blockquote>
+<p>systemctl start redis</p>
+</blockquote>
+<h3 id="设置开机自启"><a href="#设置开机自启" class="headerlink" title="设置开机自启"></a>设置开机自启</h3><hr>
+<blockquote>
+<p>systemctl enable redis</p>
+</blockquote>
+<h3 id="查看是否启动"><a href="#查看是否启动" class="headerlink" title="查看是否启动"></a>查看是否启动</h3><hr>
+<blockquote>
+<p>sudo systemctl status redis</p>
+</blockquote>
+<p>⭐ 到这里位置服务端的 redis 已经启动好了。接下来需要配置的是远程连接。</p>
+<h3 id="修改配置"><a href="#修改配置" class="headerlink" title="修改配置"></a>修改配置</h3><hr>
+<blockquote>
+<ol>
+<li>vim /etc/redis.conf</li>
+<li>注释掉 bind 127.0.0.1 启用远程连接</li>
+<li>解开注释 # requirepass foobared 将 foodared 替换成自己的密码 启用密码</li>
+</ol>
+</blockquote>
+<h3 id="开放端口"><a href="#开放端口" class="headerlink" title="开放端口"></a>开放端口</h3><hr>
+<p>可以通过对应平台的防火墙进行设置<br><img src="/2e20d1b4/tu1.png" alt="tu1.png"></p>
+<p>可以通过命令设置防火墙</p>
+<ul>
+<li>sudo firewall-cmd –add-port=6379/tcp –permanent </li>
+<li>sudo firewall-cmd –reload </li>
+</ul>
+<h3 id="重启-redis"><a href="#重启-redis" class="headerlink" title="重启 redis"></a>重启 redis</h3><blockquote>
+<p>systemctl restart redis</p>
+</blockquote>
+<h3 id="连接成功"><a href="#连接成功" class="headerlink" title="连接成功"></a>连接成功</h3><hr>
+<p><img src="/2e20d1b4/tu2.png" alt="tu2.png"></p>
+]]></content>
+      <categories>
+        <category>CentOS</category>
+      </categories>
+      <tags>
+        <tag>centos</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MySql基础(一)</title>
+    <url>/183e61db.html</url>
+    <content><![CDATA[<hr>
+<ul>
+<li>mysql 的默认引擎</li>
+<li>mysql的知识点</li>
+</ul>
+<span id="more"></span>
+
+
+
+<h1 id="基础结构"><a href="#基础结构" class="headerlink" title="基础结构"></a>基础结构</h1><h2 id="功能模块划"><a href="#功能模块划" class="headerlink" title="功能模块划"></a>功能模块划</h2><p><strong>Server层</strong></p>
+<ul>
+<li>连接器（管理接连，权限验证）</li>
+<li>查询缓存</li>
+<li>分析器（词法分析，语法分析）</li>
+<li>优化器（执行计划生成，索引选择）</li>
+<li>执行器（操作引擎，返回结果）</li>
+<li>存储过程，触发器，视图等等。</li>
+</ul>
+<p><strong>存储引擎层</strong></p>
+<ul>
+<li>数据的存储和提取。</li>
+</ul>
+<h2 id="mysql-的默认引擎"><a href="#mysql-的默认引擎" class="headerlink" title="mysql 的默认引擎"></a>mysql 的默认引擎</h2><blockquote>
+<p>MySQL 默认存储引擎是 InnoDB ，创建表的时候，如不指定引擎类型，默认InnoDB</p>
+</blockquote>
+<h2 id="mysql的小知识点"><a href="#mysql的小知识点" class="headerlink" title="mysql的小知识点"></a>mysql的小知识点</h2><h3 id="连接器"><a href="#连接器" class="headerlink" title="连接器"></a>连接器</h3><ol>
+<li>连接器负责对客户端建立链接，获取权限，维持和管理连接<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">mysql <span class="operator">-</span>h ip <span class="operator">-</span>P port <span class="operator">-</span>u <span class="keyword">user</span> <span class="operator">-</span>p</span><br></pre></td></tr></table></figure></li>
+<li>账户密&amp;码正确，连接器查询权限获得权限，自此，断开连接之前都是该权限。</li>
+</ol>
+<p><strong>完成连接后的小知识点</strong></p>
+<ul>
+<li>连接完成后，没有动作，即 sleep 处于空闲状态。可以使用 show processlist 查看</li>
+<li>默认断开时间 8 小时 由 wait_timeout 控制，当断开后继续执行，抛出错误信息 lost connection 需要重新连接。</li>
+<li>长连接：客户持续有请求，则一直使用同一个连接</li>
+<li>短连接：每次执行完很少几次查询就会断开，下次查询重新建立</li>
+<li>减少建立连接，尽量使用长连接。</li>
+</ul>
+<p><strong>若都是长连接，MySQL 占用内存涨的很快，因为 MySQL 执行过程中临时使用的内存管理在连接对象里面，要在断开连接时才会释放。长期积累 可能会 OOM MySQL 异常重启。</strong></p>
+<ul>
+<li>定期断开长连接。</li>
+<li>使用mysql_reset_connection来重新初始化连接资源</li>
+</ul>
+<h3 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h3><ol>
+<li>MySQL建立连接后，执行sql</li>
+<li>执行前，判断之前是否执行过</li>
+<li>执行过，通过sql(key)直接返回数据（value）</li>
+<li>没有执行过，查询出结果，并放到缓存中</li>
+<li>多命中缓存，效率高</li>
+</ol>
+<p><strong>大多数情况不建议使用查询缓存，因为可能弊大于利</strong></p>
+<ol>
+<li>缓存需要语句完全相等，包括参数。</li>
+<li>表更新后就会失效 因此，只有在表更新频率不高，查询语句完全一致的情况下，可以手动开启缓存，其他一律关闭。 </li>
+</ol>
+<p><strong>注意：mysql8之后，取消了缓存功能。</strong></p>
+<p>可以使用 <em><strong>query_cache_type</strong></em> 设置成 <em><strong>DEMAND</strong></em> 来进行按需缓存 通过 SQL_CACHE 显示执行。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> SQL_CACHE <span class="operator">*</span> <span class="keyword">from</span> T <span class="keyword">where</span> ID<span class="operator">=</span><span class="number">10</span>；</span><br></pre></td></tr></table></figure>
+<p><strong>可是使用 show variables 来查看服务器配置信息。</strong></p>
+<h3 id="分析器"><a href="#分析器" class="headerlink" title="分析器"></a>分析器</h3><ol>
+<li>未命中缓存，进入分析器，进行查询。</li>
+<li>分析器首先做词法分析，它要知道这个语句中的单词是什么意思</li>
+<li>分析器再进行语法分析，词法分析结果，语法分析器根据语法规则判断 SQL 语句是否满足 SQL 语法</li>
+<li>表名和列名在分析语法时就已经确定过了</li>
+</ol>
+<p><strong>tips:</strong> You have an error in your SQL syntax  关注 use near 的解析</p>
+<p><strong>分析器干两件事：</strong></p>
+<ol>
+<li>解析语句，生成解析树 </li>
+<li>检查语句中的关键词，表，字段是否存在</li>
+</ol>
+<h3 id="优化器"><a href="#优化器" class="headerlink" title="优化器"></a>优化器</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> t1 <span class="keyword">join</span> t2 <span class="keyword">using</span>(ID)  <span class="keyword">where</span> t1.c<span class="operator">=</span><span class="number">10</span> <span class="keyword">and</span> t2.d<span class="operator">=</span><span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+<p>既可以先从表 t1 里面取出 c=10 的记录的 ID 值，再根据 ID 值关联到表 t2，再判断 t2 里面 d 的值是否等于 20。</p>
+<p>也可以先从表 t2 里面取出 d=20 的记录的 ID 值，再根据 ID 值关联到 t1，再判断 t1 里面 c 的值是否等于 10。<br><strong>区别:</strong></p>
+<ol>
+<li>执行效率不同</li>
+<li>尽可能扫描少的数据库行纪录</li>
+</ol>
+<p><em><strong>优化器是在表里面有多个索引的时候，决定使用哪个索引；</strong></em></p>
+<h3 id="执行器"><a href="#执行器" class="headerlink" title="执行器"></a>执行器</h3><ul>
+<li><p>判断是否对 表 T 有执行查询的权限</p>
+</li>
+<li><p>权限验证不仅再执行器这里，再分析器知道要做什么之后，也会做一次权限校验叫precheck</p>
+</li>
+<li><p>precheck 无法对运行时涉及到的表进行权限验证所以再执行器这里还需要验证。</p>
+</li>
+<li><p>判断拥有权限后，根据表定义的引擎，使用执行器使用对应引擎提供的接口。</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>MySql</category>
+      </categories>
+      <tags>
+        <tag>mysql</tag>
       </tags>
   </entry>
   <entry>
